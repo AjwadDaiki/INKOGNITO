@@ -54,8 +54,8 @@ export const DRAWING_COLORS = [
 export const DEFAULT_SETTINGS = {
   mode: "classic",
   drawingSeconds: 45,
-  discussionSeconds: 40,
-  voteSeconds: 30,
+  discussionSeconds: 25,
+  voteSeconds: 20,
   gallerySeconds: 12,
   resolutionSeconds: 10,
   rounds: 3,

@@ -467,6 +467,9 @@ export class RoomManager {
     }
     const { room, player } = located;
     const round = room.round!;
+    if (payload.targetPlayerId === player.id) {
+      return;
+    }
     round.pointers[player.id] = payload.targetPlayerId;
     if (payload.targetPlayerId) {
       const target = room.players.find((entry) => entry.id === payload.targetPlayerId);
@@ -475,6 +478,14 @@ export class RoomManager {
       }
     }
     this.touch(player);
+    const everyonePointed = room.players
+      .filter((entry) => entry.connected)
+      .every((entry) => round.pointers[entry.id]);
+    if (everyonePointed) {
+      room.systemNotice = "Tout le monde a choisi un suspect.";
+      this.setPhase(room, "vote", room.settings.voteSeconds * 1000);
+      return;
+    }
     this.emitRoomState(room);
   }
 

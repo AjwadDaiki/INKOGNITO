@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import clsx from "clsx";
 import { DRAWING_PREVIEW_SIZE, DRAWING_SIZE } from "@shared/constants";
 import type { DrawingStroke } from "@shared/protocol";
 import { renderStrokeCanvas } from "@/lib/canvas";
 
-export function MiniDrawingCanvas({
+function MiniDrawingCanvasComponent({
   strokes,
   previewStroke,
   size = DRAWING_PREVIEW_SIZE,
@@ -30,10 +30,12 @@ export function MiniDrawingCanvas({
     <canvas
       ref={ref}
       className={clsx(
-        "aspect-square w-full rounded-[24px] border border-white/10 bg-white shadow-inner",
+        "aspect-square w-full rounded-[20px] border border-white/10 bg-white shadow-inner",
         className
       )}
       aria-label="Apercu du dessin"
     />
   );
 }
+
+export const MiniDrawingCanvas = memo(MiniDrawingCanvasComponent);

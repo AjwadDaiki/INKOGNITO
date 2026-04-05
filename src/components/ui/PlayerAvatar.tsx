@@ -17,18 +17,21 @@ function shapeClass(shape: PlayerView["profile"]["shape"]) {
 export function PlayerAvatar({
   player,
   highlighted = false,
-  badge
+  badge,
+  compact = false
 }: {
   player: PlayerView;
   highlighted?: boolean;
   badge?: string | null;
+  compact?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className={clsx("flex min-w-0 items-center", compact ? "gap-2" : "gap-3")}>
       <div className="relative">
         <div
           className={clsx(
-            "flex h-14 w-14 items-center justify-center border border-white/10 bg-white/5 text-2xl shadow-lg transition",
+            "flex items-center justify-center border border-white/10 bg-white/5 shadow-lg transition",
+            compact ? "h-10 w-10 text-lg" : "h-14 w-14 text-2xl",
             shapeClass(player.profile.shape),
             highlighted && "scale-105 ring-2 ring-neon-cyan/60"
           )}
@@ -42,15 +45,24 @@ export function PlayerAvatar({
           </span>
         </div>
         {badge ? (
-          <span className="absolute -bottom-1 -right-1 rounded-full border border-white/10 bg-ink-900 px-2 py-0.5 text-[10px] font-semibold text-white">
+          <span
+            className={clsx(
+              "absolute rounded-full border border-white/10 bg-ink-900 font-semibold text-white",
+              compact
+                ? "-bottom-1 -right-1 px-1.5 py-0.5 text-[9px]"
+                : "-bottom-1 -right-1 px-2 py-0.5 text-[10px]"
+            )}
+          >
             {badge}
           </span>
         ) : null}
       </div>
       <div className="min-w-0">
-        <div className="truncate text-sm font-semibold text-white">{player.profile.name}</div>
-        <div className="text-xs text-ink-300">
-          {player.connected ? "Connecté" : "Déconnecté"} · {player.points} pts
+        <div className={clsx("truncate font-semibold text-white", compact ? "text-xs" : "text-sm")}>
+          {player.profile.name}
+        </div>
+        <div className={clsx("text-ink-300", compact ? "text-[11px]" : "text-xs")}>
+          {player.connected ? "Connecte" : "Deco"} · {player.points} pts
         </div>
       </div>
     </div>

@@ -106,9 +106,11 @@ export default function App() {
 
       <div className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
         <div className="pointer-events-auto flex flex-col items-center gap-2">
-          <div className="rounded-full border border-white/10 bg-black/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-ink-300 backdrop-blur">
-            {socketConnected ? "Temps réel connecté" : "Reconnexion..."}
-          </div>
+          {!socketConnected || !room ? (
+            <div className="rounded-full border border-white/10 bg-black/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-ink-300 backdrop-blur">
+              {socketConnected ? "Temps reel connecte" : "Reconnexion..."}
+            </div>
+          ) : null}
           {error ? (
             <div className="flex items-center gap-3 rounded-2xl border border-neon-rose/25 bg-neon-rose/10 px-4 py-3 text-sm text-rose-100 shadow-rose">
               <span>{error}</span>

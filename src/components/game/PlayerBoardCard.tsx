@@ -1,3 +1,4 @@
+import { memo } from "react";
 import clsx from "clsx";
 import type {
   DrawingStroke,
@@ -13,30 +14,23 @@ import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 function roleLabel(role: PlayerRole | null | undefined) {
   if (role === "undercover") return "UNDERCOVER";
-  if (role === "mr_white") return "MR. WHITE";
+  if (role === "mr_white") return "MR.WHITE";
   if (role === "civil") return "CIVIL";
   return null;
 }
 
-function chipClassName(tone: "neutral" | "accent" | "danger" | "success" = "neutral") {
-  if (tone === "accent") {
-    return "border-neon-cyan/30 bg-neon-cyan/10 text-neon-cyan";
-  }
-  if (tone === "danger") {
-    return "border-neon-rose/30 bg-neon-rose/10 text-rose-100";
-  }
-  if (tone === "success") {
-    return "border-neon-green/30 bg-neon-green/10 text-neon-green";
-  }
+function chipClasses(tone: "neutral" | "accent" | "danger" | "success" = "neutral") {
+  if (tone === "accent") return "border-neon-cyan/35 bg-neon-cyan/10 text-neon-cyan";
+  if (tone === "danger") return "border-neon-rose/35 bg-neon-rose/10 text-rose-100";
+  if (tone === "success") return "border-neon-green/35 bg-neon-green/10 text-neon-green";
   return "border-white/10 bg-white/5 text-ink-200";
 }
 
-export function PlayerBoardCard({
+function PlayerBoardCardComponent({
   phase,
   player,
   strokes,
   previewStroke,
-  reactionCounts,
   previewSize,
   isSelf,
   isSuspect,
@@ -45,6 +39,7 @@ export function PlayerBoardCard({
   selectedVoteTargetId,
   revealedRole,
   pointsAwarded,
+  reactionCounts,
   onReact,
   onPointFinger,
   onVote
@@ -53,7 +48,6 @@ export function PlayerBoardCard({
   player: PlayerView;
   strokes: DrawingStroke[];
   previewStroke?: DrawingStroke | null;
-  reactionCounts: Array<[ReactionEmoji, number]>;
   previewSize: number;
   isSelf: boolean;
   isSuspect: boolean;
@@ -62,6 +56,7 @@ export function PlayerBoardCard({
   selectedVoteTargetId: string | null;
   revealedRole?: PlayerRole | null;
   pointsAwarded?: number;
+  reactionCounts: Array<[ReactionEmoji, number]>;
   onReact: (targetPlayerId: string, emoji: ReactionEmoji) => void;
   onPointFinger: (targetPlayerId: string | null) => void;
   onVote: (targetPlayerId: string | null) => void;
@@ -69,11 +64,11 @@ export function PlayerBoardCard({
   const canVote = phase === "vote" && !isSelf;
   const isVoteSelected = selectedVoteTargetId === player.id;
   const isPointedBySelf = selfPointerTargetId === player.id;
-  const liveLabel = phase === "drawing" && previewStroke ? "live" : null;
+  const liveLabel = phase === "drawing" && previewStroke ? "LIVE" : null;
   const revealedRoleLabel = roleLabel(revealedRole);
+  const showControls = phase === "gallery" || phase === "discussion";
   const Container = canVote ? "button" : "article";
-  const showReactionSummary =
-    reactionCounts.length > 0 || phase === "gallery" || phase === "discussion" || phase === "resolution";
+  const topReaction = reactionCounts[0];
 
   return (
     <Container
@@ -84,23 +79,31 @@ export function PlayerBoardCard({
           }
         : {})}
       className={clsx(
-        "rounded-[28px] border p-4 text-left transition",
+        "flex h-full min-h-0 flex-col rounded-[22px] border p-2.5 text-left transition duration-200",
         isVoteSelected && "border-neon-cyan/45 bg-neon-cyan/10 shadow-cyan",
         isSuspect && "border-neon-rose/35 bg-neon-rose/10 shadow-rose",
+        revealedRole === "undercover" && "border-neon-rose/35 bg-neon-rose/10",
+        revealedRole === "mr_white" && "border-amber-300/35 bg-amber-300/10",
         !isVoteSelected &&
           !isSuspect &&
+          !revealedRole &&
           "border-white/10 bg-white/[0.035] hover:border-white/20 hover:bg-white/[0.055]",
         canVote && "cursor-pointer"
       )}
     >
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <PlayerAvatar player={player} highlighted={isSuspect || isVoteSelected} badge={isSelf ? "toi" : null} />
-        <div className="flex flex-wrap justify-end gap-2">
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <PlayerAvatar
+          player={player}
+          highlighted={isSuspect || isVoteSelected}
+          badge={isSelf ? "toi" : null}
+          compact
+        />
+        <div className="flex flex-wrap justify-end gap-1">
           {liveLabel ? (
             <span
               className={clsx(
-                "rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] animate-pulse-soft",
-                chipClassName("accent")
+                "rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] animate-pulse-soft",
+                chipClasses("accent")
               )}
             >
               {liveLabel}
@@ -109,30 +112,20 @@ export function PlayerBoardCard({
           {accuseCount > 0 && phase === "discussion" ? (
             <span
               className={clsx(
-                "rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]",
-                chipClassName("danger")
+                "rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em]",
+                chipClasses("danger")
               )}
             >
-              {accuseCount} vise
-            </span>
-          ) : null}
-          {isVoteSelected ? (
-            <span
-              className={clsx(
-                "rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]",
-                chipClassName("accent")
-              )}
-            >
-              ton vote
+              {accuseCount}
             </span>
           ) : null}
           {revealedRoleLabel ? (
             <span
               className={clsx(
-                "rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]",
+                "rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em]",
                 revealedRole === "civil"
-                  ? chipClassName("success")
-                  : chipClassName("danger")
+                  ? chipClasses("success")
+                  : chipClasses("danger")
               )}
             >
               {revealedRoleLabel}
@@ -141,73 +134,58 @@ export function PlayerBoardCard({
         </div>
       </div>
 
-      <MiniDrawingCanvas
-        strokes={strokes}
-        previewStroke={phase === "drawing" ? previewStroke : null}
-        size={previewSize}
-        className="rounded-[24px] bg-white"
-      />
+      <div className="min-h-0 flex-1">
+        <MiniDrawingCanvas
+          strokes={strokes}
+          previewStroke={phase === "drawing" ? previewStroke : null}
+          size={previewSize}
+          className="rounded-[18px] bg-white"
+        />
+      </div>
 
-      {showReactionSummary && reactionCounts.length > 0 ? (
-        <div className="mt-3 flex flex-wrap gap-2 text-xs text-ink-200">
-          {reactionCounts.map(([emoji, count]) => (
-            <span key={emoji} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1">
-              {emoji} x{count}
-            </span>
-          ))}
+      <div className="mt-2 flex min-h-[20px] items-center justify-between gap-2 text-[11px]">
+        <div className="truncate text-ink-300">
+          {topReaction ? `${topReaction[0]} x${topReaction[1]}` : phase === "vote" ? "Choisis ta cible" : ""}
         </div>
-      ) : showReactionSummary ? (
-        <div className="mt-3 text-xs text-ink-300">Pas encore de reaction.</div>
-      ) : null}
+        {phase === "resolution" ? (
+          <span
+            className={clsx(
+              "rounded-full border px-2 py-0.5 font-semibold uppercase tracking-[0.18em]",
+              chipClasses(pointsAwarded && pointsAwarded > 0 ? "success" : "neutral")
+            )}
+          >
+            +{pointsAwarded ?? 0}
+          </span>
+        ) : isVoteSelected ? (
+          <span className={clsx("rounded-full border px-2 py-0.5 font-semibold", chipClasses("accent"))}>
+            vote
+          </span>
+        ) : null}
+      </div>
 
-      {phase === "gallery" || phase === "discussion" ? (
-        <div className="mt-4 space-y-3">
-          <div className="rounded-[20px] border border-white/10 bg-white/[0.03] p-3">
+      {showControls ? (
+        <div className="mt-2 space-y-2">
+          <div className="rounded-[18px] border border-white/10 bg-white/[0.03] p-2">
             <EmojiReactionBar onReact={(emoji) => onReact(player.id, emoji)} />
           </div>
           {phase === "discussion" && !isSelf ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <Button tone={isPointedBySelf ? "primary" : "secondary"} onClick={() => onPointFinger(player.id)}>
-                {isPointedBySelf ? "Tu l'accuses" : "Accuser"}
+                {isPointedBySelf ? "Vise" : "Accuser"}
               </Button>
               {isPointedBySelf ? (
                 <Button tone="ghost" onClick={() => onPointFinger(null)}>
                   Retirer
                 </Button>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {phase === "vote" ? (
-        <div className="mt-4 text-sm text-ink-300">
-          {isSelf ? "Tu ne peux pas te voter." : "Clique sur cette carte pour voter."}
-        </div>
-      ) : null}
-
-      {phase === "resolution" ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          <span
-            className={clsx(
-              "rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em]",
-              chipClassName(pointsAwarded && pointsAwarded > 0 ? "success" : "neutral")
-            )}
-          >
-            +{pointsAwarded ?? 0} pts
-          </span>
-          {isSuspect ? (
-            <span
-              className={clsx(
-                "rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em]",
-                chipClassName("danger")
+              ) : (
+                <div />
               )}
-            >
-              suspect
-            </span>
+            </div>
           ) : null}
         </div>
       ) : null}
     </Container>
   );
 }
+
+export const PlayerBoardCard = memo(PlayerBoardCardComponent);

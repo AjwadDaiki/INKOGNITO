@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { MIN_PLAYERS } from "@shared/constants";
 import type { PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
 import { ChatPanel } from "@/components/ui/ChatPanel";
@@ -36,7 +37,8 @@ export function LobbyScreen({
     () => connectedPlayers.filter((player) => player.ready).length,
     [connectedPlayers]
   );
-  const canLaunch = isHost && connectedPlayers.length >= 4 && readyCount >= 4;
+  const canLaunch =
+    isHost && connectedPlayers.length >= MIN_PLAYERS && readyCount >= MIN_PLAYERS;
   const [civilWord, setCivilWord] = useState("");
   const [undercoverWord, setUndercoverWord] = useState("");
 
@@ -79,14 +81,14 @@ export function LobbyScreen({
               <div className="font-mono text-4xl font-semibold tracking-[0.2em] text-white">
                 {room.roomCode}
               </div>
-              <div className="mt-2 text-sm text-ink-300">Sans friction. Juste un lien et du chaos.</div>
+              <div className="mt-2 text-sm text-ink-300">Un lien, des joueurs, et la partie part vite.</div>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button tone="secondary" onClick={copyRoomCode}>
-                📋 Copier le code
+                Copier le code
               </Button>
               <Button tone="secondary" onClick={copyRoomLink}>
-                🔗 Partager
+                Partager
               </Button>
             </div>
           </div>
@@ -95,7 +97,7 @@ export function LobbyScreen({
             <div className="mb-3 flex items-center justify-between">
               <h2 className="font-display text-2xl text-white">Joueurs ({room.players.length}/12)</h2>
               <span className="text-sm text-ink-300">
-                {readyCount} prêts · {connectedPlayers.length} connectés
+                {readyCount} prets · {connectedPlayers.length} connectes
               </span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -103,7 +105,7 @@ export function LobbyScreen({
                 <div key={player.id} className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
                   <PlayerAvatar
                     player={player}
-                    badge={player.isHost ? "HOST" : player.ready ? "PRÊT" : null}
+                    badge={player.isHost ? "HOST" : player.ready ? "PRET" : null}
                     highlighted={player.id === selfPlayer.id}
                   />
                 </div>
@@ -120,8 +122,8 @@ export function LobbyScreen({
         <div className="grid gap-6">
           <GlassPanel className="space-y-5">
             <div>
-              <div className="mb-2 text-sm uppercase tracking-[0.18em] text-ink-300">Paramètres</div>
-              <h2 className="font-display text-2xl text-white">Choisis ton chaos</h2>
+              <div className="mb-2 text-sm uppercase tracking-[0.18em] text-ink-300">Parametres</div>
+              <h2 className="font-display text-2xl text-white">Reglage rapide</h2>
             </div>
 
             <div className="grid gap-3">
@@ -173,7 +175,7 @@ export function LobbyScreen({
               </label>
 
               <label className="text-sm text-ink-300">
-                Difficulté
+                Difficulte
                 <select
                   disabled={!isHost}
                   value={room.settings.difficulty}
@@ -184,7 +186,7 @@ export function LobbyScreen({
                   }
                   className="mt-2 min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
                 >
-                  <option value="random">Aléatoire</option>
+                  <option value="random">Aleatoire</option>
                   <option value="easy">Facile</option>
                   <option value="normal">Normal</option>
                   <option value="hard">Difficile</option>
@@ -215,11 +217,11 @@ export function LobbyScreen({
                   <input
                     value={undercoverWord}
                     onChange={(event) => setUndercoverWord(event.target.value)}
-                    placeholder="Mot piège"
+                    placeholder="Mot piege"
                     className="min-h-11 rounded-2xl border border-white/10 bg-white/5 px-4 text-white"
                   />
                   <Button tone="secondary" onClick={addCustomPair}>
-                    + Ajouter la paire
+                    Ajouter la paire
                   </Button>
                 </div>
               ) : null}
@@ -227,20 +229,20 @@ export function LobbyScreen({
 
             <div className="grid gap-2">
               <Button tone={selfPlayer.ready ? "secondary" : "primary"} onClick={onToggleReady} fullWidth>
-                {selfPlayer.ready ? "✓ Prêt" : "Se marquer prêt"}
+                {selfPlayer.ready ? "Pret" : "Se marquer pret"}
               </Button>
               {isHost ? (
                 <Button fullWidth onClick={onStartGame} disabled={!canLaunch}>
-                  🚀 Lancer la partie
+                  Lancer la partie
                 </Button>
               ) : (
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-ink-300">
-                  L’hôte déclenchera la partie quand 4 joueurs seront prêts.
+                  L'hote declenchera la partie quand {MIN_PLAYERS} joueurs seront prets.
                 </div>
               )}
               {isHost && !canLaunch ? (
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-ink-300">
-                  Conditions de lancement: minimum 4 joueurs connectés et 4 prêts.
+                  Conditions de lancement: minimum {MIN_PLAYERS} joueurs connectes et {MIN_PLAYERS} prets.
                   Actuel: {readyCount}/{connectedPlayers.length}.
                 </div>
               ) : null}

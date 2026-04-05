@@ -62,7 +62,7 @@ export const DEFAULT_SETTINGS = {
   difficulty: "random"
 } as const;
 
-export const MIN_PLAYERS = 4;
+export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 12;
 
 export const CHAT_MESSAGE_LIMIT = 100;

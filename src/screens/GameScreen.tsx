@@ -30,15 +30,15 @@ function phaseText(room: RoomView) {
     return room.round?.role.ownWord ?? "???";
   }
   if (room.phase === "gallery") {
-    return "Regarde les dessins.";
+    return "Observe";
   }
   if (room.phase === "discussion") {
-    return "Clique un dessin pour designer ton suspect.";
+    return "Choisis";
   }
   if (room.phase === "vote") {
-    return "Clique un dessin pour voter.";
+    return "Vote";
   }
-  return "L'imposteur est revele.";
+  return "Reveal";
 }
 
 function rightGridColumns(playerCount: number) {
@@ -159,11 +159,7 @@ export function GameScreen({
       return (
         <div className="flex h-full flex-col justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.18em] text-ink-300">Galerie</div>
             <div className="mt-2 font-display text-5xl text-white">Observe</div>
-            <p className="mt-3 max-w-md text-sm text-ink-300">
-              La table est figee. Quand tout le monde a vu, passez a la suite.
-            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button tone="secondary" onClick={onReadyForNextPhase}>
@@ -181,13 +177,9 @@ export function GameScreen({
       return (
         <div className="flex h-full flex-col justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.18em] text-ink-300">Suspect</div>
             <div className="mt-2 font-display text-5xl text-white">
               {selfPointerTargetId ? playersById[selfPointerTargetId]?.profile.name ?? "?" : "Choisis"}
             </div>
-            <p className="mt-3 max-w-md text-sm text-ink-300">
-              Clique un dessin a droite. Des que tout le monde a choisi, on passe au vote.
-            </p>
           </div>
           {selfPointerTargetId ? (
             <div>
@@ -204,13 +196,9 @@ export function GameScreen({
       return (
         <div className="flex h-full flex-col justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.18em] text-ink-300">Vote</div>
             <div className="mt-2 font-display text-5xl text-white">
               {round.selfVote ? playersById[round.selfVote]?.profile.name ?? "?" : "Blanc"}
             </div>
-            <p className="mt-3 max-w-md text-sm text-ink-300">
-              Clique un dessin a droite pour voter. Tu peux aussi voter blanc.
-            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button tone="secondary" onClick={() => onVote(null)}>
@@ -226,7 +214,6 @@ export function GameScreen({
       <div className="flex h-full flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs uppercase tracking-[0.18em] text-ink-300">Reveal</div>
             <div className="mt-2 font-display text-4xl text-white">
               {suspectPlayer ? `${suspectPlayer.profile.name} etait vise` : "Pas de majorite"}
             </div>
@@ -256,7 +243,7 @@ export function GameScreen({
                 </div>
               ))
             ) : (
-              <div className="text-sm text-ink-300">Aucun role special.</div>
+              <div className="text-sm text-ink-300">-</div>
             )}
           </div>
         </div>
@@ -350,10 +337,7 @@ export function GameScreen({
 
         <GlassPanel className="flex h-full min-h-0 flex-col gap-3 p-3">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-xs uppercase tracking-[0.18em] text-ink-300">Autres joueurs</div>
-              <div className="text-sm text-ink-200">{connectedCount - 1} visibles</div>
-            </div>
+            <div className="text-sm text-ink-200">{connectedCount - 1}</div>
             <div className="text-xs uppercase tracking-[0.18em] text-ink-300">
               {room.phase === "discussion"
                 ? "Cliquer = suspect"

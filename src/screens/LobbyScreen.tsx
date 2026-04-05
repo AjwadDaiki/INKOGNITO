@@ -72,137 +72,101 @@ export function LobbyScreen({
   }
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-8">
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.85fr]">
+    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-6 md:px-8">
+      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <GlassPanel className="space-y-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <div className="mb-2 text-sm uppercase tracking-[0.18em] text-ink-300">Salon</div>
-              <div className="font-mono text-4xl font-semibold tracking-[0.2em] text-white">
-                {room.roomCode}
-              </div>
-              <div className="mt-2 text-sm text-ink-300">Un lien, des joueurs, et la partie part vite.</div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="font-mono text-4xl font-semibold tracking-[0.2em] text-white">
+              {room.roomCode}
             </div>
             <div className="flex flex-wrap gap-2">
               <Button tone="secondary" onClick={copyRoomCode}>
-                Copier le code
+                Code
               </Button>
               <Button tone="secondary" onClick={copyRoomLink}>
-                Partager
+                Lien
               </Button>
             </div>
           </div>
 
-          <div>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-display text-2xl text-white">Joueurs ({room.players.length}/12)</h2>
-              <span className="text-sm text-ink-300">
-                {readyCount} prets · {connectedPlayers.length} connectes
-              </span>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {room.players.map((player) => (
-                <div key={player.id} className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
-                  <PlayerAvatar
-                    player={player}
-                    badge={player.isHost ? "HOST" : player.ready ? "PRET" : null}
-                    highlighted={player.id === selfPlayer.id}
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {room.players.map((player) => (
+              <div key={player.id} className="rounded-[24px] border border-white/10 bg-white/[0.04] p-4">
+                <PlayerAvatar
+                  player={player}
+                  badge={player.isHost ? "HOST" : player.ready ? "PRET" : null}
+                  highlighted={player.id === selfPlayer.id}
+                />
+              </div>
+            ))}
           </div>
 
-          <div>
-            <div className="mb-3 text-sm uppercase tracking-[0.18em] text-ink-300">Ton avatar</div>
-            <ProfileEditor profile={selfPlayer.profile} onChange={onProfileChange} compact />
-          </div>
+          <ProfileEditor profile={selfPlayer.profile} onChange={onProfileChange} compact />
         </GlassPanel>
 
         <div className="grid gap-6">
-          <GlassPanel className="space-y-5">
-            <div>
-              <div className="mb-2 text-sm uppercase tracking-[0.18em] text-ink-300">Parametres</div>
-              <h2 className="font-display text-2xl text-white">Reglage rapide</h2>
-            </div>
-
+          <GlassPanel className="space-y-4">
             <div className="grid gap-3">
-              <label className="text-sm text-ink-300">
-                Mode
-                <select
-                  disabled={!isHost}
-                  value={room.settings.mode}
-                  onChange={(event) =>
-                    onUpdateSettings({ mode: event.target.value as RoomView["settings"]["mode"] })
-                  }
-                  className="mt-2 min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
-                >
-                  <option value="classic">Classique</option>
-                  <option value="mr_white">Mr. White</option>
-                </select>
-              </label>
+              <select
+                disabled={!isHost}
+                value={room.settings.mode}
+                onChange={(event) =>
+                  onUpdateSettings({ mode: event.target.value as RoomView["settings"]["mode"] })
+                }
+                className="min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
+              >
+                <option value="classic">Classique</option>
+                <option value="mr_white">Mr. White</option>
+              </select>
 
-              <label className="text-sm text-ink-300">
-                Temps de dessin
-                <select
-                  disabled={!isHost}
-                  value={room.settings.drawingSeconds}
-                  onChange={(event) => onUpdateSettings({ drawingSeconds: Number(event.target.value) })}
-                  className="mt-2 min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
-                >
-                  {[30, 45, 60, 90].map((value) => (
-                    <option key={value} value={value}>
-                      {value} secondes
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <select
+                disabled={!isHost}
+                value={room.settings.drawingSeconds}
+                onChange={(event) => onUpdateSettings({ drawingSeconds: Number(event.target.value) })}
+                className="min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
+              >
+                {[30, 45, 60, 90].map((value) => (
+                  <option key={value} value={value}>
+                    {value}s dessin
+                  </option>
+                ))}
+              </select>
 
-              <label className="text-sm text-ink-300">
-                Rounds
-                <select
-                  disabled={!isHost}
-                  value={room.settings.rounds}
-                  onChange={(event) => onUpdateSettings({ rounds: Number(event.target.value) })}
-                  className="mt-2 min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
-                >
-                  {[3, 4, 5].map((value) => (
-                    <option key={value} value={value}>
-                      {value} rounds
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <select
+                disabled={!isHost}
+                value={room.settings.rounds}
+                onChange={(event) => onUpdateSettings({ rounds: Number(event.target.value) })}
+                className="min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
+              >
+                {[3, 4, 5].map((value) => (
+                  <option key={value} value={value}>
+                    {value} rounds
+                  </option>
+                ))}
+              </select>
 
-              <label className="text-sm text-ink-300">
-                Difficulte
-                <select
-                  disabled={!isHost}
-                  value={room.settings.difficulty}
-                  onChange={(event) =>
-                    onUpdateSettings({
-                      difficulty: event.target.value as RoomView["settings"]["difficulty"]
-                    })
-                  }
-                  className="mt-2 min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
-                >
-                  <option value="random">Aleatoire</option>
-                  <option value="easy">Facile</option>
-                  <option value="normal">Normal</option>
-                  <option value="hard">Difficile</option>
-                </select>
-              </label>
+              <select
+                disabled={!isHost}
+                value={room.settings.difficulty}
+                onChange={(event) =>
+                  onUpdateSettings({
+                    difficulty: event.target.value as RoomView["settings"]["difficulty"]
+                  })
+                }
+                className="min-h-11 w-full rounded-2xl border border-white/10 bg-ink-900 px-4 text-white disabled:opacity-60"
+              >
+                <option value="random">Aleatoire</option>
+                <option value="easy">Facile</option>
+                <option value="normal">Normal</option>
+                <option value="hard">Difficile</option>
+              </select>
             </div>
 
             <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="text-sm font-semibold text-white">Mots custom</div>
-                <span className="text-xs text-ink-300">{customPairs.length} paire(s)</span>
-              </div>
               <div className="grid gap-2">
-                {customPairs.slice(0, 5).map((pair) => (
+                {customPairs.slice(0, 4).map((pair) => (
                   <div key={pair.id} className="rounded-2xl bg-white/[0.04] px-3 py-2 text-sm text-ink-200">
-                    {pair.civilWord} vs {pair.undercoverWord}
+                    {pair.civilWord} / {pair.undercoverWord}
                   </div>
                 ))}
               </div>
@@ -211,17 +175,17 @@ export function LobbyScreen({
                   <input
                     value={civilWord}
                     onChange={(event) => setCivilWord(event.target.value)}
-                    placeholder="Mot principal"
+                    placeholder="Mot 1"
                     className="min-h-11 rounded-2xl border border-white/10 bg-white/5 px-4 text-white"
                   />
                   <input
                     value={undercoverWord}
                     onChange={(event) => setUndercoverWord(event.target.value)}
-                    placeholder="Mot piege"
+                    placeholder="Mot 2"
                     className="min-h-11 rounded-2xl border border-white/10 bg-white/5 px-4 text-white"
                   />
                   <Button tone="secondary" onClick={addCustomPair}>
-                    Ajouter la paire
+                    Ajouter
                   </Button>
                 </div>
               ) : null}
@@ -229,28 +193,23 @@ export function LobbyScreen({
 
             <div className="grid gap-2">
               <Button tone={selfPlayer.ready ? "secondary" : "primary"} onClick={onToggleReady} fullWidth>
-                {selfPlayer.ready ? "Pret" : "Se marquer pret"}
+                {selfPlayer.ready ? "Pret" : "Pret ?"}
               </Button>
               {isHost ? (
                 <Button fullWidth onClick={onStartGame} disabled={!canLaunch}>
-                  Lancer la partie
+                  Lancer
                 </Button>
-              ) : (
+              ) : null}
+              {!canLaunch ? (
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-ink-300">
-                  L'hote declenchera la partie quand {MIN_PLAYERS} joueurs seront prets.
-                </div>
-              )}
-              {isHost && !canLaunch ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-ink-300">
-                  Conditions de lancement: minimum {MIN_PLAYERS} joueurs connectes et {MIN_PLAYERS} prets.
-                  Actuel: {readyCount}/{connectedPlayers.length}.
+                  {readyCount}/{connectedPlayers.length}
                 </div>
               ) : null}
             </div>
           </GlassPanel>
 
-          <GlassPanel className="min-h-[320px]">
-            <ChatPanel title="Mini-chat" players={room.players} messages={room.roomChat} onSend={onSendChat} />
+          <GlassPanel className="min-h-[260px]">
+            <ChatPanel title="Chat" players={room.players} messages={room.roomChat} onSend={onSendChat} />
           </GlassPanel>
         </div>
       </div>

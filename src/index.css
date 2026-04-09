@@ -110,3 +110,21 @@ textarea {
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.1);
 }
+
+/* ─── Soft pulse for live indicators ─── */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+/* ─── Glow ring for vote/suspect selection ─── */
+@keyframes glow-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240, 192, 0, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(240, 192, 0, 0); }
+}
+.animate-glow-ring {
+  animation: glow-ring 1.8s ease-in-out infinite;
+}

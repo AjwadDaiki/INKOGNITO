@@ -1,5 +1,6 @@
 import { memo } from "react";
 import clsx from "clsx";
+import { motion } from "framer-motion";
 import type { DrawingStroke, PlayerRole, PlayerView, RoomView } from "@shared/protocol";
 import { MiniDrawingCanvas } from "@/components/game/MiniDrawingCanvas";
 import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
@@ -64,11 +65,19 @@ function PlayerBoardCardComponent({
     }
   }
 
+  const MotionContainer = isInteractive ? motion.button : motion.article;
+
   return (
-    <Container
+    <MotionContainer
       {...(isInteractive ? { type: "button" as const, onClick: handleClick } : {})}
+      initial={{ opacity: 0, scale: 0.92, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      whileHover={isInteractive ? { scale: 1.03, y: -2 } : {}}
+      whileTap={isInteractive ? { scale: 0.97 } : {}}
+      transition={{ type: "spring", stiffness: 340, damping: 22 }}
+      layout
       className={clsx(
-        "grid h-full w-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] rounded-[22px] text-left transition duration-200",
+        "grid h-full w-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] rounded-[22px] text-left transition-colors duration-200",
         dense ? "gap-1 p-1.5" : "gap-1.5 p-2",
         isVoteSelected && "bg-primary-light ring-2 ring-primary",
         isSuspect && phase === "discussion" && "bg-tertiary-light ring-2 ring-tertiary",
@@ -81,7 +90,7 @@ function PlayerBoardCardComponent({
           (isSelf
             ? "border border-[rgba(240,192,0,0.3)] bg-primary-light"
             : "border border-[rgba(15,23,42,0.07)] bg-surface-card shadow-[0_3px_0_rgba(15,23,42,0.08)] hover:bg-surface-low"),
-        isInteractive && "cursor-pointer active:scale-[0.98]"
+        isInteractive && "cursor-pointer"
       )}
     >
       <div className="flex min-w-0 items-center justify-between gap-1">
@@ -155,7 +164,7 @@ function PlayerBoardCardComponent({
           </span>
         ) : null}
       </div>
-    </Container>
+    </MotionContainer>
   );
 }
 

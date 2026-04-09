@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DRAWING_COLORS, DRAWING_SIZE } from "@shared/constants";
 import { createId } from "@shared/game";
 import type { DrawingStroke, DrawingTool } from "@shared/protocol";
-import { getCanvasSnapshot, normalizePointerPosition, renderStrokeCanvas } from "@/lib/canvas";
+import { drawStroke, getCanvasSnapshot, normalizePointerPosition, renderStrokeCanvas } from "@/lib/canvas";
 import { Button } from "@/components/ui/Button";
 
 const TOOL_OPTIONS: Array<{ tool: DrawingTool; label: string; title: string }> = [
-  { tool: "pen", label: "Pen", title: "Crayon" },
-  { tool: "brush", label: "Br", title: "Pinceau" },
-  { tool: "fill", label: "Fi", title: "Remplir" },
-  { tool: "eraser", label: "Er", title: "Gomme" }
+  { tool: "pen", label: "✏️", title: "Crayon" },
+  { tool: "brush", label: "🖌️", title: "Pinceau" },
+  { tool: "fill", label: "🪣", title: "Remplir" },
+  { tool: "eraser", label: "🧹", title: "Gomme" }
 ];
 
 const SIZE_PRESETS = [
@@ -17,6 +17,11 @@ const SIZE_PRESETS = [
   { label: "M", value: 8 },
   { label: "L", value: 14 }
 ] as const;
+
+/** Min squared distance between two recorded points (2px) */
+const MIN_POINT_DIST_SQ = 4;
+/** Min ms between network preview sends (~12 fps over the wire) */
+const PREVIEW_THROTTLE_MS = 80;
 
 interface DrawingCanvasProps {
   playerId: string;
@@ -35,29 +40,70 @@ export function DrawingCanvas({
   onUndo,
   onClear
 }: DrawingCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const previewTimer = useRef<number | null>(null);
+  /* ── React state (only for UI — never touched during drawing) ── */
   const [activeTool, setActiveTool] = useState<DrawingTool>("pen");
   const [activeColor, setActiveColor] = useState<string>(DRAWING_COLORS[0]);
   const [brushSize, setBrushSize] = useState<number>(8);
-  const [draftStroke, setDraftStroke] = useState<DrawingStroke | null>(null);
 
-  const committedStrokes = useMemo(() => strokes, [strokes]);
+  /* ── Refs — all hot-path data lives here, zero React renders while drawing ── */
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const bufferRef = useRef<HTMLCanvasElement | null>(null); // offscreen committed-strokes buffer
+  const draftRef = useRef<DrawingStroke | null>(null);
+  const rafRef = useRef(0);
+  const lastPreviewTime = useRef(0);
+  // Stable refs for callbacks that close over props/state
+  const onPreviewRef = useRef(onPreview);
+  const onCommitRef = useRef(onCommit);
+  const strokesRef = useRef(strokes);
+  onPreviewRef.current = onPreview;
+  onCommitRef.current = onCommit;
+  strokesRef.current = strokes;
 
+  /* ── Create offscreen buffer + init visible canvas (once) ── */
   useEffect(() => {
-    if (!canvasRef.current) return;
-    canvasRef.current.width = DRAWING_SIZE;
-    canvasRef.current.height = DRAWING_SIZE;
-    renderStrokeCanvas(canvasRef.current, committedStrokes, draftStroke);
-  }, [committedStrokes, draftStroke]);
+    const buffer = document.createElement("canvas");
+    buffer.width = DRAWING_SIZE;
+    buffer.height = DRAWING_SIZE;
+    const ctx = buffer.getContext("2d");
+    if (ctx) { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, DRAWING_SIZE, DRAWING_SIZE); }
+    bufferRef.current = buffer;
 
-  useEffect(() => {
-    return () => {
-      if (previewTimer.current) window.clearTimeout(previewTimer.current);
-    };
+    if (canvasRef.current) {
+      canvasRef.current.width = DRAWING_SIZE;
+      canvasRef.current.height = DRAWING_SIZE;
+    }
   }, []);
 
-  function buildStroke(point: { x: number; y: number }) {
+  /* ── Re-bake buffer when committed strokes change (undo, clear, server sync) ── */
+  useEffect(() => {
+    if (!bufferRef.current) return;
+    renderStrokeCanvas(bufferRef.current, strokes);
+    renderFrame();
+  }, [strokes]);
+
+  /* ── Cleanup ── */
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  /* ── Core render: buffer copy + draft overlay (one drawImage + one stroke) ── */
+  const renderFrame = useCallback(() => {
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      const buffer = bufferRef.current;
+      if (!canvas || !buffer) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      // 1) Blit the committed-strokes buffer (one GPU copy)
+      ctx.clearRect(0, 0, DRAWING_SIZE, DRAWING_SIZE);
+      ctx.drawImage(buffer, 0, 0);
+      // 2) Draw only the current draft stroke on top
+      const draft = draftRef.current;
+      if (draft) drawStroke(ctx, draft);
+    });
+  }, []);
+
+  /* ── Stroke building ── */
+  function buildStroke(point: { x: number; y: number }): DrawingStroke {
     return {
       id: createId("stroke"),
       playerId,
@@ -66,60 +112,80 @@ export function DrawingCanvas({
       size: brushSize,
       points: [point],
       createdAt: Date.now()
-    } satisfies DrawingStroke;
+    };
   }
 
-  function queuePreview(stroke: DrawingStroke) {
-    if (previewTimer.current) window.clearTimeout(previewTimer.current);
-    previewTimer.current = window.setTimeout(() => onPreview(stroke), 40);
+  /* ── Network throttle: send preview at ~12 fps, not 60 ── */
+  function sendPreview(stroke: DrawingStroke) {
+    const now = performance.now();
+    if (now - lastPreviewTime.current < PREVIEW_THROTTLE_MS) return;
+    lastPreviewTime.current = now;
+    onPreviewRef.current(stroke);
   }
 
-  function commitNow(stroke: DrawingStroke) {
-    if (!canvasRef.current) return;
-    renderStrokeCanvas(canvasRef.current, [...committedStrokes, stroke]);
-    const snapshot = getCanvasSnapshot(canvasRef.current);
-    onCommit(stroke, snapshot);
-  }
-
+  /* ── Pointer handlers — fully imperative, zero setState ── */
   function beginStroke(event: React.PointerEvent<HTMLCanvasElement>) {
     if (!canvasRef.current) return;
     const point = normalizePointerPosition(event, canvasRef.current);
     const stroke = buildStroke(point);
 
     if (activeTool === "fill") {
-      commitNow(stroke);
+      // Fill: commit immediately, re-bake buffer
+      if (bufferRef.current) {
+        renderStrokeCanvas(bufferRef.current, [...strokesRef.current, stroke]);
+      }
+      renderFrame();
+      const snapshot = getCanvasSnapshot(canvasRef.current);
+      onCommitRef.current(stroke, snapshot);
       return;
     }
 
     canvasRef.current.setPointerCapture(event.pointerId);
-    setDraftStroke(stroke);
-    queuePreview(stroke);
+    draftRef.current = stroke;
+    renderFrame();
+    sendPreview(stroke);
   }
 
   function moveStroke(event: React.PointerEvent<HTMLCanvasElement>) {
-    if (!draftStroke || !canvasRef.current) return;
+    const draft = draftRef.current;
+    if (!draft || !canvasRef.current) return;
     const point = normalizePointerPosition(event, canvasRef.current);
-    const nextStroke = { ...draftStroke, points: [...draftStroke.points, point] };
-    setDraftStroke(nextStroke);
-    queuePreview(nextStroke);
+
+    // Point downsampling: skip if < 2px from last point
+    const last = draft.points[draft.points.length - 1];
+    const dx = point.x - last.x;
+    const dy = point.y - last.y;
+    if (dx * dx + dy * dy < MIN_POINT_DIST_SQ) return;
+
+    draft.points.push(point); // mutate ref directly — no copy, no setState
+    renderFrame();
+    sendPreview(draft);
   }
 
   function finishStroke(event: React.PointerEvent<HTMLCanvasElement>) {
-    if (!draftStroke || !canvasRef.current) return;
+    const draft = draftRef.current;
+    if (!draft || !canvasRef.current) return;
 
     if (canvasRef.current.hasPointerCapture(event.pointerId)) {
       canvasRef.current.releasePointerCapture(event.pointerId);
     }
 
+    // Bake draft into buffer so it's part of committed artwork
+    if (bufferRef.current) {
+      const ctx = bufferRef.current.getContext("2d");
+      if (ctx) drawStroke(ctx, draft);
+    }
+    draftRef.current = null;
+    renderFrame();
+
     const snapshot = getCanvasSnapshot(canvasRef.current);
-    onCommit(draftStroke, snapshot);
-    setDraftStroke(null);
+    onCommitRef.current(draft, snapshot);
   }
 
   return (
     <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-2.5">
-      <div className="flex flex-wrap items-center gap-2 rounded-[24px] bg-surface-low/70 px-2.5 py-2">
-        <div className="flex gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5 rounded-[24px] bg-surface-low/70 px-2 py-1.5 md:gap-2 md:px-2.5 md:py-2">
+        <div className="flex gap-1">
           {TOOL_OPTIONS.map(({ tool, label, title }) => (
             <button
               key={tool}
@@ -127,7 +193,7 @@ export function DrawingCanvas({
               title={title}
               aria-label={title}
               onClick={() => setActiveTool(tool)}
-              className={`flex h-9 w-9 items-center justify-center rounded-2xl text-xs font-bold uppercase tracking-[0.12em] transition md:h-10 md:w-10 ${
+              className={`flex h-8 w-8 items-center justify-center rounded-2xl text-base transition md:h-10 md:w-10 ${
                 activeTool === tool
                   ? "bg-primary-light text-ink-950 shadow-primary"
                   : "bg-surface-low text-ink-700 hover:bg-surface-high"
@@ -138,13 +204,13 @@ export function DrawingCanvas({
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1 md:gap-1.5">
           {DRAWING_COLORS.map((color) => (
             <button
               key={color}
               type="button"
               onClick={() => setActiveColor(color)}
-              className={`h-7 w-7 rounded-full border-[3px] transition-transform md:h-8 md:w-8 ${
+              className={`h-6 w-6 rounded-full border-[3px] transition-transform md:h-8 md:w-8 ${
                 activeColor === color ? "scale-110 border-ink-950" : "border-transparent"
               }`}
               style={{ backgroundColor: color }}
@@ -153,7 +219,7 @@ export function DrawingCanvas({
           ))}
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ml-auto flex items-center gap-1 md:gap-1.5">
           {SIZE_PRESETS.map((preset) => (
             <button
               key={preset.value}
@@ -189,21 +255,21 @@ export function DrawingCanvas({
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 rounded-[24px] bg-surface-low/70 px-2.5 py-2">
+      <div className="flex flex-wrap items-center gap-1.5 rounded-[24px] bg-surface-low/70 px-2 py-1.5 md:gap-2 md:px-2.5 md:py-2">
         <input
           type="range"
           min={2}
           max={28}
           value={brushSize}
           onChange={(event) => setBrushSize(Number(event.target.value))}
-          className="min-w-[120px] flex-1 accent-primary"
+          className="min-w-[80px] flex-1 accent-primary md:min-w-[120px]"
           aria-label="Taille du trait"
         />
         <Button
           tone="secondary"
           onClick={onUndo}
           title="Annuler"
-          className="min-h-9 px-3 py-1.5 text-xs"
+          className="min-h-8 px-2.5 py-1 text-xs md:min-h-9 md:px-3 md:py-1.5"
         >
           Undo
         </Button>
@@ -211,7 +277,7 @@ export function DrawingCanvas({
           tone="danger"
           onClick={onClear}
           title="Tout effacer"
-          className="min-h-9 px-3 py-1.5 text-xs"
+          className="min-h-8 px-2.5 py-1 text-xs md:min-h-9 md:px-3 md:py-1.5"
         >
           Clear
         </Button>

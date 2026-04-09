@@ -90,34 +90,62 @@ export function RoleRevealScreen({
             </div>
           </motion.div>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, type: "spring", stiffness: 300, damping: 22 }}
+            className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]"
+          >
             <div className="rounded-[24px] bg-surface-low px-4 py-4">
               <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-ink-400">
                 Avant de continuer
               </div>
               <div className="grid gap-2 text-sm text-ink-700">
-                <div>1. Memorise ton role et ton mot.</div>
-                <div>2. Cache bien cet ecran aux autres joueurs.</div>
-                <div>3. Clique quand tu es pret a dessiner.</div>
+                {["1. Memorise ton role et ton mot.", "2. Cache bien cet ecran aux autres joueurs.", "3. Clique quand tu es pret a dessiner."].map((step, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.35 + i * 0.08, type: "spring", stiffness: 350, damping: 22 }}
+                  >
+                    {step}
+                  </motion.div>
+                ))}
               </div>
             </div>
 
-            <div className="rounded-[24px] bg-ink-950 px-4 py-4 text-white md:min-w-[220px]">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 300, damping: 20 }}
+              className="rounded-[24px] bg-ink-950 px-4 py-4 text-white md:min-w-[220px]"
+            >
               <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/60">
                 Validation
               </div>
-              <div className="mt-2 text-3xl font-extrabold">
+              <motion.div
+                key={confirmedCount}
+                initial={{ scale: 1.3 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                className="mt-2 text-3xl font-extrabold"
+              >
                 {confirmedCount}/{room.players.length}
-              </div>
+              </motion.div>
               <div className="mt-1 text-sm text-white/70">joueurs ont confirme</div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="mt-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, type: "spring", stiffness: 300, damping: 20 }}
+            className="mt-6"
+          >
             <Button onClick={onConfirm} fullWidth>
               J'ai memorise, on peut continuer
             </Button>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </div>

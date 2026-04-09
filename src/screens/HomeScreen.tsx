@@ -24,7 +24,6 @@ export function HomeScreen({
   function extractRoomCode(raw: string) {
     const trimmed = raw.trim();
     if (!trimmed) return "";
-
     try {
       const url = new URL(trimmed);
       return url.searchParams.get("room")?.toUpperCase() ?? "";
@@ -35,72 +34,36 @@ export function HomeScreen({
 
   const normalizedRoomCode = extractRoomCode(accessValue);
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
-    <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden p-4">
+    <div className="flex h-[100svh] flex-col items-center justify-center overflow-hidden p-4">
+      {/* Title */}
       <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-        className="mb-6 text-center"
+        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-5 text-center"
       >
-        <h1 className="font-display text-6xl font-extrabold tracking-[-0.03em] text-ink-950 md:text-8xl">
+        <h1 className="font-display text-6xl font-extrabold tracking-[-0.04em] text-ink-950 md:text-8xl">
           INKOGNITO
         </h1>
-        <p className="mt-1 text-sm font-medium text-ink-500 md:text-base">
-          Dessin · Bluff · Deduction
-        </p>
+        <p className="mt-1 text-sm font-medium text-ink-500">Imposteur dessin</p>
       </motion.div>
 
+      {/* Single card */}
       <motion.div
-        initial="hidden"
-        animate="show"
-        transition={{ staggerChildren: 0.08 }}
-        className="grid w-full max-w-3xl gap-3 md:grid-cols-2"
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="bento-card w-full max-w-lg p-5"
       >
-        <motion.div
-          variants={cardVariants}
-          transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
-          className="bento-card flex flex-col gap-4 p-5"
-        >
-          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-ink-500">
-            Ton profil
-          </h2>
+        <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
 
-          <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
-
-          <div className="rounded-[24px] bg-surface-low px-4 py-4 text-sm text-ink-700">
-            <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-400">
-              Regles
-            </div>
-            <div className="grid gap-2">
-              <div>1. Chaque joueur recoit un mot secret.</div>
-              <div>2. Tout le monde dessine sans parler ni ecrire.</div>
-              <div>3. Les civils ont le meme mot, l&apos;Undercover un mot proche.</div>
-              <div>4. Vous observez, discutez, puis votez.</div>
-              <div>5. Trouvez l&apos;intrus avant qu&apos;il retourne la manche.</div>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          variants={cardVariants}
-          transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
-          className="bento-card flex flex-col gap-4 p-5"
-        >
-          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-ink-500">
-            Rejoins la partie
-          </h2>
-
+        <div className="mt-4 flex flex-col gap-3">
           <input
             value={accessValue}
-            onChange={(event) => setAccessValue(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
+            onChange={(e) => setAccessValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
                 onJoin(normalizedRoomCode);
               }
             }}
@@ -110,7 +73,7 @@ export function HomeScreen({
 
           <div className="grid grid-cols-2 gap-2">
             <Button fullWidth onClick={onCreate} disabled={loading}>
-              {loading ? "..." : "Creer"}
+              {loading ? "..." : "Creer une salle"}
             </Button>
             <Button
               fullWidth
@@ -123,11 +86,31 @@ export function HomeScreen({
           </div>
 
           {error ? (
-            <div className="rounded-2xl bg-tertiary-light px-4 py-3 text-sm font-medium text-tertiary">
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl bg-tertiary-light px-4 py-3 text-sm font-medium text-tertiary"
+            >
               {error}
-            </div>
+            </motion.div>
           ) : null}
-        </motion.div>
+        </div>
+
+        {/* Rules */}
+        <div className="mt-4 grid grid-cols-3 gap-2 text-center text-[11px] text-ink-500">
+          <div className="rounded-2xl bg-surface-low px-2 py-2.5">
+            <div className="text-base">🎨</div>
+            <div className="mt-1 font-semibold">Dessine</div>
+          </div>
+          <div className="rounded-2xl bg-surface-low px-2 py-2.5">
+            <div className="text-base">🕵️</div>
+            <div className="mt-1 font-semibold">Trouve l'intrus</div>
+          </div>
+          <div className="rounded-2xl bg-surface-low px-2 py-2.5">
+            <div className="text-base">🗳️</div>
+            <div className="mt-1 font-semibold">Vote</div>
+          </div>
+        </div>
       </motion.div>
     </div>
   );

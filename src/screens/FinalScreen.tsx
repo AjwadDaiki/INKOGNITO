@@ -51,7 +51,12 @@ export function FinalScreen({
     <div className="flex h-[100dvh] flex-col gap-3 overflow-hidden p-3 md:p-4">
 
       {/* ── Header ── */}
-      <div className="bento-card shrink-0 px-5 py-3">
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 350, damping: 24 }}
+        className="bento-card shrink-0 px-5 py-3"
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-3xl font-extrabold text-ink-950">
             Résultats
@@ -65,7 +70,7 @@ export function FinalScreen({
             </Button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* ── Bento grid ── */}
       <div className="grid min-h-0 flex-1 gap-3 xl:grid-cols-[0.75fr_1.25fr]">
@@ -82,21 +87,34 @@ export function FinalScreen({
               return (
                 <motion.div
                   key={entry.playerId}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.06, duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+                  initial={{ opacity: 0, x: -20, scale: 0.92 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  transition={{ delay: index * 0.08, type: "spring", stiffness: 340, damping: 22 }}
+                  whileHover={{ scale: 1.02, x: 4 }}
                   className={`flex items-center justify-between rounded-[20px] px-4 py-3 ${
-                    isSelf ? "bg-primary-light" : "bg-surface-low"
+                    index === 0
+                      ? "bg-gradient-to-r from-primary-light to-[#fff4cc] shadow-[0_4px_16px_rgba(240,192,0,0.2)]"
+                      : isSelf
+                        ? "bg-primary-light"
+                        : "bg-surface-low"
                   }`}
                 >
                   <div className="flex items-center gap-2 font-semibold text-ink-950">
-                    <span className="text-lg font-extrabold text-ink-300">#{entry.rank}</span>
+                    <span className={`text-lg font-extrabold ${index === 0 ? "text-primary" : "text-ink-300"}`}>
+                      #{entry.rank}
+                    </span>
                     {player?.profile.emoji} {player?.profile.name}
                   </div>
-                  <div className="font-display text-xl font-extrabold text-ink-950">
+                  <motion.div
+                    key={entry.points}
+                    initial={{ scale: 1.3 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    className="font-display text-xl font-extrabold text-ink-950"
+                  >
                     {entry.points}
                     <span className="ml-0.5 text-sm font-medium text-ink-500">pts</span>
-                  </div>
+                  </motion.div>
                 </motion.div>
               );
             })}

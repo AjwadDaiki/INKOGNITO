@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { MIN_PLAYERS } from "@shared/constants";
 import type { PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
@@ -18,34 +18,36 @@ function PillGroup<T extends string | number>({
 }: {
   options: T[];
   value: T;
-  onChange: (value: T) => void;
+  onChange: (v: T) => void;
   disabled?: boolean;
-  format?: (value: T) => string;
+  format?: (v: T) => string;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2">
-      {options.map((option) => {
-        const active = option === value;
+    <div className="flex gap-1.5">
+      {options.map((opt) => {
+        const active = opt === value;
         return (
           <motion.button
-            key={String(option)}
+            key={String(opt)}
             type="button"
-            whileTap={disabled ? {} : { scale: 0.95 }}
+            whileTap={disabled ? {} : { scale: 0.93 }}
             disabled={disabled}
-            onClick={() => onChange(option)}
-            className={`rounded-2xl px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${
+            onClick={() => onChange(opt)}
+            className={`flex-1 rounded-2xl py-2 text-xs font-bold transition ${
               active
                 ? "bg-gradient-to-br from-primary to-[#FFD700] text-ink-950 shadow-primary"
-                : "bg-surface-low text-ink-700 hover:bg-surface-high"
+                : "bg-white/60 text-ink-700 hover:bg-white/80"
             } disabled:opacity-40`}
           >
-            {format ? format(option) : String(option)}
+            {format ? format(opt) : String(opt)}
           </motion.button>
         );
       })}
     </div>
   );
 }
+
+type MobileTab = "players" | "settings" | "chat";
 
 export function LobbyScreen({
   room,
@@ -63,212 +65,271 @@ export function LobbyScreen({
   onSendChat: (message: string) => void;
 }) {
   const isHost = selfPlayer.isHost;
-  const connectedPlayers = useMemo(() => room.players.filter((player) => player.connected), [room.players]);
+  const [mobileTab, setMobileTab] = useState<MobileTab>("settings");
+  const connectedPlayers = useMemo(
+    () => room.players.filter((p) => p.connected),
+    [room.players]
+  );
   const readyCount = useMemo(
-    () => connectedPlayers.filter((player) => player.ready).length,
+    () => connectedPlayers.filter((p) => p.ready).length,
     [connectedPlayers]
   );
-  const canLaunch = isHost && connectedPlayers.length >= MIN_PLAYERS && readyCount >= MIN_PLAYERS;
-
-  async function copyRoomLink() {
-    await navigator.clipboard.writeText(roomLink(room.roomCode));
-  }
+  const canLaunch =
+    isHost && connectedPlayers.length >= MIN_PLAYERS && readyCount >= MIN_PLAYERS;
 
   async function copyRoomCode() {
     await navigator.clipboard.writeText(room.roomCode);
   }
+  async function copyRoomLink() {
+    await navigator.clipboard.writeText(roomLink(room.roomCode));
+  }
+
+  /* ── Shared sub-panels ── */
+
+  const playersPanel = (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="mb-3 flex shrink-0 items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-ink-400">
+          Joueurs
+        </span>
+        <span className="rounded-full bg-surface-low px-2.5 py-1 text-[10px] font-bold text-ink-500">
+          {readyCount}/{connectedPlayers.length} prets
+        </span>
+      </div>
+      <div className="scrollbar-thin flex-1 space-y-2 overflow-y-auto">
+        {room.players.map((player, i) => (
+          <motion.div
+            key={player.id}
+            initial={{ opacity: 0, x: -12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.04, duration: 0.25 }}
+            className={`flex items-center gap-3 rounded-[20px] border p-3 ${
+              player.id === selfPlayer.id
+                ? "border-[rgba(240,192,0,0.3)] bg-primary-light"
+                : player.ready
+                  ? "border-[rgba(34,197,94,0.2)] bg-[#ecfdf5]"
+                  : "border-[rgba(15,23,42,0.06)] bg-white/60"
+            }`}
+          >
+            <div
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-2xl"
+              style={{
+                background: `linear-gradient(160deg,${player.profile.color}44,${player.profile.color}18)`,
+                boxShadow: `0 3px 12px ${player.profile.color}40`
+              }}
+            >
+              {player.profile.emoji}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-bold text-ink-950">
+                {player.profile.name}
+              </div>
+              <div className="mt-0.5 flex gap-1.5">
+                {player.isHost && (
+                  <span className="rounded-full bg-ink-950 px-2 py-0.5 text-[9px] font-bold uppercase text-white">
+                    Host
+                  </span>
+                )}
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
+                    player.ready
+                      ? "bg-[#dcfce7] text-[#15803d]"
+                      : "bg-surface-low text-ink-500"
+                  }`}
+                >
+                  {player.ready ? "Pret" : "..."}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+
+        {room.players.length < 8 && (
+          <div className="flex items-center justify-center gap-2 rounded-[20px] border-2 border-dashed border-surface-high p-3 text-sm text-ink-300">
+            + Inviter
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const settingsPanel = (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <span className="mb-3 shrink-0 text-[10px] font-bold uppercase tracking-[0.16em] text-ink-400">
+        Reglages
+      </span>
+      <div className="flex flex-1 flex-col gap-4">
+        {([
+          { label: "Mode", node: (
+            <PillGroup
+              options={["classic", "mr_white"] as const}
+              value={room.settings.mode}
+              onChange={(v) => onUpdateSettings({ mode: v })}
+              disabled={!isHost}
+              format={(v) => (v === "classic" ? "Classique" : "Mr White")}
+            />
+          )},
+          { label: "Temps dessin", node: (
+            <PillGroup
+              options={[30, 45, 60, 90] as const}
+              value={room.settings.drawingSeconds}
+              onChange={(v) => onUpdateSettings({ drawingSeconds: v })}
+              disabled={!isHost}
+              format={(v) => `${v}s`}
+            />
+          )},
+          { label: "Rounds", node: (
+            <PillGroup
+              options={[3, 4, 5] as const}
+              value={room.settings.rounds}
+              onChange={(v) => onUpdateSettings({ rounds: v })}
+              disabled={!isHost}
+            />
+          )},
+          { label: "Difficulte", node: (
+            <PillGroup
+              options={["easy", "normal", "hard"] as const}
+              value={room.settings.difficulty === "random" ? "normal" : room.settings.difficulty}
+              onChange={(v) => onUpdateSettings({ difficulty: v })}
+              disabled={!isHost}
+              format={(v) => (v === "easy" ? "Facile" : v === "normal" ? "Normal" : "Hard")}
+            />
+          )}
+        ] as const).map((setting, i) => (
+          <motion.div
+            key={setting.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.06 + i * 0.06, type: "spring", stiffness: 350, damping: 22 }}
+          >
+            <div className="mb-1.5 text-xs font-bold text-ink-700">{setting.label}</div>
+            {setting.node}
+          </motion.div>
+        ))}
+
+        {/* Launch zone */}
+        <motion.div
+          initial={{ opacity: 0, y: 16, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.32, type: "spring", stiffness: 300, damping: 20 }}
+          className="mt-auto flex flex-col gap-2 rounded-[20px] bg-ink-950 p-4 text-white"
+        >
+          <div className="text-center text-2xl font-extrabold">
+            {readyCount}/{Math.max(connectedPlayers.length, MIN_PLAYERS)}
+            <span className="ml-1 text-sm font-medium text-white/60">prets</span>
+          </div>
+          <Button
+            tone={selfPlayer.ready ? "secondary" : "primary"}
+            onClick={onToggleReady}
+            fullWidth
+          >
+            {selfPlayer.ready ? "Plus pret" : "Je suis pret"}
+          </Button>
+          {isHost && (
+            <Button fullWidth onClick={onStartGame} disabled={!canLaunch}>
+              Lancer la partie
+            </Button>
+          )}
+        </motion.div>
+      </div>
+    </div>
+  );
+
+  const chatPanel = (
+    <ChatPanel
+      title="Chat"
+      players={room.players}
+      messages={room.roomChat}
+      onSend={onSendChat}
+    />
+  );
+
+  const tabs: { key: MobileTab; label: string }[] = [
+    { key: "players", label: `Joueurs (${connectedPlayers.length})` },
+    { key: "settings", label: "Reglages" },
+    { key: "chat", label: "Chat" }
+  ];
 
   return (
-    <div className="flex h-[100svh] flex-col overflow-hidden p-3 md:p-4">
-      <div className="bento-card flex min-h-0 flex-1 flex-col overflow-hidden p-4 md:p-5">
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-[28px] bg-surface-low/70 px-4 py-3">
-          <div className="min-w-0">
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink-400">
-              Salle
-            </div>
-            <div className="mt-1 flex flex-wrap items-center gap-3">
-              <span className="font-mono text-3xl font-extrabold tracking-[0.24em] text-ink-950">
-                {room.roomCode}
-              </span>
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-ink-600 shadow-card">
-                {connectedPlayers.length} joueur{connectedPlayers.length > 1 ? "s" : ""} connecte
-                {connectedPlayers.length > 1 ? "s" : ""}
-              </span>
-            </div>
-          </div>
+    <div className="flex h-[100svh] flex-col gap-2.5 overflow-hidden p-3 md:p-4">
 
-          <div className="flex flex-wrap gap-2">
-            <Button tone="secondary" onClick={copyRoomCode} className="min-h-9 px-3 py-1.5 text-xs">
-              Copier code
-            </Button>
-            <Button tone="secondary" onClick={copyRoomLink} className="min-h-9 px-3 py-1.5 text-xs">
-              Copier lien
-            </Button>
-          </div>
+      {/* Top bar */}
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 350, damping: 24 }}
+        className="bento-card flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 py-3"
+      >
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-xl font-extrabold tracking-[0.22em] text-ink-950 md:text-2xl">
+            {room.roomCode}
+          </span>
+          <motion.span
+            key={connectedPlayers.length}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            className="rounded-full bg-surface-low px-3 py-1 text-xs font-bold text-ink-500"
+          >
+            {connectedPlayers.length} joueur{connectedPlayers.length > 1 ? "s" : ""}
+          </motion.span>
         </div>
+        <div className="flex gap-2">
+          <Button tone="secondary" onClick={copyRoomCode} className="min-h-9 px-3 text-xs">
+            Code
+          </Button>
+          <Button tone="secondary" onClick={copyRoomLink} className="min-h-9 px-3 text-xs">
+            Lien
+          </Button>
+        </div>
+      </motion.div>
 
-        <div className="mt-4 grid min-h-0 flex-1 gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex min-h-0 flex-col gap-4">
-            <div className="rounded-[28px] bg-surface-low/55 p-4">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-ink-400">
-                    Equipe
-                  </div>
-                  <div className="mt-1 text-lg font-extrabold text-ink-950">
-                    Tout le monde est reuni ici
-                  </div>
-                </div>
-                <div className="rounded-full bg-white px-3 py-1 text-xs font-bold text-ink-600 shadow-card">
-                  {readyCount}/{connectedPlayers.length} prets
-                </div>
-              </div>
+      {/* ── Mobile tabs (visible < lg) ── */}
+      <div className="flex shrink-0 gap-1.5 lg:hidden">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setMobileTab(tab.key)}
+            className={`flex-1 rounded-2xl py-2 text-xs font-bold transition ${
+              mobileTab === tab.key
+                ? "bg-gradient-to-br from-primary to-[#FFD700] text-ink-950 shadow-primary"
+                : "bg-white/60 text-ink-700"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {room.players.map((player, index) => (
-                  <motion.div
-                    key={player.id}
-                    layout
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03, duration: 0.24 }}
-                    className={`rounded-[24px] border p-3 ${
-                      player.id === selfPlayer.id
-                        ? "border-[rgba(240,192,0,0.34)] bg-primary-light"
-                        : player.ready
-                          ? "border-[rgba(34,197,94,0.22)] bg-[#ecfdf5]"
-                          : "border-[rgba(15,23,42,0.07)] bg-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-3xl shadow-card"
-                        style={{
-                          background: `linear-gradient(160deg,${player.profile.color}44,${player.profile.color}18)`,
-                          boxShadow: `0 4px 14px ${player.profile.color}40`
-                        }}
-                      >
-                        {player.profile.emoji}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-bold text-ink-950">
-                          {player.profile.name}
-                        </div>
-                        <div className="mt-1 flex flex-wrap gap-1.5">
-                          {player.isHost ? (
-                            <span className="rounded-full bg-ink-950 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white">
-                              Host
-                            </span>
-                          ) : null}
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] ${
-                              player.ready
-                                ? "bg-[#dcfce7] text-[#15803d]"
-                                : "bg-surface-low text-ink-500"
-                            }`}
-                          >
-                            {player.ready ? "Pret" : "En attente"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+      {/* ── Mobile: single panel (< lg) ── */}
+      <div className="min-h-0 flex-1 lg:hidden">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={mobileTab}
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.15 }}
+            className="bento-card flex h-full min-h-0 flex-col p-4"
+          >
+            {mobileTab === "players" && playersPanel}
+            {mobileTab === "settings" && settingsPanel}
+            {mobileTab === "chat" && chatPanel}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
-            <div className="rounded-[28px] bg-surface-low/55 p-4">
-              <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-ink-400">
-                Regles rapides
-              </div>
-              <div className="grid gap-2 text-sm text-ink-700 md:grid-cols-2">
-                <div>1. Tout le monde recoit un mot.</div>
-                <div>2. Chacun le dessine sans parler.</div>
-                <div>3. L&apos;Undercover a un mot proche.</div>
-                <div>4. On observe, on discute, puis on vote.</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid min-h-0 gap-4 lg:grid-rows-[auto_auto_minmax(0,1fr)]">
-            <div className="rounded-[28px] bg-surface-low/55 p-4">
-              <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-ink-400">
-                Reglages
-              </div>
-              <div className="grid gap-4">
-                <div>
-                  <div className="mb-2 text-sm font-bold text-ink-700">Mode</div>
-                  <PillGroup
-                    options={["classic", "mr_white"] as const}
-                    value={room.settings.mode}
-                    onChange={(value) => onUpdateSettings({ mode: value })}
-                    disabled={!isHost}
-                    format={(value) => (value === "classic" ? "Classique" : "Mr White")}
-                  />
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-bold text-ink-700">Temps de dessin</div>
-                  <PillGroup
-                    options={[30, 45, 60] as const}
-                    value={room.settings.drawingSeconds}
-                    onChange={(value) => onUpdateSettings({ drawingSeconds: value })}
-                    disabled={!isHost}
-                    format={(value) => `${value}s`}
-                  />
-                </div>
-
-                <div>
-                  <div className="mb-2 text-sm font-bold text-ink-700">Rounds</div>
-                  <PillGroup
-                    options={[3, 4, 5] as const}
-                    value={room.settings.rounds}
-                    onChange={(value) => onUpdateSettings({ rounds: value })}
-                    disabled={!isHost}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[28px] bg-ink-950 px-4 py-4 text-white">
-              <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/60">
-                Pret au lancement
-              </div>
-              <div className="mb-4 text-2xl font-extrabold">
-                {readyCount}/{Math.max(connectedPlayers.length, MIN_PLAYERS)}
-              </div>
-              <div className="mb-4 text-sm text-white/70">
-                Il faut au moins {MIN_PLAYERS} joueurs prets pour lancer la partie.
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button
-                  tone={selfPlayer.ready ? "secondary" : "primary"}
-                  onClick={onToggleReady}
-                  fullWidth
-                >
-                  {selfPlayer.ready ? "Je ne suis plus pret" : "Je suis pret"}
-                </Button>
-                {isHost ? (
-                  <Button fullWidth onClick={onStartGame} disabled={!canLaunch}>
-                    Lancer la partie
-                  </Button>
-                ) : (
-                  <div className="flex items-center justify-center rounded-2xl bg-white/8 px-4 py-3 text-sm text-white/70">
-                    Le host lance la partie
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="min-h-0 rounded-[28px] bg-surface-low/55 p-4">
-              <ChatPanel
-                title="Chat de la salle"
-                players={room.players}
-                messages={room.roomChat}
-                onSend={onSendChat}
-              />
-            </div>
-          </div>
+      {/* ── Desktop: 3 columns (>= lg) ── */}
+      <div className="hidden min-h-0 flex-1 gap-2.5 lg:grid lg:grid-cols-[1fr_0.85fr_0.85fr]">
+        <div className="bento-card flex min-h-0 flex-col p-4">
+          {playersPanel}
+        </div>
+        <div className="bento-card flex min-h-0 flex-col p-4">
+          {settingsPanel}
+        </div>
+        <div className="bento-card flex min-h-0 flex-col p-4">
+          {chatPanel}
         </div>
       </div>
     </div>

@@ -5,11 +5,11 @@ import type { DrawingStroke, DrawingTool } from "@shared/protocol";
 import { getCanvasSnapshot, normalizePointerPosition, renderStrokeCanvas } from "@/lib/canvas";
 import { Button } from "@/components/ui/Button";
 
-const TOOL_OPTIONS: Array<{ tool: DrawingTool; title: string }> = [
-  { tool: "pen", title: "Crayon" },
-  { tool: "brush", title: "Pinceau" },
-  { tool: "fill", title: "Pot de peinture" },
-  { tool: "eraser", title: "Gomme" }
+const TOOL_OPTIONS: Array<{ tool: DrawingTool; label: string; title: string }> = [
+  { tool: "pen", label: "Pen", title: "Crayon" },
+  { tool: "brush", label: "Br", title: "Pinceau" },
+  { tool: "fill", label: "Fi", title: "Remplir" },
+  { tool: "eraser", label: "Er", title: "Gomme" }
 ];
 
 const SIZE_PRESETS = [
@@ -53,9 +53,7 @@ export function DrawingCanvas({
 
   useEffect(() => {
     return () => {
-      if (previewTimer.current) {
-        window.clearTimeout(previewTimer.current);
-      }
+      if (previewTimer.current) window.clearTimeout(previewTimer.current);
     };
   }, []);
 
@@ -72,9 +70,7 @@ export function DrawingCanvas({
   }
 
   function queuePreview(stroke: DrawingStroke) {
-    if (previewTimer.current) {
-      window.clearTimeout(previewTimer.current);
-    }
+    if (previewTimer.current) window.clearTimeout(previewTimer.current);
     previewTimer.current = window.setTimeout(() => onPreview(stroke), 40);
   }
 
@@ -89,10 +85,12 @@ export function DrawingCanvas({
     if (!canvasRef.current) return;
     const point = normalizePointerPosition(event, canvasRef.current);
     const stroke = buildStroke(point);
+
     if (activeTool === "fill") {
       commitNow(stroke);
       return;
     }
+
     canvasRef.current.setPointerCapture(event.pointerId);
     setDraftStroke(stroke);
     queuePreview(stroke);
@@ -108,44 +106,46 @@ export function DrawingCanvas({
 
   function finishStroke(event: React.PointerEvent<HTMLCanvasElement>) {
     if (!draftStroke || !canvasRef.current) return;
+
     if (canvasRef.current.hasPointerCapture(event.pointerId)) {
       canvasRef.current.releasePointerCapture(event.pointerId);
     }
+
     const snapshot = getCanvasSnapshot(canvasRef.current);
     onCommit(draftStroke, snapshot);
     setDraftStroke(null);
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex flex-wrap gap-2">
-          {TOOL_OPTIONS.map(({ tool, title }) => (
+    <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-2.5">
+      <div className="flex flex-wrap items-center gap-2 rounded-[24px] bg-surface-low/70 px-2.5 py-2">
+        <div className="flex gap-1.5">
+          {TOOL_OPTIONS.map(({ tool, label, title }) => (
             <button
               key={tool}
               type="button"
               title={title}
               aria-label={title}
               onClick={() => setActiveTool(tool)}
-              className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition ${
+              className={`flex h-9 w-9 items-center justify-center rounded-2xl text-xs font-bold uppercase tracking-[0.12em] transition md:h-10 md:w-10 ${
                 activeTool === tool
-                  ? "border-neon-cyan/50 bg-neon-cyan/10 text-white"
-                  : "border-white/10 bg-white/5 text-ink-200 hover:bg-white/10"
+                  ? "bg-primary-light text-ink-950 shadow-primary"
+                  : "bg-surface-low text-ink-700 hover:bg-surface-high"
               }`}
             >
-              <ToolIcon tool={tool} />
+              {label}
             </button>
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {DRAWING_COLORS.map((color) => (
             <button
               key={color}
               type="button"
               onClick={() => setActiveColor(color)}
-              className={`h-8 w-8 rounded-full border-2 transition ${
-                activeColor === color ? "scale-110 border-white" : "border-transparent"
+              className={`h-7 w-7 rounded-full border-[3px] transition-transform md:h-8 md:w-8 ${
+                activeColor === color ? "scale-110 border-ink-950" : "border-transparent"
               }`}
               style={{ backgroundColor: color }}
               aria-label={`Couleur ${color}`}
@@ -153,16 +153,17 @@ export function DrawingCanvas({
           ))}
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1.5">
           {SIZE_PRESETS.map((preset) => (
             <button
-              key={preset.label}
+              key={preset.value}
               type="button"
+              title={`Taille ${preset.value}px`}
               onClick={() => setBrushSize(preset.value)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold uppercase transition md:h-9 md:w-9 ${
                 brushSize === preset.value
-                  ? "border-neon-cyan/50 bg-neon-cyan/10 text-white"
-                  : "border-white/10 bg-white/5 text-ink-200"
+                  ? "bg-primary-light text-ink-950"
+                  : "bg-surface-low text-ink-700 hover:bg-surface-high"
               }`}
             >
               {preset.label}
@@ -171,14 +172,14 @@ export function DrawingCanvas({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden rounded-[28px] border border-white/10 bg-[#f8f7f4] p-3 shadow-2xl">
+      <div className="min-h-0 flex-1 overflow-hidden rounded-[28px] bg-[#f8f6f2] p-2 shadow-card">
         <canvas
           ref={canvasRef}
-          className="aspect-square h-full max-h-full w-full touch-none rounded-[22px] bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]"
+          className="aspect-square h-full max-h-full w-full touch-none rounded-[22px] bg-white"
           style={{
             cursor: activeTool === "fill" ? "cell" : activeTool === "eraser" ? "grab" : "crosshair",
             backgroundImage:
-              "linear-gradient(rgba(16,16,24,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(16,16,24,0.03) 1px, transparent 1px)",
+              "linear-gradient(rgba(15,23,42,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.03) 1px, transparent 1px)",
             backgroundSize: "32px 32px"
           }}
           onPointerDown={beginStroke}
@@ -188,58 +189,33 @@ export function DrawingCanvas({
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 rounded-[24px] bg-surface-low/70 px-2.5 py-2">
         <input
           type="range"
           min={2}
           max={28}
           value={brushSize}
           onChange={(event) => setBrushSize(Number(event.target.value))}
-          className="min-w-[180px] flex-1 accent-neon-cyan"
+          className="min-w-[120px] flex-1 accent-primary"
           aria-label="Taille du trait"
         />
-        <Button tone="secondary" onClick={onUndo}>
-          Annuler
+        <Button
+          tone="secondary"
+          onClick={onUndo}
+          title="Annuler"
+          className="min-h-9 px-3 py-1.5 text-xs"
+        >
+          Undo
         </Button>
-        <Button tone="danger" onClick={onClear}>
-          Effacer
+        <Button
+          tone="danger"
+          onClick={onClear}
+          title="Tout effacer"
+          className="min-h-9 px-3 py-1.5 text-xs"
+        >
+          Clear
         </Button>
       </div>
     </div>
-  );
-}
-
-function ToolIcon({ tool }: { tool: DrawingTool }) {
-  if (tool === "pen") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
-        <path d="M4 20l4.5-1 9-9a2.1 2.1 0 000-3L16.5 6a2.1 2.1 0 00-3 0l-9 9L4 20z" />
-        <path d="M13 7l4 4" />
-      </svg>
-    );
-  }
-  if (tool === "brush") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
-        <path d="M14 4l6 6" />
-        <path d="M7 13l7-7 4 4-7 7" />
-        <path d="M5 19c1.2 1.2 4.3 1.4 6-.3 1.7-1.7 1.5-4.8.3-6" />
-      </svg>
-    );
-  }
-  if (tool === "fill") {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
-        <path d="M7 14l7-7 5 5-7 7H7v-5z" />
-        <path d="M15 19h5" />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
-      <path d="M6 15l7-7 5 5-7 7H6v-5z" />
-      <path d="M14 7l3 3" />
-      <path d="M4 20h7" />
-    </svg>
   );
 }

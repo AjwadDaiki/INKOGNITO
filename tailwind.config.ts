@@ -5,37 +5,69 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: {
-          950: "#0A0A0F",
-          900: "#12121A",
-          800: "#1A1A2E",
-          300: "#8888AA",
-          200: "#EEEEF2"
+        // Surfaces — warm off-white (plus blanc cassé, style cartoon)
+        surface: {
+          DEFAULT: "#e9edf2",
+          card: "#fffdf9",
+          low: "#f4f7fb",
+          high: "#e4e9f0"
         },
+        // Primary — electric gold/yellow
+        primary: {
+          DEFAULT: "#F0C000",
+          light: "#FFF1AE",
+          dark: "#A07A00"
+        },
+        // Tertiary — coral red
+        tertiary: {
+          DEFAULT: "#FF5C4D",
+          light: "#FFE8E3"
+        },
+        // Ink — text scale (light mode)
+        ink: {
+          950: "#0F172A",
+          900: "#1E293B",
+          700: "#334155",
+          500: "#64748B",
+          300: "#94A3B8",
+          100: "#E2EAF0"
+        },
+        // Accent helpers
+        accent: {
+          sky: "#0EA5E9",
+          violet: "#7C3AED",
+          green: "#22C55E"
+        },
+        // Keep neon for game-state indicators
         neon: {
           violet: "#7B2FFF",
-          cyan: "#00F0FF",
+          cyan: "#00B4D8",
           rose: "#FF2D78",
-          green: "#00FF88"
+          green: "#00CC66"
         }
       },
       boxShadow: {
-        glow: "0 0 0 1px rgba(255,255,255,0.06), 0 16px 45px rgba(123,47,255,0.24)",
-        cyan: "0 0 0 1px rgba(255,255,255,0.06), 0 14px 38px rgba(0,240,255,0.18)",
-        rose: "0 0 0 1px rgba(255,255,255,0.06), 0 14px 38px rgba(255,45,120,0.2)"
+        card: "0 4px 0 rgba(15,23,42,0.09), 0 8px 28px rgba(15,23,42,0.05)",
+        "card-hover": "0 6px 0 rgba(15,23,42,0.09), 0 12px 32px rgba(15,23,42,0.07)",
+        primary: "0 3px 0 rgba(140,90,0,0.30), 0 6px 20px rgba(240,192,0,0.35)",
+        tertiary: "0 4px 20px rgba(255,92,77,0.3)",
+        glow: "0 4px 24px rgba(124,58,237,0.2)",
+        cyan: "0 4px 20px rgba(14,165,233,0.2)",
+        rose: "0 4px 20px rgba(255,45,120,0.2)"
       },
       borderRadius: {
-        "4xl": "2rem"
+        "4xl": "2rem",
+        "5xl": "3rem"
       },
       fontFamily: {
-        display: ["Clash Display", "Satoshi", "sans-serif"],
-        sans: ["General Sans", "DM Sans", "sans-serif"],
+        display: ["Plus Jakarta Sans", "sans-serif"],
+        sans: ["Be Vietnam Pro", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"]
       },
       animation: {
         float: "float 8s ease-in-out infinite",
         "pulse-soft": "pulseSoft 2.8s ease-in-out infinite",
-        grain: "grain 12s steps(10) infinite"
+        "pop-in": "popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both"
       },
       keyframes: {
         float: {
@@ -43,20 +75,12 @@ const config: Config = {
           "50%": { transform: "translateY(-8px)" }
         },
         pulseSoft: {
-          "0%, 100%": { opacity: "0.72", transform: "scale(1)" },
-          "50%": { opacity: "1", transform: "scale(1.03)" }
+          "0%, 100%": { opacity: "0.8", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.04)" }
         },
-        grain: {
-          "0%, 100%": { transform: "translate(0, 0)" },
-          "10%": { transform: "translate(-5%, -10%)" },
-          "20%": { transform: "translate(-15%, 5%)" },
-          "30%": { transform: "translate(7%, -25%)" },
-          "40%": { transform: "translate(-5%, 25%)" },
-          "50%": { transform: "translate(-15%, 10%)" },
-          "60%": { transform: "translate(15%, 0%)" },
-          "70%": { transform: "translate(0%, 15%)" },
-          "80%": { transform: "translate(3%, 35%)" },
-          "90%": { transform: "translate(-10%, 10%)" }
+        popIn: {
+          "0%": { opacity: "0", transform: "scale(0.85)" },
+          "100%": { opacity: "1", transform: "scale(1)" }
         }
       }
     }

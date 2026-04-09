@@ -22,36 +22,37 @@ export function ChatPanel({
 }) {
   const [value, setValue] = useState("");
   const playersById = useMemo(
-    () => Object.fromEntries(players.map((player) => [player.id, player])),
+    () => Object.fromEntries(players.map((p) => [p.id, p])),
     [players]
   );
 
   return (
     <div className="flex h-full flex-col">
-      <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-ink-300">{title}</div>
-      <div className="scrollbar-thin flex-1 space-y-2 overflow-y-auto pr-1">
-        {messages.map((message) => {
-          const player = playersById[message.playerId];
+      <div className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-ink-500">{title}</div>
+      <div className="scrollbar-thin flex-1 space-y-1.5 overflow-y-auto">
+        {messages.map((msg) => {
+          const player = playersById[msg.playerId];
+          const flair = flairLabel(msg);
           return (
-            <div key={message.id} className="rounded-2xl border border-white/6 bg-white/[0.04] px-3 py-2">
-              <div className="mb-1 flex items-center gap-2 text-xs text-ink-300">
+            <div key={msg.id} className="rounded-2xl bg-surface-low px-3 py-2">
+              <div className="mb-0.5 flex items-center gap-1.5 text-xs text-ink-500">
                 <span>{player?.profile.emoji ?? "?"}</span>
-                <span className="font-semibold text-white">{player?.profile.name ?? "?"}</span>
-                {flairLabel(message) ? (
-                  <span className="rounded-full bg-neon-violet/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-neon-violet">
-                    {flairLabel(message)}
+                <span className="font-semibold text-ink-950">{player?.profile.name ?? "?"}</span>
+                {flair ? (
+                  <span className="rounded-full bg-primary-light px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-primary-dark">
+                    {flair}
                   </span>
                 ) : null}
               </div>
-              <div className="break-words text-sm text-white">{message.text}</div>
+              <div className="break-words text-sm text-ink-950">{msg.text}</div>
             </div>
           );
         })}
       </div>
       <form
-        className="mt-3 flex gap-2"
-        onSubmit={(event) => {
-          event.preventDefault();
+        className="mt-2 flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
           if (!value.trim()) return;
           onSend(value.trim());
           setValue("");
@@ -59,12 +60,12 @@ export function ChatPanel({
       >
         <input
           value={value}
-          onChange={(event) => setValue(event.target.value.slice(0, 100))}
-          placeholder="Message"
-          className="min-h-11 flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none transition focus:border-neon-cyan/40 focus:bg-white/10"
+          onChange={(e) => setValue(e.target.value.slice(0, 100))}
+          placeholder="Message..."
+          className="min-h-11 flex-1 rounded-2xl bg-surface-low px-4 text-sm text-ink-950 outline-none transition placeholder:text-ink-300 focus:bg-surface-high"
         />
-        <Button type="submit" tone="secondary">
-          OK
+        <Button type="submit" tone="primary" className="shrink-0 px-4">
+          →
         </Button>
       </form>
     </div>

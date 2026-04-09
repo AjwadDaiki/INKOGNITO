@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import type { PlayerProfile } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
-import { GlassPanel } from "@/components/ui/GlassPanel";
 import { ProfileEditor } from "@/components/ui/ProfileEditor";
 
 export function HomeScreen({
@@ -24,6 +24,7 @@ export function HomeScreen({
   function extractRoomCode(raw: string) {
     const trimmed = raw.trim();
     if (!trimmed) return "";
+
     try {
       const url = new URL(trimmed);
       return url.searchParams.get("room")?.toUpperCase() ?? "";
@@ -34,53 +35,100 @@ export function HomeScreen({
 
   const normalizedRoomCode = extractRoomCode(accessValue);
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="relative mx-auto flex min-h-screen w-full max-w-4xl flex-col justify-center px-4 py-10 md:px-8">
-      <div className="mb-8 text-center">
-        <h1 className="font-display text-5xl font-semibold tracking-[-0.03em] text-white md:text-7xl">
+    <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden p-4">
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+        className="mb-6 text-center"
+      >
+        <h1 className="font-display text-6xl font-extrabold tracking-[-0.03em] text-ink-950 md:text-8xl">
           INKOGNITO
         </h1>
-      </div>
+        <p className="mt-1 text-sm font-medium text-ink-500 md:text-base">
+          Dessin · Bluff · Deduction
+        </p>
+      </motion.div>
 
-      <GlassPanel className="mx-auto w-full max-w-3xl">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr]">
-          <ProfileEditor profile={profile} onChange={onProfileChange} compact />
+      <motion.div
+        initial="hidden"
+        animate="show"
+        transition={{ staggerChildren: 0.08 }}
+        className="grid w-full max-w-3xl gap-3 md:grid-cols-2"
+      >
+        <motion.div
+          variants={cardVariants}
+          transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
+          className="bento-card flex flex-col gap-4 p-5"
+        >
+          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-ink-500">
+            Ton profil
+          </h2>
 
-          <div className="space-y-4">
-            <input
-              value={accessValue}
-              onChange={(event) => setAccessValue(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
-                  onJoin(normalizedRoomCode);
-                }
-              }}
-              placeholder="Code ou lien"
-              className="min-h-11 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-white outline-none transition focus:border-neon-cyan/40 focus:bg-white/10"
-            />
+          <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Button fullWidth onClick={onCreate} disabled={loading}>
-                Creer
-              </Button>
-              <Button
-                fullWidth
-                tone="secondary"
-                onClick={() => onJoin(normalizedRoomCode)}
-                disabled={normalizedRoomCode.length < 6 || loading}
-              >
-                Rejoindre
-              </Button>
+          <div className="rounded-[24px] bg-surface-low px-4 py-4 text-sm text-ink-700">
+            <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-400">
+              Regles
             </div>
-
-            {error ? (
-              <div className="rounded-2xl border border-neon-rose/25 bg-neon-rose/10 px-4 py-3 text-sm text-rose-100">
-                {error}
-              </div>
-            ) : null}
+            <div className="grid gap-2">
+              <div>1. Chaque joueur recoit un mot secret.</div>
+              <div>2. Tout le monde dessine sans parler ni ecrire.</div>
+              <div>3. Les civils ont le meme mot, l&apos;Undercover un mot proche.</div>
+              <div>4. Vous observez, discutez, puis votez.</div>
+              <div>5. Trouvez l&apos;intrus avant qu&apos;il retourne la manche.</div>
+            </div>
           </div>
-        </div>
-      </GlassPanel>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
+          className="bento-card flex flex-col gap-4 p-5"
+        >
+          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-ink-500">
+            Rejoins la partie
+          </h2>
+
+          <input
+            value={accessValue}
+            onChange={(event) => setAccessValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
+                onJoin(normalizedRoomCode);
+              }
+            }}
+            placeholder="Code ou lien d'invitation..."
+            className="min-h-11 w-full rounded-2xl bg-surface-low px-4 text-sm text-ink-950 outline-none transition placeholder:text-ink-300 focus:bg-surface-high"
+          />
+
+          <div className="grid grid-cols-2 gap-2">
+            <Button fullWidth onClick={onCreate} disabled={loading}>
+              {loading ? "..." : "Creer"}
+            </Button>
+            <Button
+              fullWidth
+              tone="secondary"
+              onClick={() => onJoin(normalizedRoomCode)}
+              disabled={normalizedRoomCode.length < 6 || loading}
+            >
+              Rejoindre
+            </Button>
+          </div>
+
+          {error ? (
+            <div className="rounded-2xl bg-tertiary-light px-4 py-3 text-sm font-medium text-tertiary">
+              {error}
+            </div>
+          ) : null}
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

@@ -1,72 +1,97 @@
 # INKOGNITO
 
-Party game multijoueur en temps réel basé sur le dessin, les rôles cachés et le vote.
+Party game multijoueur en temps reel base sur le dessin, les roles caches et le vote.
 
-## Commandes
+## Lancer le projet
 
-### Développement local
+### Installation
 
 ```powershell
 npm install
+```
+
+### Developpement complet
+
+Lance le client Vite et le serveur Socket.IO ensemble :
+
+```powershell
 npm run dev
 ```
 
-- Client Vite: `http://localhost:5173`
-- Serveur Socket.IO + API: `http://localhost:3001`
+En general :
 
-### Build production
+- client : `http://localhost:5173`
+- serveur : `http://localhost:3001`
+
+Si `5173` est deja pris, Vite prendra un autre port (`5174`, `5175`, etc.).  
+Ouvre l'URL affichee dans le terminal.
+
+## Lancer separement
+
+### Client uniquement
 
 ```powershell
-npm install
+npm run dev:client
+```
+
+### Serveur uniquement
+
+```powershell
+npm run dev:server
+```
+
+Le serveur utilise par defaut :
+
+- port `3001`
+- endpoint health : `http://localhost:3001/health`
+
+## Build
+
+```powershell
 npm run build
 ```
 
-### Lancer en production
+## Preview du build frontend
+
+```powershell
+npm run preview
+```
+
+Attention : `preview.html` est une maquette statique.  
+Ce n'est pas l'application React. Pour voir les vraies modifs, utilise `npm run dev` ou `npm run preview`.
+
+## Production
 
 ```powershell
 $env:PORT=3001
 npm start
 ```
 
-Version shell Unix:
+Equivalent bash :
 
 ```bash
 PORT=3001 npm start
 ```
 
-## Déploiement simple
+## Si un port est deja pris
 
-Le serveur Express sert automatiquement le build frontend depuis `dist/`.
+### Fermer les vieux process Node
 
-Workflow minimal:
+Exemple PowerShell :
 
-```bash
-npm install
-npm run build
-PORT=3001 npm start
+```powershell
+Get-NetTCPConnection -LocalPort 3001 -State Listen
+Stop-Process -Id <PID> -Force
 ```
 
-Ensuite, place un reverse proxy devant si besoin:
+Exemple pour plusieurs ports :
 
-- domaine public vers `3001`
-- WebSocket activé sur `/socket.io`
-- HTTPS recommandé
+```powershell
+Stop-Process -Id 21752,14916,15152,18636 -Force
+```
 
-## MVP réellement branché
+## Documentation serveur
 
-- création et rejointe de room
-- lobby avec hôte, ready, réglages et mots custom
-- attribution des rôles
-- dessin live synchronisé
-- galerie
-- discussion + point du doigt + chat
-- vote secret
-- résolution avec score
-- fin de partie avec classement, awards et historique des rounds
+Voir aussi :
 
-## Limites actuelles
-
-- pas de mode Chaos
-- pas de sound design complet
-- pas d’image de partage auto
-- pas encore de système avancé de spectateur / AFK / replay
+- [server/README.md](C:\Users\Daiki\Desktop\inko\server\README.md)

@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, PropsWithChildren } from "react";
+import { motion } from "framer-motion";
 import clsx from "clsx";
 
 type ButtonProps = PropsWithChildren<
@@ -13,25 +14,35 @@ export function Button({
   className,
   tone = "primary",
   fullWidth = false,
+  disabled,
   ...props
 }: ButtonProps) {
   return (
-    <button
+    <motion.button
+      whileTap={disabled ? {} : { scale: 0.95 }}
+      whileHover={disabled ? {} : { scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      disabled={disabled}
       className={clsx(
-        "inline-flex min-h-11 items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50",
+        // Base: min 44 px height (touch target A11y), extreme rounding
+        "inline-flex min-h-11 items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40",
+        // Primary — sun-drenched gold gradient + cartoon bottom shadow
         tone === "primary" &&
-          "bg-neon-violet text-white shadow-glow hover:bg-[#8f4dff] active:translate-y-px",
+          "bg-gradient-to-br from-primary to-[#FFD700] text-ink-950 shadow-primary border border-[rgba(140,90,0,0.15)] active:translate-y-[2px] active:shadow-none",
+        // Secondary — surface tinted + cartoon shadow
         tone === "secondary" &&
-          "border border-white/10 bg-white/5 text-white shadow-cyan hover:border-neon-cyan/40 hover:bg-white/10",
-        tone === "ghost" && "text-ink-200 hover:bg-white/5",
+          "bg-surface-low text-ink-950 hover:bg-surface-high border border-[rgba(15,23,42,0.08)] shadow-[0_3px_0_rgba(15,23,42,0.09)] active:translate-y-[2px] active:shadow-none",
+        // Ghost
+        tone === "ghost" && "text-ink-700 hover:bg-surface-low",
+        // Danger — coral light + cartoon shadow
         tone === "danger" &&
-          "border border-neon-rose/30 bg-neon-rose/10 text-white hover:bg-neon-rose/20",
+          "bg-tertiary-light text-tertiary hover:bg-[#ffd4d0] border border-[rgba(255,92,77,0.18)] shadow-[0_3px_0_rgba(255,92,77,0.18)] active:translate-y-[2px] active:shadow-none",
         fullWidth && "w-full",
         className
       )}
-      {...props}
+      {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }

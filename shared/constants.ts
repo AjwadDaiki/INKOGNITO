@@ -2,28 +2,48 @@ export const ROOM_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
 export const AVATAR_EMOJIS = [
   "🦊",
+  "🐻",
+  "🐸",
+  "🐼",
+  "🦁",
+  "🐯",
+  "🦝",
+  "🐨",
+  "🐙",
+  "🦋",
+  "🦄",
+  "🐲",
   "👻",
-  "🎮",
   "💀",
-  "🔥",
-  "🌙",
-  "🎭",
-  "🍕",
+  "🤡",
+  "👾",
+  "🎮",
   "🎨",
-  "🧠",
+  "🍕",
+  "🍩",
+  "🔥",
   "⚡",
-  "🦄"
+  "🌙",
+  "🌈",
+  "🎭",
+  "🧠",
+  "👑",
+  "💎",
+  "🚀",
+  "🎯"
 ] as const;
 
 export const AVATAR_COLORS = [
-  "#7B2FFF",
-  "#00F0FF",
-  "#FF2D78",
-  "#00FF88",
-  "#F59E0B",
-  "#14B8A6",
-  "#FB7185",
-  "#38BDF8"
+  "#FF5C4D",
+  "#F0C000",
+  "#8B5CF6",
+  "#0EA5E9",
+  "#10B981",
+  "#F97316",
+  "#EC4899",
+  "#06B6D4",
+  "#EF4444",
+  "#84CC16"
 ] as const;
 
 export const AVATAR_SHAPES = ["circle", "rounded", "hex", "diamond"] as const;

@@ -6,17 +6,17 @@ export function CountdownPill({ endsAt }: { endsAt: number | null }) {
   const [, forceTick] = useState(0);
 
   useEffect(() => {
-    const interval = window.setInterval(() => forceTick((value) => value + 1), 500);
+    const interval = window.setInterval(() => forceTick((v) => v + 1), 500);
     return () => window.clearInterval(interval);
   }, []);
+
+  const urgent = isEndingSoon(endsAt);
 
   return (
     <div
       className={clsx(
-        "rounded-full border px-3 py-2 font-mono text-sm transition",
-        isEndingSoon(endsAt)
-          ? "border-neon-rose/40 bg-neon-rose/10 text-neon-rose"
-          : "border-white/10 bg-white/5 text-white"
+        "rounded-full px-3 py-2 font-mono text-sm font-semibold transition",
+        urgent ? "bg-tertiary-light text-tertiary" : "bg-surface-low text-ink-700"
       )}
     >
       ⏱ {formatRemainingTime(endsAt)}

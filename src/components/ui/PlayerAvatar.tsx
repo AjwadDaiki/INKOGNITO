@@ -27,27 +27,28 @@ export function PlayerAvatar({
 }) {
   return (
     <div className={clsx("flex min-w-0 items-center", compact ? "gap-2" : "gap-3")}>
-      <div className="relative">
+      <div className="relative shrink-0">
         <div
           className={clsx(
-            "flex items-center justify-center border border-white/10 bg-white/5 shadow-lg transition",
-            compact ? "h-10 w-10 text-lg" : "h-14 w-14 text-2xl",
+            "flex items-center justify-center transition",
+            compact ? "h-8 w-8 text-base md:h-9 md:w-9 md:text-lg" : "h-14 w-14 text-2xl",
             shapeClass(player.profile.shape),
-            highlighted && "scale-105 ring-2 ring-neon-cyan/60"
+            highlighted && "ring-2 ring-primary ring-offset-2"
           )}
           style={{
-            background: `linear-gradient(180deg, ${player.profile.color}33, rgba(255,255,255,0.05))`,
-            boxShadow: `0 0 0 1px ${player.profile.color}66, 0 10px 30px ${player.profile.color}33`
+            background: `linear-gradient(160deg, ${player.profile.color}44, ${player.profile.color}18)`,
+            boxShadow: `0 2px 14px ${player.profile.color}50`
           }}
         >
           <span className={clsx(player.profile.shape === "diamond" && "-rotate-45")}>
             {player.profile.emoji}
           </span>
         </div>
+
         {badge ? (
           <span
             className={clsx(
-              "absolute rounded-full border border-white/10 bg-ink-900 font-semibold text-white",
+              "absolute rounded-full bg-ink-950 font-bold text-white",
               compact
                 ? "-bottom-1 -right-1 px-1.5 py-0.5 text-[9px]"
                 : "-bottom-1 -right-1 px-2 py-0.5 text-[10px]"
@@ -57,11 +58,17 @@ export function PlayerAvatar({
           </span>
         ) : null}
       </div>
+
       <div className="min-w-0">
-        <div className={clsx("truncate font-semibold text-white", compact ? "text-xs" : "text-sm")}>
+        <div
+          className={clsx(
+            "truncate font-semibold text-ink-950",
+            compact ? "text-[11px] md:text-xs" : "text-sm"
+          )}
+        >
           {player.profile.name}
         </div>
-        <div className={clsx("text-ink-300", compact ? "text-[11px]" : "text-xs")}>
+        <div className={clsx("truncate text-ink-500", compact ? "text-[10px]" : "text-xs")}>
           {player.connected ? "Connecte" : "Deco"} · {player.points} pts
         </div>
       </div>

@@ -53,7 +53,9 @@ export function FinalScreen({
       <InkSplatter variant={0} className="left-[7%] top-[12%]" size={220} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[8%] right-[7%]" size={230} opacity={0.09} />
 
-      <div className="paper-sheet notebook-page desk-shadow flex h-full w-full max-w-[1580px] flex-col overflow-hidden px-5 py-5 md:px-8">
+      <div className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full max-w-[1580px] flex-col overflow-hidden px-5 py-5 md:px-8">
+        <div className="absolute right-10 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
+        <div className="absolute bottom-12 left-8 h-16 w-16 rounded-full bg-ink-950/6" />
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>

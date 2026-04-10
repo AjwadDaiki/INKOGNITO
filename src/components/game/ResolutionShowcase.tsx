@@ -98,6 +98,30 @@ export function ResolutionShowcase({
                 transition={{ delay: 0.12, type: "spring", stiffness: 260, damping: 24 }}
                 className="paper-sheet relative mt-5 overflow-hidden px-4 py-4"
               >
+                <motion.div
+                  initial={{ scale: 0.1, opacity: 0 }}
+                  animate={{ scale: 1, opacity: isCaught ? 0.32 : 0.2 }}
+                  transition={{ delay: 0.06, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+                  className={`pointer-events-none absolute inset-[-18%] rounded-full ${
+                    isCaught
+                      ? "bg-[radial-gradient(circle_at_center,rgba(196,62,46,0.7),rgba(196,62,46,0.16)_34%,transparent_64%)]"
+                      : "bg-[radial-gradient(circle_at_center,rgba(212,160,23,0.58),rgba(212,160,23,0.14)_34%,transparent_64%)]"
+                  }`}
+                  style={{ filter: "blur(1px)" }}
+                />
+                <motion.div
+                  initial={{ scale: 0.12, opacity: 0, rotate: -25 }}
+                  animate={{ scale: 1, opacity: 0.18, rotate: 0 }}
+                  transition={{ delay: 0.12, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                  className="pointer-events-none absolute -left-12 -top-10 h-28 w-28 rounded-full bg-ink-950"
+                  style={{ filter: "blur(2px)" }}
+                />
+                <motion.div
+                  initial={{ scale: 0.12, opacity: 0, rotate: 25 }}
+                  animate={{ scale: 1, opacity: 0.12, rotate: 0 }}
+                  transition={{ delay: 0.16, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                  className="pointer-events-none absolute -bottom-10 -right-6 h-20 w-20 rounded-full bg-ink-950"
+                />
                 <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-ink-950/8" />
                 <MiniDrawingCanvas
                   strokes={round.drawings[suspectPlayer.id]?.strokes ?? []}
@@ -182,6 +206,14 @@ export function ResolutionShowcase({
                   transition={{ delay: index * 0.04, type: "spring", stiffness: 250, damping: 22 }}
                   className={`paper-sheet overflow-hidden px-3 py-3 ${isSuspect ? "ring-2 ring-tertiary/25" : ""}`}
                 >
+                  {isSuspect ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.15 }}
+                      animate={{ opacity: 0.2, scale: 1 }}
+                      transition={{ delay: 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                      className="pointer-events-none absolute inset-[-10%] rounded-full bg-[radial-gradient(circle_at_center,rgba(196,62,46,0.65),rgba(196,62,46,0.14)_30%,transparent_58%)]"
+                    />
+                  ) : null}
                   <MiniDrawingCanvas
                     strokes={round.drawings[player.id]?.strokes ?? []}
                     size={180}

@@ -91,8 +91,11 @@ export function LobbyScreen({
         initial={{ opacity: 0, y: 24, rotate: -1 }}
         animate={{ opacity: 1, y: 0, rotate: -0.4 }}
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        className="paper-sheet notebook-page desk-shadow flex h-full w-full max-w-[1480px] flex-col overflow-hidden px-5 py-5 md:px-8"
+        className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full max-w-[1480px] flex-col overflow-hidden px-5 py-5 md:px-8"
       >
+        <div className="absolute right-8 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
+        <div className="absolute bottom-8 left-10 h-16 w-16 rounded-full bg-ink-950/6" />
+
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -156,7 +159,7 @@ export function LobbyScreen({
                             {player.profile.name}
                           </div>
                           <div className="text-xs text-ink-500">
-                            {player.isHost ? "hote" : "joueur"} · {player.ready ? "pret" : "attend"}
+                            {player.isHost ? "hote" : "joueur"} - {player.ready ? "pret" : "attend"}
                           </div>
                         </div>
                       </div>

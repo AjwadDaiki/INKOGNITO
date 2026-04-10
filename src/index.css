@@ -31,12 +31,12 @@ body {
   margin: 0;
   overflow: hidden;
   background:
-    radial-gradient(circle at 11% 12%, rgba(26, 20, 16, 0.16), transparent 0 17%),
-    radial-gradient(circle at 90% 10%, rgba(26, 20, 16, 0.12), transparent 0 14%),
-    radial-gradient(circle at 87% 84%, rgba(26, 20, 16, 0.14), transparent 0 16%),
-    radial-gradient(circle at 16% 86%, rgba(26, 20, 16, 0.1), transparent 0 13%),
-    linear-gradient(180deg, rgba(120, 88, 57, 0.1), rgba(120, 88, 57, 0.02)),
-    linear-gradient(180deg, #ddd2c4 0%, #d4c8b8 100%);
+    radial-gradient(circle at 11% 12%, rgba(26, 20, 16, 0.18), transparent 0 17%),
+    radial-gradient(circle at 90% 10%, rgba(26, 20, 16, 0.14), transparent 0 14%),
+    radial-gradient(circle at 87% 84%, rgba(26, 20, 16, 0.16), transparent 0 16%),
+    radial-gradient(circle at 16% 86%, rgba(26, 20, 16, 0.12), transparent 0 13%),
+    linear-gradient(180deg, rgba(95, 66, 38, 0.18), rgba(95, 66, 38, 0.04)),
+    linear-gradient(180deg, #cfbea8 0%, #b89f84 100%);
   position: relative;
 }
 
@@ -50,6 +50,24 @@ body::before {
     linear-gradient(90deg, rgba(119, 84, 50, 0.08) 0, rgba(119, 84, 50, 0.02) 8%, rgba(119, 84, 50, 0.02) 92%, rgba(119, 84, 50, 0.08) 100%);
   mix-blend-mode: multiply;
   opacity: 0.6;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(91, 61, 37, 0.09) 0,
+      rgba(91, 61, 37, 0.09) 2px,
+      rgba(155, 120, 82, 0.02) 2px,
+      rgba(155, 120, 82, 0.02) 34px
+    ),
+    linear-gradient(180deg, rgba(43, 28, 16, 0.1), transparent 18%, transparent 82%, rgba(43, 28, 16, 0.12));
+  opacity: 0.34;
+  mix-blend-mode: multiply;
 }
 
 button,
@@ -78,6 +96,8 @@ textarea {
   position: relative;
   background:
     url("data:image/svg+xml,%3Csvg width='140' height='140' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.12'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 88% 12%, rgba(120, 92, 62, 0.08), transparent 0 20%),
+    radial-gradient(circle at 14% 84%, rgba(120, 92, 62, 0.06), transparent 0 18%),
     linear-gradient(180deg, rgba(247, 240, 228, 0.98) 0%, rgba(239, 230, 215, 0.98) 100%);
   border: 1px solid rgba(90, 68, 47, 0.15);
   border-radius: 1.7rem;
@@ -85,6 +105,18 @@ textarea {
     0 2px 0 rgba(90, 68, 47, 0.16),
     0 16px 28px rgba(90, 68, 47, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.paper-sheet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(26, 20, 16, 0.06), transparent 0 10%),
+    radial-gradient(circle at 94% 88%, rgba(26, 20, 16, 0.05), transparent 0 10%);
+  opacity: 0.8;
 }
 
 .notebook-page::before {
@@ -108,7 +140,7 @@ textarea {
 .desk-shadow {
   box-shadow:
     0 3px 0 rgba(90, 68, 47, 0.18),
-    0 18px 35px rgba(90, 68, 47, 0.16);
+    0 22px 42px rgba(90, 68, 47, 0.2);
 }
 
 .ink-chip {
@@ -167,4 +199,41 @@ textarea {
 
 .animate-ink-spread {
   animation: ink-spread 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ink-bloom {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.88;
+  }
+}
+
+.animate-ink-bloom {
+  animation: ink-bloom 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-settle {
+  0% {
+    transform: translateY(34px) rotate(-6deg) scale(0.94);
+    opacity: 0;
+  }
+  62% {
+    transform: translateY(-6px) rotate(1deg) scale(1.01);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-page-settle {
+  animation: page-settle 0.8s cubic-bezier(0.2, 1, 0.3, 1) both;
 }

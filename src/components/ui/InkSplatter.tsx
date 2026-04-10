@@ -45,8 +45,17 @@ export function InkSplatter({
   const Wrapper = animate ? motion.div : "div";
   const animateProps = animate
     ? {
-        animate: { rotate: [0, 2, -1, 0], scale: [1, 1.02, 0.98, 1] },
-        transition: { duration: 20 + variant * 5, repeat: Infinity, ease: "easeInOut" as const },
+        initial: { scale: 0.72, opacity: 0 },
+        animate: {
+          rotate: [0, 2, -1, 0],
+          scale: [1, 1.03, 0.99, 1],
+          opacity: [0, opacity, opacity * 1.08, opacity]
+        },
+        transition: {
+          opacity: { duration: 1.1, ease: [0.22, 1, 0.36, 1] as const },
+          rotate: { duration: 20 + variant * 5, repeat: Infinity, ease: "easeInOut" as const },
+          scale: { duration: 20 + variant * 5, repeat: Infinity, ease: "easeInOut" as const }
+        },
       }
     : {};
 

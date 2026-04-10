@@ -50,8 +50,9 @@ export function RoleRevealScreen({
         initial={{ opacity: 0, y: 24, rotate: -1.5 }}
         animate={{ opacity: 1, y: 0, rotate: -0.8 }}
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        className="paper-sheet notebook-page desk-shadow w-full max-w-3xl overflow-hidden px-6 py-7 md:px-10 md:py-8"
+        className="paper-sheet notebook-page desk-shadow animate-page-settle w-full max-w-3xl overflow-hidden px-6 py-7 md:px-10 md:py-8"
       >
+        <div className="absolute right-8 top-10 h-20 w-20 rounded-full bg-ink-950/8" />
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>

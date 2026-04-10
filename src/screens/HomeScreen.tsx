@@ -44,9 +44,11 @@ export function HomeScreen({
         initial={{ opacity: 0, y: 28, rotate: -1.4 }}
         animate={{ opacity: 1, y: 0, rotate: -0.8 }}
         transition={{ type: "spring", stiffness: 180, damping: 20 }}
-        className="paper-sheet notebook-page desk-shadow relative w-full max-w-2xl overflow-hidden px-6 py-7 md:px-10 md:py-9"
+        className="paper-sheet notebook-page desk-shadow animate-page-settle relative w-full max-w-2xl overflow-hidden px-6 py-7 md:px-10 md:py-9"
       >
         <div className="absolute inset-x-0 top-0 h-10 bg-[linear-gradient(180deg,rgba(90,68,47,0.08),transparent)]" />
+        <div className="absolute -right-10 top-8 h-24 w-24 rounded-full bg-ink-950/10" />
+        <div className="absolute bottom-10 left-8 h-14 w-14 rounded-full bg-ink-950/6" />
 
         <div className="pl-7 md:pl-10">
           <div className="text-center">

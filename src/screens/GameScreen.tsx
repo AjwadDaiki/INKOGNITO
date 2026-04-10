@@ -48,6 +48,7 @@ export function GameScreen({
   onReaction,
   onSendChat,
   onVote,
+  onPointFinger,
   onSubmitGuess
 }: {
   room: RoomView;
@@ -60,6 +61,7 @@ export function GameScreen({
   onReaction: (targetPlayerId: string, emoji: ReactionEmoji) => void;
   onSendChat: (text: string) => void;
   onVote: (targetPlayerId: string | null) => void;
+  onPointFinger: (targetPlayerId: string | null) => void;
   onSubmitGuess: (guess: string) => void;
 }) {
   const [pendingVote, setPendingVote] = useState<string | null>(null);
@@ -95,23 +97,46 @@ export function GameScreen({
       ? playersById[activeRound.resolution.suspectPlayerId]
       : null;
 
-  const voteMarkersByTarget = useMemo(() => {
-    const map: Record<string, PlayerView[]> = {};
+  const { confirmedMarkers, pendingMarkers } = useMemo(() => {
+    const confirmed: Record<string, PlayerView[]> = {};
+    const pending: Record<string, PlayerView[]> = {};
+
+    // Confirmed votes
     for (const [voterId, targetId] of Object.entries(activeRound.liveVotes)) {
       if (!targetId) continue;
       const voter = playersById[voterId];
       if (!voter) continue;
-      if (!map[targetId]) map[targetId] = [];
-      map[targetId].push(voter);
+      if (!confirmed[targetId]) confirmed[targetId] = [];
+      confirmed[targetId].push(voter);
     }
+
+    // Pending selections from pointers (exclude confirmed voters)
+    for (const [voterId, targetId] of Object.entries(activeRound.pointers)) {
+      if (!targetId) continue;
+      if (submittedVotePlayerIds.includes(voterId)) continue;
+      const voter = playersById[voterId];
+      if (!voter) continue;
+      if (!pending[targetId]) pending[targetId] = [];
+      pending[targetId].push(voter);
+    }
+
+    // Add self pending vote instantly (before server roundtrip)
     if (room.phase === "vote" && !selfHasSubmittedVote && pendingVote) {
-      if (!map[pendingVote]) map[pendingVote] = [];
-      if (!map[pendingVote].some((entry) => entry.id === selfPlayer.id)) {
-        map[pendingVote] = [...map[pendingVote], selfPlayer];
+      if (!pending[pendingVote]) pending[pendingVote] = [];
+      if (!pending[pendingVote].some((v) => v.id === selfPlayer.id)) {
+        pending[pendingVote] = [...pending[pendingVote], selfPlayer];
       }
     }
-    return map;
-  }, [activeRound.liveVotes, pendingVote, playersById, room.phase, selfHasSubmittedVote, selfPlayer]);
+
+    return { confirmedMarkers: confirmed, pendingMarkers: pending };
+  }, [activeRound.liveVotes, activeRound.pointers, pendingVote, playersById, room.phase, selfHasSubmittedVote, selfPlayer, submittedVotePlayerIds]);
+
+  // Broadcast pending vote selection to other players
+  useEffect(() => {
+    if (room.phase === "vote" && !selfHasSubmittedVote) {
+      onPointFinger(pendingVote);
+    }
+  }, [pendingVote, room.phase, selfHasSubmittedVote, onPointFinger]);
 
   useEffect(() => {
     setShowSplash(true);
@@ -138,7 +163,8 @@ export function GameScreen({
         voters={[]}
         revealedRole={activeRound.resolution?.revealedRoles[player.id]}
         pointsAwarded={activeRound.resolution?.pointsAwarded[player.id]}
-        voteMarkers={room.phase === "vote" ? voteMarkersByTarget[player.id] ?? [] : []}
+        voteMarkers={room.phase === "vote" ? confirmedMarkers[player.id] ?? [] : []}
+        pendingMarkers={room.phase === "vote" ? pendingMarkers[player.id] ?? [] : []}
         onVote={
           isSelf
             ? () => {}

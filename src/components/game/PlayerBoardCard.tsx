@@ -25,6 +25,7 @@ function PlayerBoardCardComponent({
   isSelf = false,
   selectedVoteTargetId,
   voteMarkers = [],
+  pendingMarkers = [],
   onVote
 }: {
   phase: RoomView["phase"];
@@ -40,6 +41,7 @@ function PlayerBoardCardComponent({
   revealedRole?: PlayerRole | null;
   pointsAwarded?: number;
   voteMarkers?: PlayerView[];
+  pendingMarkers?: PlayerView[];
   onVote: (targetPlayerId: string | null) => void;
 }) {
   const isVoteSelected = selectedVoteTargetId === player.id;
@@ -71,21 +73,30 @@ function PlayerBoardCardComponent({
         {player.profile.name}
       </div>
 
-      {/* Vote markers — compact emoji row */}
-      {phase === "vote" && voteMarkers.length > 0 ? (
+      {/* Vote markers — confirmed (color) + pending (grayscale) */}
+      {phase === "vote" && (voteMarkers.length > 0 || pendingMarkers.length > 0) ? (
         <div className="flex flex-wrap justify-center gap-0.5">
           {voteMarkers.slice(0, 6).map((voter) => (
             <div
               key={voter.id}
-              title={voter.profile.name}
-              className="flex h-5 w-5 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-[rgba(245,239,229,0.96)] text-[10px] shadow-sm"
+              title={`${voter.profile.name} (voté)`}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-[rgba(74,60,46,0.18)] bg-[rgba(245,239,229,0.96)] text-[10px] shadow-sm"
             >
               {voter.profile.emoji}
             </div>
           ))}
-          {voteMarkers.length > 6 ? (
+          {pendingMarkers.slice(0, 6 - voteMarkers.length).map((voter) => (
+            <div
+              key={voter.id}
+              title={`${voter.profile.name} (en attente)`}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-[rgba(74,60,46,0.15)] bg-[rgba(245,239,229,0.5)] text-[10px] opacity-50 grayscale"
+            >
+              {voter.profile.emoji}
+            </div>
+          ))}
+          {voteMarkers.length + pendingMarkers.length > 6 ? (
             <div className="flex h-5 items-center rounded-full bg-paper px-1 text-[9px] font-semibold text-ink-700">
-              +{voteMarkers.length - 6}
+              +{voteMarkers.length + pendingMarkers.length - 6}
             </div>
           ) : null}
         </div>
@@ -113,6 +124,7 @@ export const PlayerBoardCard = memo(PlayerBoardCardComponent, (prev, next) => {
     prev.isSelf === next.isSelf &&
     prev.selectedVoteTargetId === next.selectedVoteTargetId &&
     sameVoters(prev.voteMarkers ?? [], next.voteMarkers ?? []) &&
+    sameVoters(prev.pendingMarkers ?? [], next.pendingMarkers ?? []) &&
     sameVoters(prev.voters ?? [], next.voters ?? []) &&
     prev.revealedRole === next.revealedRole &&
     prev.pointsAwarded === next.pointsAwarded

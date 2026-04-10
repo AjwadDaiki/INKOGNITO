@@ -165,6 +165,7 @@ export default function App() {
           onReaction={sendReaction}
           onSendChat={sendChatMessage}
           onVote={castVote}
+          onPointFinger={pointFinger}
           onSubmitGuess={submitMrWhiteGuess}
         />
       )

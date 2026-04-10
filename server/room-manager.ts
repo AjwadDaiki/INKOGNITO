@@ -413,7 +413,21 @@ export class RoomManager {
     }
     round.votes[player.id] = payload.targetPlayerId;
     round.submittedVotePlayerIds.add(player.id);
+    round.pointers[player.id] = null;
     this.touch(player);
+
+    // If everyone voted, speed up timer to 3s
+    const connectedIds = room.players.filter((p) => p.connected).map((p) => p.id);
+    const allVoted = connectedIds.every((id) => round.submittedVotePlayerIds.has(id));
+    if (allVoted && room.phaseEndsAt) {
+      const remaining = room.phaseEndsAt - Date.now();
+      if (remaining > 3000) {
+        this.clearRoomTimeout(room);
+        room.phaseEndsAt = Date.now() + 3000;
+        room.timeoutHandle = setTimeout(() => this.handlePhaseTimeout(room.code), 3000);
+      }
+    }
+
     this.emitRoomState(room);
   }
 
@@ -450,12 +464,22 @@ export class RoomManager {
     this.emitRoomState(room);
   }
 
-  pointFinger(_payload: {
+  pointFinger(payload: {
     roomCode: string;
     clientId: string;
     targetPlayerId: string | null;
   }) {
-    // Discussion phase removed — no-op kept for protocol compatibility
+    const located = this.findPlayer(payload.roomCode, payload.clientId);
+    if (!located || !located.room.round || located.room.phase !== "vote") {
+      return;
+    }
+    const { room, player } = located;
+    const round = room.round!;
+    if (round.submittedVotePlayerIds.has(player.id)) return;
+    if (payload.targetPlayerId === player.id) return;
+    round.pointers[player.id] = payload.targetPlayerId;
+    this.touch(player);
+    this.emitRoomState(room);
   }
 
   chatMessage(payload: { roomCode: string; clientId: string; text: string }) {
@@ -608,6 +632,18 @@ export class RoomManager {
         this.setPhase(room, "vote", room.settings.voteSeconds * 1000);
         break;
       case "vote":
+        // Auto-confirm pending votes from pointers
+        if (room.round) {
+          for (const player of room.players) {
+            if (!player.connected) continue;
+            if (room.round.submittedVotePlayerIds.has(player.id)) continue;
+            const pendingTarget = room.round.pointers[player.id];
+            if (pendingTarget) {
+              room.round.votes[player.id] = pendingTarget;
+              room.round.submittedVotePlayerIds.add(player.id);
+            }
+          }
+        }
         this.resolveVotePhase(room);
         break;
       case "resolution":

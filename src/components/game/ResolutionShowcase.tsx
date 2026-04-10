@@ -29,7 +29,7 @@ export function ResolutionShowcase({
   const suspectRole = suspectPlayer ? round.resolution.revealedRoles[suspectPlayer.id] : null;
   const isCaught = suspectRole === "undercover" || suspectRole === "mr_white";
 
-  // Group votes by target: { targetId -> [voterPlayer, ...] }
+  // Group votes by target
   const votesByTarget: Record<string, PlayerView[]> = {};
   const blankVoters: PlayerView[] = [];
   for (const [fromId, toId] of Object.entries(round.resolution.votes)) {
@@ -49,92 +49,58 @@ export function ResolutionShowcase({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
 
-      {/* ── Top strip: Words + Points ── */}
+      {/* Top strip */}
       <motion.div
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 350, damping: 22 }}
-        className="flex shrink-0 flex-wrap items-center gap-2 rounded-[20px] bg-surface-card/90 px-4 py-3 backdrop-blur-md"
+        className="flex shrink-0 flex-wrap items-center gap-2 rounded-[16px] bg-surface-card/90 px-3 py-2"
       >
-        {/* Result label */}
-        <motion.span
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1, type: "spring", stiffness: 400, damping: 18 }}
-          className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] ${
-            isCaught ? "bg-tertiary-light text-tertiary" : "bg-[#e0eddb] text-[#3d6b30]"
-          }`}
-        >
-          {isCaught ? "Imposteur elimine !" : "Innocent elimine..."}
-        </motion.span>
-
-        {/* Words */}
-        <div className="flex items-center gap-1.5">
-          <span className="rounded-full bg-[#e0eddb] px-2.5 py-1 text-xs font-bold text-[#3d6b30]">
-            {round.resolution.civilWord}
-          </span>
-          <span className="text-xs text-ink-300">/</span>
-          <span className="rounded-full bg-[#f5e8c0] px-2.5 py-1 text-xs font-bold text-[#8B6914]">
-            {round.resolution.undercoverWord}
-          </span>
-        </div>
-
-        {/* Points */}
-        <div className="ml-auto flex items-center gap-1">
-          {room.players.map((p, i) => {
-            const pts = round.resolution?.pointsAwarded[p.id] ?? 0;
-            return (
-              <motion.span
-                key={p.id}
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 + i * 0.05, type: "spring", stiffness: 400, damping: 18 }}
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                  pts > 0 ? "bg-[#e0eddb] text-[#3d6b30]" : "bg-surface-low text-ink-500"
-                }`}
-              >
-                {p.profile.emoji} {pts > 0 ? `+${pts}` : "0"}
-              </motion.span>
-            );
-          })}
-        </div>
+        <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
+          isCaught ? "bg-tertiary-light text-tertiary" : "bg-[#e0eddb] text-[#3d6b30]"
+        }`}>
+          {isCaught ? "Elimine !" : "Innocent..."}
+        </span>
+        <span className="rounded-full bg-[#e0eddb] px-2 py-0.5 text-[10px] font-bold text-[#3d6b30]">
+          {round.resolution.civilWord}
+        </span>
+        <span className="text-ink-300">/</span>
+        <span className="rounded-full bg-[#f5e8c0] px-2 py-0.5 text-[10px] font-bold text-[#8B6914]">
+          {round.resolution.undercoverWord}
+        </span>
       </motion.div>
 
-      {/* ── Mr White guess form ── */}
+      {/* Mr White guess */}
       {round.resolution.mrWhiteGuess.pending &&
         round.resolution.mrWhiteGuess.playerId === selfPlayer.id && (
           <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="shrink-0 rounded-[20px] bg-gradient-to-r from-[#fef3c7] to-[#fff8e1] p-4"
+            className="shrink-0 rounded-[16px] bg-gradient-to-r from-[#f5e8c0] to-[#faf3e0] p-3"
             onSubmit={(e) => {
               e.preventDefault();
               if (guess.trim()) { onSubmitGuess(guess.trim()); setGuess(""); }
             }}
           >
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#8B6914]">
+            <div className="mb-2 font-sketch text-sm font-bold text-[#8B6914]">
               Derniere chance — devine le mot civil !
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <input
                 value={guess}
                 onChange={(e) => setGuess(e.target.value)}
-                className="h-11 flex-1 rounded-2xl bg-surface-card px-4 text-sm text-ink-950 shadow-inner outline-none focus:ring-2 focus:ring-primary/30"
+                className="h-10 flex-1 rounded-xl bg-surface-card px-3 text-sm text-ink-950 outline-none focus:ring-2 focus:ring-primary/30"
                 placeholder="Mot civil..."
                 autoFocus
               />
-              <Button type="submit" className="min-h-11 px-5 text-sm">Deviner</Button>
+              <Button type="submit" className="min-h-10 px-4 text-xs">Deviner</Button>
             </div>
           </motion.form>
         )}
 
-      {/* ── Among Us style vote grid ── */}
+      {/* Player cards grid — Among Us style */}
       <div
-        className="grid min-h-0 flex-1 gap-2 overflow-auto"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`
-        }}
+        className="grid flex-1 gap-2 place-items-center overflow-auto"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {allPlayers.map((player, idx) => {
           const role = round.resolution!.revealedRoles[player.id];
@@ -149,128 +115,108 @@ export function ResolutionShowcase({
               key={player.id}
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{
-                delay: 0.15 + idx * 0.08,
-                type: "spring",
-                stiffness: 320,
-                damping: 22
-              }}
-              className={`flex flex-col rounded-[20px] border-2 p-2 transition-all ${
+              transition={{ delay: 0.1 + idx * 0.06, type: "spring", stiffness: 320, damping: 22 }}
+              className={`flex w-full flex-col items-center gap-1 rounded-[14px] border-2 p-2 ${
                 isSuspect
                   ? isImpostor
-                    ? "border-tertiary bg-gradient-to-b from-tertiary-light to-paper shadow-[0_4px_20px_rgba(196,62,46,0.15)]"
-                    : "border-primary bg-gradient-to-b from-primary-light to-paper shadow-[0_4px_20px_rgba(212,160,23,0.15)]"
+                    ? "border-tertiary bg-gradient-to-b from-tertiary-light to-paper"
+                    : "border-primary bg-gradient-to-b from-primary-light to-paper"
                   : isImpostor
-                    ? "border-tertiary/30 bg-gradient-to-b from-tertiary-light/40 to-paper"
-                    : "border-surface-low/60 bg-surface-card/90"
+                    ? "border-tertiary/30 bg-tertiary-light/30"
+                    : "border-ink-100/50 bg-surface-card/80"
               }`}
             >
               {/* Drawing */}
-              <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[14px] bg-paper-warm">
-                <MiniDrawingCanvas
-                  strokes={round.drawings[player.id]?.strokes ?? []}
-                  size={180}
-                  className="aspect-square max-h-full max-w-full rounded-[14px]"
-                />
-              </div>
+              <MiniDrawingCanvas
+                strokes={round.drawings[player.id]?.strokes ?? []}
+                size={160}
+                className="rounded-[10px]"
+              />
 
-              {/* Name + Role badge */}
-              <div className="mt-1.5 flex items-center justify-between gap-1 px-1">
-                <div className="flex min-w-0 items-center gap-1.5">
+              {/* Name + role */}
+              <div className="flex w-full items-center justify-between gap-1 px-0.5">
+                <div className="flex min-w-0 items-center gap-1">
                   <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm"
-                    style={{
-                      background: `linear-gradient(160deg, ${player.profile.color}44, ${player.profile.color}18)`
-                    }}
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]"
+                    style={{ background: `linear-gradient(160deg, ${player.profile.color}44, ${player.profile.color}18)` }}
                   >
                     {player.profile.emoji}
                   </span>
-                  <span className="truncate text-xs font-bold text-ink-950">
-                    {player.profile.name}
-                  </span>
+                  <span className="truncate text-[10px] font-bold text-ink-950">{player.profile.name}</span>
                 </div>
                 {badge && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 + idx * 0.08, type: "spring", stiffness: 400, damping: 16 }}
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em] ${badge.bg}`}
+                    transition={{ delay: 0.4 + idx * 0.06 }}
+                    className={`shrink-0 rounded-full px-1.5 py-0.5 text-[7px] font-bold uppercase ${badge.bg}`}
                   >
                     {badge.label}
                   </motion.span>
                 )}
               </div>
 
-              {/* Votes received — small avatar bubbles */}
-              <div className="mt-1.5 min-h-[28px] rounded-[12px] bg-surface-low/60 px-2 py-1">
+              {/* Votes received — emoji + pseudo for each voter */}
+              <div className="w-full rounded-lg bg-surface-low/50 px-1.5 py-1">
                 {voters.length > 0 ? (
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-[9px] font-bold uppercase text-ink-400 mr-0.5">
-                      {voters.length}×
-                    </span>
+                  <div className="flex flex-col gap-0.5">
                     {voters.map((voter, vi) => (
                       <motion.div
                         key={voter.id}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{
-                          delay: 0.6 + idx * 0.08 + vi * 0.1,
-                          type: "spring",
-                          stiffness: 450,
-                          damping: 18
-                        }}
-                        title={`${voter.profile.name} a vote pour ${player.profile.name}`}
-                        className="flex h-6 w-6 items-center justify-center rounded-full text-xs shadow-sm"
-                        style={{
-                          background: `linear-gradient(160deg, ${voter.profile.color}55, ${voter.profile.color}22)`
-                        }}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 + idx * 0.06 + vi * 0.08 }}
+                        className="flex items-center gap-1"
                       >
-                        {voter.profile.emoji}
+                        <span
+                          className="flex h-4 w-4 items-center justify-center rounded-full text-[8px]"
+                          style={{ background: `linear-gradient(160deg, ${voter.profile.color}55, ${voter.profile.color}22)` }}
+                        >
+                          {voter.profile.emoji}
+                        </span>
+                        <span className="text-[9px] font-semibold text-ink-700">{voter.profile.name}</span>
                       </motion.div>
                     ))}
                   </div>
                 ) : (
-                  <span className="text-[9px] text-ink-300">Aucun vote</span>
+                  <span className="text-[8px] text-ink-300">Aucun vote</span>
                 )}
               </div>
 
               {/* Points */}
               {pts !== 0 && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.9 + idx * 0.05, type: "spring", stiffness: 400, damping: 18 }}
-                  className={`mt-1 text-center text-[10px] font-bold ${
-                    pts > 0 ? "text-[#3d6b30]" : "text-ink-400"
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.8 + idx * 0.05 }}
+                  className={`rounded-full px-2 py-0.5 text-[8px] font-bold ${
+                    pts > 0 ? "bg-[#e0eddb] text-[#3d6b30]" : "bg-surface-low text-ink-400"
                   }`}
                 >
-                  {pts > 0 ? `+${pts} pts` : `${pts} pts`}
-                </motion.div>
+                  {pts > 0 ? `+${pts}` : pts} pts
+                </motion.span>
               )}
             </motion.div>
           );
         })}
       </div>
 
-      {/* Blank votes (if any) */}
+      {/* Blank voters */}
       {blankVoters.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.0 }}
-          className="shrink-0 flex items-center gap-2 rounded-[16px] bg-surface-low/60 px-3 py-2"
-        >
-          <span className="text-[10px] font-bold uppercase text-ink-400">Vote blanc :</span>
+        <div className="shrink-0 flex items-center gap-1.5 rounded-[12px] bg-surface-low/50 px-2.5 py-1.5">
+          <span className="text-[9px] font-bold uppercase text-ink-400">Blanc :</span>
           {blankVoters.map((v) => (
-            <span
-              key={v.id}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-xs"
-              style={{ background: `linear-gradient(160deg, ${v.profile.color}44, ${v.profile.color}18)` }}
-            >
-              {v.profile.emoji}
-            </span>
+            <div key={v.id} className="flex items-center gap-0.5">
+              <span
+                className="flex h-4 w-4 items-center justify-center rounded-full text-[8px]"
+                style={{ background: `linear-gradient(160deg, ${v.profile.color}44, ${v.profile.color}18)` }}
+              >
+                {v.profile.emoji}
+              </span>
+              <span className="text-[8px] font-semibold text-ink-500">{v.profile.name}</span>
+            </div>
           ))}
-        </motion.div>
+        </div>
       )}
     </div>
   );

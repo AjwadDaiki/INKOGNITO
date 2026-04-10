@@ -269,12 +269,11 @@ export function GameScreen({
           ) : (
             <>
               {/* Player grid — vote phase */}
-              <GlassPanel className="flex min-h-0 flex-1 flex-col overflow-hidden p-2">
+              <GlassPanel className="min-h-0 flex-1 overflow-auto p-2">
                 <div
-                  className="grid min-h-0 flex-1 gap-2 overflow-hidden"
+                  className="grid gap-2 place-items-center"
                   style={{
-                    gridTemplateColumns: `repeat(${fCols}, minmax(0, 1fr))`,
-                    gridTemplateRows: `repeat(${fRows}, minmax(0, 1fr))`
+                    gridTemplateColumns: `repeat(${fCols}, minmax(0, 1fr))`
                   }}
                 >
                   {allConnected.map((p) => makeCard(p, bSize))}

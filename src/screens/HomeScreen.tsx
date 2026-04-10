@@ -56,6 +56,14 @@ export function HomeScreen({
           <span className="text-ink-drip">INK</span>
           <span className="text-gradient-gold">OGNITO</span>
         </motion.h1>
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.25, type: "spring", stiffness: 400, damping: 20 }}
+          className="ml-2 inline-block rounded-full bg-primary/20 px-2 py-0.5 align-top font-sketch text-xs font-bold text-primary-dark"
+        >
+          v2
+        </motion.span>
         {/* Ink drip under the title */}
         <motion.div
           initial={{ scaleY: 0 }}

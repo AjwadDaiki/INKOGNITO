@@ -61,6 +61,7 @@ interface RoundState {
   words: Record<string, string | null>;
   drawings: Record<string, DrawingStateView>;
   votes: Record<string, string | null>;
+  submittedVotePlayerIds: Set<string>;
   pointers: Record<string, string | null>;
   reactions: ReactionEvent[];
   chat: ChatMessage[];
@@ -232,7 +233,7 @@ export class RoomManager {
     const located = this.findPlayer(payload.roomCode, payload.clientId);
     if (!located) return;
     const { room, player } = located;
-    if (room.phase !== "lobby" || room.hostId !== player.id) {
+    if (room.phase !== "lobby") {
       return;
     }
     room.settings = clampSettings({
@@ -258,16 +259,20 @@ export class RoomManager {
     const located = this.findPlayer(payload.roomCode, payload.clientId);
     if (!located) return;
     const { room, player } = located;
-    if (room.hostId !== player.id || room.phase !== "lobby") {
+    if (room.phase !== "lobby") {
       return;
     }
 
     const connectedPlayers = room.players.filter((entry) => entry.connected);
     const readyCount = connectedPlayers.filter((entry) => entry.ready).length;
-    if (!canStartGame(readyCount, connectedPlayers.length)) {
+    if (connectedPlayers.length < MIN_PLAYERS) {
+      this.sendErrorToPlayer(player, `Il faut au moins ${MIN_PLAYERS} joueurs connectes.`);
+      return;
+    }
+    if (readyCount !== connectedPlayers.length || !canStartGame(readyCount, connectedPlayers.length)) {
       this.sendErrorToPlayer(
         player,
-        `Impossible de lancer: ${readyCount}/${connectedPlayers.length} joueurs connectés sont prêts. Minimum ${MIN_PLAYERS} joueurs connectés et prêts.`
+        `Impossible de lancer: ${readyCount}/${connectedPlayers.length} joueurs connectes sont prets. Tout le monde doit etre pret.`
       );
       return;
     }
@@ -414,10 +419,17 @@ export class RoomManager {
     }
     const { room, player } = located;
     const round = room.round!;
+    if (round.submittedVotePlayerIds.has(player.id)) {
+      return;
+    }
     if (payload.targetPlayerId === player.id) {
       return;
     }
+    if (payload.targetPlayerId !== null && !(payload.targetPlayerId in round.votes)) {
+      return;
+    }
     round.votes[player.id] = payload.targetPlayerId;
+    round.submittedVotePlayerIds.add(player.id);
     this.touch(player);
     this.emitRoomState(room);
   }
@@ -602,6 +614,7 @@ export class RoomManager {
       words,
       drawings,
       votes: Object.fromEntries(playerIds.map((id) => [id, null])),
+      submittedVotePlayerIds: new Set<string>(),
       pointers: Object.fromEntries(playerIds.map((id) => [id, null])),
       reactions: [],
       chat: [],
@@ -832,9 +845,7 @@ export class RoomManager {
             },
             drawings: room.round.drawings,
             selfVote: room.round.votes[selfId] ?? null,
-            votedPlayerIds: Object.entries(room.round.votes)
-              .filter(([, target]) => target !== null)
-              .map(([playerId]) => playerId),
+            votedPlayerIds: [...room.round.submittedVotePlayerIds],
             liveVotes: room.phase === "vote" || room.phase === "resolution" || room.phase === "final"
               ? Object.fromEntries(
                   Object.entries(room.round.votes).filter(([, target]) => target !== null)

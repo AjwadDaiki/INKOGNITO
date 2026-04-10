@@ -61,17 +61,24 @@ export function HomeScreen({
               Inkognito
             </motion.h1>
             <p className="mt-2 font-sketch text-2xl text-ink-700 md:text-3xl">
-              Carnet de croquis tache d&apos;encre
+              Imposteur version dessin
             </p>
           </div>
 
           <div className="paper-divider my-6" />
 
-          <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
+            <div className="rounded-[1.6rem] border border-[rgba(74,60,46,0.12)] bg-paper/80 px-4 py-4">
+              <div className="mb-3 font-sketch text-2xl font-semibold text-ink-900">
+                Ta page
+              </div>
+              <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
+            </div>
+
             <div className="space-y-4">
               <div>
                 <div className="mb-2 font-sketch text-2xl font-semibold text-ink-900">
-                  Entrer dans la partie
+                  Code de groupe
                 </div>
                 <input
                   value={accessValue}
@@ -105,13 +112,6 @@ export function HomeScreen({
                   {error}
                 </div>
               ) : null}
-            </div>
-
-            <div className="rounded-[1.6rem] border border-[rgba(74,60,46,0.12)] bg-paper/80 px-4 py-4">
-              <div className="mb-3 font-sketch text-2xl font-semibold text-ink-900">
-                Ta page
-              </div>
-              <ProfileEditor profile={profile} onChange={onProfileChange} compact />
             </div>
           </div>
         </div>

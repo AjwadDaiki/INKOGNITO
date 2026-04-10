@@ -114,7 +114,11 @@ export function ProfileEditor({
           layout
           transition={{ type: "spring", stiffness: 340, damping: 20 }}
           className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[rgba(74,60,46,0.14)] bg-paper text-3xl shadow-card"
-          style={{ boxShadow: `0 2px 0 rgba(90,68,47,0.18), 0 10px 22px ${profile.color}18` }}
+          style={{
+            boxShadow: hideColor
+              ? "0 2px 0 rgba(90,68,47,0.18), 0 10px 22px rgba(90,68,47,0.14)"
+              : `0 2px 0 rgba(90,68,47,0.18), 0 10px 22px ${profile.color}18`
+          }}
         >
           {profile.emoji}
         </motion.div>

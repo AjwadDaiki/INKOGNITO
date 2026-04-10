@@ -137,6 +137,7 @@ export interface RoundView {
   role: RoundRoleView;
   drawings: Record<string, DrawingStateView>;
   selfVote: string | null;
+  /** Players who already locked a vote, including vote blanc. */
   votedPlayerIds: string[];
   /** Live votes visible to everyone: { voterId -> targetId | null } */
   liveVotes: Record<string, string | null>;

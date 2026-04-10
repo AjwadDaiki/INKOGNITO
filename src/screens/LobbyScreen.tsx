@@ -63,7 +63,6 @@ export function LobbyScreen({
   onStartGame: () => void;
   onSendChat: (message: string) => void;
 }) {
-  const isHost = selfPlayer.isHost;
   const connectedPlayers = useMemo(
     () => room.players.filter((p) => p.connected),
     [room.players]
@@ -72,8 +71,9 @@ export function LobbyScreen({
     () => connectedPlayers.filter((p) => p.ready).length,
     [connectedPlayers]
   );
-  const canLaunch =
-    isHost && connectedPlayers.length >= MIN_PLAYERS && readyCount >= MIN_PLAYERS;
+  const everyoneReady =
+    connectedPlayers.length >= MIN_PLAYERS && readyCount === connectedPlayers.length;
+  const canLaunch = connectedPlayers.length >= MIN_PLAYERS;
   const selectedCategories = room.settings.selectedCategories?.length
     ? room.settings.selectedCategories
     : ["Tout"];
@@ -87,8 +87,6 @@ export function LobbyScreen({
   }
 
   function toggleCategory(category: string) {
-    if (!isHost) return;
-
     if (category === "Tout") {
       onUpdateSettings({ selectedCategories: ["Tout"] });
       return;
@@ -122,16 +120,19 @@ export function LobbyScreen({
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="font-sketch text-4xl font-bold text-ink-950 md:text-5xl">
-                Salle {room.roomCode}
+                Lobby {room.roomCode}
               </div>
               <div className="mt-1 text-sm text-ink-500">
-                {connectedPlayers.length} joueur{connectedPlayers.length > 1 ? "s" : ""} autour de la table
+                {connectedPlayers.length} joueur{connectedPlayers.length > 1 ? "s" : ""} dans le lobby
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <span className="ink-chip text-xs font-semibold text-ink-700">
                 {readyCount}/{connectedPlayers.length} prets
+              </span>
+              <span className="ink-chip text-xs font-semibold text-ink-700">
+                {everyoneReady ? "tout le monde est pret" : "en attente"}
               </span>
               <Button tone="secondary" onClick={copyRoomCode} className="min-h-10 px-4 text-xs">
                 Copier le code
@@ -142,11 +143,9 @@ export function LobbyScreen({
               <Button tone={selfPlayer.ready ? "secondary" : "primary"} onClick={onToggleReady}>
                 {selfPlayer.ready ? "Annuler" : "Je suis pret"}
               </Button>
-              {isHost ? (
-                <Button onClick={onStartGame} disabled={!canLaunch}>
-                  Lancer
-                </Button>
-              ) : null}
+              <Button onClick={onStartGame} disabled={!canLaunch}>
+                Lancer
+              </Button>
             </div>
           </div>
 
@@ -155,7 +154,7 @@ export function LobbyScreen({
           <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
             <div className="flex min-h-0 flex-col gap-4">
               <div className="rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/88 px-4 py-4 md:px-5">
-                <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">Autour du carnet</div>
+                <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">Lobby</div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {room.players.map((player, index) => (
                     <motion.div
@@ -172,7 +171,7 @@ export function LobbyScreen({
                       <div className="flex items-center gap-3">
                         <div
                           className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper text-2xl"
-                          style={{ boxShadow: `0 8px 18px ${player.profile.color}20` }}
+                          style={{ boxShadow: "0 8px 18px rgba(90,68,47,0.12)" }}
                         >
                           {player.profile.emoji}
                         </div>
@@ -199,7 +198,6 @@ export function LobbyScreen({
                       options={["classic", "mr_white"] as const}
                       value={room.settings.mode}
                       onChange={(v) => onUpdateSettings({ mode: v })}
-                      disabled={!isHost}
                       format={(v) => (v === "classic" ? "Classique" : "Mr White")}
                     />
                   </div>
@@ -209,7 +207,6 @@ export function LobbyScreen({
                       options={[30, 45, 60, 90] as const}
                       value={room.settings.drawingSeconds}
                       onChange={(v) => onUpdateSettings({ drawingSeconds: v })}
-                      disabled={!isHost}
                       format={(v) => `${v}s`}
                     />
                   </div>
@@ -219,7 +216,6 @@ export function LobbyScreen({
                       options={[3, 4, 5] as const}
                       value={room.settings.rounds}
                       onChange={(v) => onUpdateSettings({ rounds: v })}
-                      disabled={!isHost}
                     />
                   </div>
                   <div>
@@ -228,7 +224,6 @@ export function LobbyScreen({
                       options={["easy", "normal", "hard"] as const}
                       value={room.settings.difficulty === "random" ? "normal" : room.settings.difficulty}
                       onChange={(v) => onUpdateSettings({ difficulty: v })}
-                      disabled={!isHost}
                       format={(v) => (v === "easy" ? "Facile" : v === "normal" ? "Normal" : "Difficile")}
                     />
                   </div>
@@ -261,7 +256,6 @@ export function LobbyScreen({
                         <button
                           key={category}
                           type="button"
-                          disabled={!isHost}
                           onClick={() => toggleCategory(category)}
                           className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                             active
@@ -279,7 +273,7 @@ export function LobbyScreen({
             </div>
 
             <div className="min-h-0 rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/82 px-4 py-4 md:px-5">
-              <ChatPanel title="Notes de table" players={room.players} messages={room.roomChat} onSend={onSendChat} />
+              <ChatPanel title="Chat" players={room.players} messages={room.roomChat} onSend={onSendChat} />
             </div>
           </div>
         </div>

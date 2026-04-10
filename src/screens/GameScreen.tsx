@@ -51,14 +51,19 @@ export function GameScreen({
     () => Object.fromEntries(room.players.map((player) => [player.id, player])),
     [room.players]
   );
+  const roundPlayers = useMemo(
+    () =>
+      Object.keys(round.drawings)
+        .map((playerId) => playersById[playerId])
+        .filter((player): player is PlayerView => Boolean(player)),
+    [playersById, round.drawings]
+  );
   const otherPlayers = useMemo(
     () => room.players.filter((player) => player.id !== selfPlayer.id),
     [room.players, selfPlayer.id]
   );
-  const allConnected = useMemo(
-    () => room.players.filter((player) => player.connected),
-    [room.players]
-  );
+  const submittedVotePlayerIds = round.votedPlayerIds;
+  const selfHasSubmittedVote = submittedVotePlayerIds.includes(selfPlayer.id);
 
   const suspectPlayer =
     round.resolution?.suspectPlayerId ? playersById[round.resolution.suspectPlayerId] : null;
@@ -67,14 +72,14 @@ export function GameScreen({
     room.phase === "vote"
       ? isMobile
         ? 1
-        : allConnected.length >= 8
+        : roundPlayers.length >= 8
           ? 4
-          : allConnected.length >= 5
+          : roundPlayers.length >= 5
             ? 3
             : 2
-      : Math.max(1, fullCols(allConnected.length, isMobile));
+      : Math.max(1, fullCols(roundPlayers.length, isMobile));
   const smallSize = previewSize(otherPlayers.length);
-  const fullSize = previewSize(allConnected.length);
+  const fullSize = previewSize(roundPlayers.length);
 
   const voteMarkersByTarget = useMemo(() => {
     const map: Record<string, PlayerView[]> = {};
@@ -85,14 +90,14 @@ export function GameScreen({
       if (!map[targetId]) map[targetId] = [];
       map[targetId].push(voter);
     }
-    if (room.phase === "vote" && round.selfVote === null && pendingVote) {
+    if (room.phase === "vote" && !selfHasSubmittedVote && pendingVote) {
       if (!map[pendingVote]) map[pendingVote] = [];
       if (!map[pendingVote].some((entry) => entry.id === selfPlayer.id)) {
         map[pendingVote] = [...map[pendingVote], selfPlayer];
       }
     }
     return map;
-  }, [pendingVote, playersById, room.phase, round.liveVotes, round.selfVote, selfPlayer]);
+  }, [pendingVote, playersById, room.phase, round.liveVotes, selfHasSubmittedVote, selfPlayer]);
 
   useEffect(() => {
     setShowSplash(true);
@@ -103,7 +108,7 @@ export function GameScreen({
 
   function makeCard(player: PlayerView, size: number) {
     const isSelf = player.id === selfPlayer.id;
-    const displayVote = round.selfVote ?? pendingVote;
+    const displayVote = selfHasSubmittedVote ? round.selfVote : pendingVote;
 
     return (
       <PlayerBoardCard
@@ -116,7 +121,7 @@ export function GameScreen({
         previewSize={size}
         isSelf={isSelf}
         selectedVoteTargetId={displayVote}
-        hasVoted={round.votedPlayerIds.includes(player.id)}
+        hasVoted={submittedVotePlayerIds.includes(player.id)}
         voters={[]}
         revealedRole={round.resolution?.revealedRoles[player.id]}
         pointsAwarded={round.resolution?.pointsAwarded[player.id]}
@@ -124,7 +129,7 @@ export function GameScreen({
         onVote={
           isSelf
             ? () => {}
-            : room.phase === "vote" && round.selfVote === null
+            : room.phase === "vote" && !selfHasSubmittedVote
               ? (targetId) => setPendingVote(targetId)
               : onVote
         }
@@ -135,10 +140,11 @@ export function GameScreen({
   function renderVoteBar() {
     if (room.phase !== "vote") return null;
 
-    const hasVoted = round.selfVote !== null;
-    const voteCount = round.votedPlayerIds.length;
+    const hasVoted = selfHasSubmittedVote;
+    const voteCount = submittedVotePlayerIds.length;
     const selectedPlayer = pendingVote ? playersById[pendingVote] : null;
     const castPlayer = round.selfVote ? playersById[round.selfVote] : null;
+    const castVoteLabel = round.selfVote === null ? "blanc" : castPlayer?.profile.name ?? "inconnu";
 
     return (
       <motion.div
@@ -153,14 +159,14 @@ export function GameScreen({
             </div>
             <div className="mt-1 font-sketch text-4xl font-semibold leading-none text-ink-950 md:text-5xl">
               {hasVoted
-                ? `Vote posé sur ${castPlayer?.profile.name ?? "blanc"}`
+                ? `Vote pose sur ${castVoteLabel}`
                 : selectedPlayer
                   ? `${selfPlayer.profile.emoji} ${selectedPlayer.profile.name}`
                   : "Choisis une page"}
             </div>
             <div className="mt-1 text-sm text-ink-600">
               {hasVoted
-                ? "Ton marqueur reste visible jusqu'à la révélation."
+                ? "Ton marqueur reste visible jusqu a la revelation."
                 : selectedPlayer
                   ? "Confirme pour verrouiller ton vote."
                   : "Tape un dessin pour y poser ton marqueur."}
@@ -170,12 +176,12 @@ export function GameScreen({
           <div className="flex flex-wrap items-center gap-2">
             {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
             <span className="ink-chip text-xs font-semibold text-ink-700">
-              {voteCount}/{allConnected.length}
+              {voteCount}/{roundPlayers.length}
             </span>
 
             {hasVoted ? (
               <span className="inline-flex items-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-4 py-2 text-sm font-semibold text-ink-700">
-                Vote validé
+                Vote valide
               </span>
             ) : selectedPlayer ? (
               <>
@@ -236,7 +242,7 @@ export function GameScreen({
                   className="grid items-start gap-4"
                   style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
                 >
-                  {allConnected.map((player) => makeCard(player, fullSize))}
+                  {roundPlayers.map((player) => makeCard(player, fullSize))}
                 </div>
               </div>
               {renderVoteBar()}

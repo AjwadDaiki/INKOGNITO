@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type { PlayerView, RoomView, RoundView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
@@ -29,21 +29,23 @@ export function ResolutionShowcase({
   const suspectRole = suspectPlayer ? round.resolution.revealedRoles[suspectPlayer.id] : null;
   const isCaught = suspectRole === "undercover" || suspectRole === "mr_white";
 
-  // Group votes by target
-  const votesByTarget: Record<string, PlayerView[]> = {};
-  const blankVoters: PlayerView[] = [];
-  for (const [fromId, toId] of Object.entries(round.resolution.votes)) {
-    const voter = playersById[fromId];
-    if (!voter) continue;
-    if (toId) {
-      if (!votesByTarget[toId]) votesByTarget[toId] = [];
-      votesByTarget[toId].push(voter);
-    } else {
-      blankVoters.push(voter);
+  const { votesByTarget, blankVoters } = useMemo(() => {
+    const nextVotesByTarget: Record<string, PlayerView[]> = {};
+    const nextBlankVoters: PlayerView[] = [];
+    for (const [fromId, toId] of Object.entries(round.resolution!.votes)) {
+      const voter = playersById[fromId];
+      if (!voter) continue;
+      if (toId) {
+        if (!nextVotesByTarget[toId]) nextVotesByTarget[toId] = [];
+        nextVotesByTarget[toId].push(voter);
+      } else {
+        nextBlankVoters.push(voter);
+      }
     }
-  }
+    return { votesByTarget: nextVotesByTarget, blankVoters: nextBlankVoters };
+  }, [playersById, round.resolution]);
 
-  const allPlayers = room.players.filter((p) => p.connected);
+  const allPlayers = useMemo(() => room.players.filter((player) => player.connected), [room.players]);
   const cols = isMobile ? Math.min(allPlayers.length, 2) : Math.min(allPlayers.length, 4);
 
   return (

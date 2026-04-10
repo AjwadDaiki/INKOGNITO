@@ -4,6 +4,18 @@ import { DRAWING_PREVIEW_SIZE, DRAWING_SIZE } from "@shared/constants";
 import type { DrawingStroke } from "@shared/protocol";
 import { drawStroke, renderStrokeCanvas } from "@/lib/canvas";
 
+function strokeSignature(stroke?: DrawingStroke | null) {
+  if (!stroke) return "";
+  const lastPoint = stroke.points[stroke.points.length - 1];
+  return `${stroke.id}:${stroke.points.length}:${lastPoint?.x ?? 0}:${lastPoint?.y ?? 0}`;
+}
+
+function strokesSignature(strokes: DrawingStroke[]) {
+  if (strokes.length === 0) return "0";
+  const last = strokes[strokes.length - 1];
+  return `${strokes.length}:${last.id}:${last.points.length}:${last.createdAt}`;
+}
+
 function MiniDrawingCanvasComponent({
   strokes,
   previewStroke,
@@ -26,18 +38,29 @@ function MiniDrawingCanvasComponent({
     buffer.width = size;
     buffer.height = size;
     const ctx = buffer.getContext("2d");
-    if (ctx) { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, size, size); }
+    if (ctx) {
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, size, size);
+    }
     bufferRef.current = buffer;
     currentSize.current = size;
-    if (ref.current) { ref.current.width = size; ref.current.height = size; }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (ref.current) {
+      ref.current.width = size;
+      ref.current.height = size;
+    }
+  }, [size]);
 
   useEffect(() => {
     if (currentSize.current === size) return;
     currentSize.current = size;
-    if (bufferRef.current) { bufferRef.current.width = size; bufferRef.current.height = size; }
-    if (ref.current) { ref.current.width = size; ref.current.height = size; }
+    if (bufferRef.current) {
+      bufferRef.current.width = size;
+      bufferRef.current.height = size;
+    }
+    if (ref.current) {
+      ref.current.width = size;
+      ref.current.height = size;
+    }
     renderedCount.current = 0;
   }, [size]);
 
@@ -51,8 +74,8 @@ function MiniDrawingCanvasComponent({
     } else if (strokes.length > renderedCount.current) {
       const ctx = buffer.getContext("2d");
       if (ctx) {
-        for (let i = renderedCount.current; i < strokes.length; i++) {
-          drawStroke(ctx, strokes[i], scale);
+        for (let index = renderedCount.current; index < strokes.length; index += 1) {
+          drawStroke(ctx, strokes[index], scale);
         }
       }
       renderedCount.current = strokes.length;
@@ -69,7 +92,9 @@ function MiniDrawingCanvasComponent({
       if (!ctx) return;
       ctx.clearRect(0, 0, size, size);
       ctx.drawImage(buffer, 0, 0);
-      if (previewStroke) drawStroke(ctx, previewStroke, size / DRAWING_SIZE);
+      if (previewStroke) {
+        drawStroke(ctx, previewStroke, size / DRAWING_SIZE);
+      }
     });
     return () => cancelAnimationFrame(rafId.current);
   }, [previewStroke, strokes, size]);
@@ -86,4 +111,11 @@ function MiniDrawingCanvasComponent({
   );
 }
 
-export const MiniDrawingCanvas = memo(MiniDrawingCanvasComponent);
+export const MiniDrawingCanvas = memo(MiniDrawingCanvasComponent, (prev, next) => {
+  return (
+    prev.size === next.size &&
+    prev.className === next.className &&
+    strokesSignature(prev.strokes) === strokesSignature(next.strokes) &&
+    strokeSignature(prev.previewStroke) === strokeSignature(next.previewStroke)
+  );
+});

@@ -21,7 +21,7 @@ import {
 
 const socketUrl =
   import.meta.env.VITE_SERVER_URL ||
-  (window.location.port === "5173" ? "http://localhost:3001" : window.location.origin);
+  (import.meta.env.DEV ? "http://localhost:3001" : window.location.origin);
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 
@@ -288,7 +288,65 @@ function applyDrawingStreamMessage(
         }
       };
     }
+
+    const room = state.room;
+    const round = room?.round;
+    if (!room || !round) {
+      return {
+        livePreviews: {
+          ...state.livePreviews,
+          [message.playerId]: null
+        }
+      };
+    }
+
+    const currentDrawing = round.drawings[message.playerId];
+    if (!currentDrawing) {
+      return {
+        livePreviews: {
+          ...state.livePreviews,
+          [message.playerId]: null
+        }
+      };
+    }
+
+    let nextDrawing = currentDrawing;
+    if (message.type === "commit" && message.stroke) {
+      nextDrawing = {
+        ...currentDrawing,
+        strokes: [...currentDrawing.strokes, message.stroke],
+        lastUpdatedAt: Date.now()
+      };
+    } else if (message.type === "undo") {
+      nextDrawing = {
+        ...currentDrawing,
+        strokes: currentDrawing.strokes.slice(0, -1),
+        snapshot: null,
+        lastUpdatedAt: Date.now()
+      };
+    } else if (message.type === "clear") {
+      nextDrawing = {
+        ...currentDrawing,
+        strokes: [],
+        snapshot: null,
+        lastUpdatedAt: Date.now()
+      };
+    }
+
     return {
+      room:
+        nextDrawing === currentDrawing
+          ? room
+          : {
+              ...room,
+              round: {
+                ...round,
+                drawings: {
+                  ...round.drawings,
+                  [message.playerId]: nextDrawing
+                }
+              }
+            },
       livePreviews: {
         ...state.livePreviews,
         [message.playerId]: null

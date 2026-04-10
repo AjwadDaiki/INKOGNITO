@@ -361,7 +361,6 @@ export class RoomManager {
       playerId: player.id,
       stroke: payload.stroke
     });
-    this.emitRoomState(room);
   }
 
   undoStroke(payload: { roomCode: string; clientId: string }) {
@@ -381,7 +380,6 @@ export class RoomManager {
       type: "undo",
       playerId: player.id
     });
-    this.emitRoomState(room);
   }
 
   clearDrawing(payload: { roomCode: string; clientId: string }) {
@@ -402,7 +400,6 @@ export class RoomManager {
       type: "clear",
       playerId: player.id
     });
-    this.emitRoomState(room);
   }
 
   castVote(payload: {

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useGameStore } from "@/store/useGameStore";
 import type { DrawingStroke, PlayerView, ReactionEmoji, RoomView } from "@shared/protocol";
 import { PlayerBoardCard } from "@/components/game/PlayerBoardCard";
 import { GameTopBar } from "@/components/game/GameTopBar";
@@ -16,7 +17,6 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 export function GameScreen({
   room,
   selfPlayer,
-  livePreviews,
   onPreview,
   onCommit,
   onUndo,
@@ -29,7 +29,6 @@ export function GameScreen({
 }: {
   room: RoomView;
   selfPlayer: PlayerView;
-  livePreviews: Record<string, DrawingStroke | null>;
   onPreview: (stroke: DrawingStroke) => void;
   onCommit: (stroke: DrawingStroke, snapshot: string | null) => void;
   onUndo: () => void;
@@ -45,6 +44,7 @@ export function GameScreen({
   const [pendingVote, setPendingVote] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const isMobile = useIsMobile();
+  const livePreviews = useGameStore((state) => state.livePreviews);
 
   const round = room.round;
   if (!round) return null;
@@ -64,6 +64,7 @@ export function GameScreen({
   );
 
   const connectedCount = allConnected.length;
+  const votedPlayerIds = useMemo(() => new Set(round.votedPlayerIds), [round.votedPlayerIds]);
   const suspectPlayer =
     round.resolution?.suspectPlayerId ? playersById[round.resolution.suspectPlayerId] : null;
 
@@ -108,12 +109,13 @@ export function GameScreen({
         phase={room.phase}
         player={player}
         strokes={round.drawings[player.id]?.strokes ?? []}
+        drawingUpdatedAt={round.drawings[player.id]?.lastUpdatedAt ?? null}
         previewStroke={livePreviews[player.id]}
         previewSize={size}
         dense={room.players.length >= 7}
         isSelf={isSelf}
         selectedVoteTargetId={displayVote}
-        hasVoted={round.votedPlayerIds.includes(player.id)}
+        hasVoted={votedPlayerIds.has(player.id)}
         voters={votersByTarget[player.id] ?? []}
         revealedRole={round.resolution?.revealedRoles[player.id]}
         pointsAwarded={round.resolution?.pointsAwarded[player.id]}

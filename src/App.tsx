@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { shallow } from "zustand/shallow";
 import { MeshBackground } from "@/components/ui/MeshBackground";
 import { useGameStore } from "@/store/useGameStore";
 import { HomeScreen } from "@/screens/HomeScreen";
@@ -18,7 +19,6 @@ export default function App() {
     loading,
     error,
     socketConnected,
-    livePreviews,
     updateProfile,
     createRoom,
     joinRoom,
@@ -39,7 +39,38 @@ export default function App() {
     replayGame,
     returnToLobby,
     clearError
-  } = useGameStore();
+  } = useGameStore(
+    (state) => ({
+      init: state.init,
+      autoJoinFromUrl: state.autoJoinFromUrl,
+      room: state.room,
+      profile: state.profile,
+      loading: state.loading,
+      error: state.error,
+      socketConnected: state.socketConnected,
+      updateProfile: state.updateProfile,
+      createRoom: state.createRoom,
+      joinRoom: state.joinRoom,
+      updateSettings: state.updateSettings,
+      toggleReady: state.toggleReady,
+      startGame: state.startGame,
+      confirmRole: state.confirmRole,
+      readyForNextPhase: state.readyForNextPhase,
+      sendDrawingPreview: state.sendDrawingPreview,
+      commitStroke: state.commitStroke,
+      undoStroke: state.undoStroke,
+      clearDrawing: state.clearDrawing,
+      castVote: state.castVote,
+      sendReaction: state.sendReaction,
+      pointFinger: state.pointFinger,
+      sendChatMessage: state.sendChatMessage,
+      submitMrWhiteGuess: state.submitMrWhiteGuess,
+      replayGame: state.replayGame,
+      returnToLobby: state.returnToLobby,
+      clearError: state.clearError
+    }),
+    shallow
+  );
 
   useEffect(() => {
     init();
@@ -114,7 +145,6 @@ export default function App() {
         <GameScreen
           room={room}
           selfPlayer={selfPlayer}
-          livePreviews={livePreviews}
           onPreview={sendDrawingPreview}
           onCommit={commitStroke}
           onUndo={undoStroke}
@@ -143,7 +173,6 @@ export default function App() {
     confirmRole,
     replayGame,
     returnToLobby,
-    livePreviews,
     sendDrawingPreview,
     commitStroke,
     undoStroke,

@@ -93,7 +93,28 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   init: () => {
     if (get().initialized) return;
     const client = getSocket();
-    client.on("connect", () => set({ socketConnected: true }));
+    client.on("connect", () => {
+      set({ socketConnected: true });
+      // Auto-rejoin room after reconnect
+      const state = get();
+      if (state.room) {
+        client.emit(
+          "join_room",
+          {
+            roomCode: state.room.roomCode,
+            clientId: state.clientId,
+            profile: state.profile
+          },
+          (response) => {
+            if (!response.ok) {
+              // Room no longer exists on server — reset to home
+              set({ room: null, loading: false, error: null });
+              setRoomCodeInUrl(null);
+            }
+          }
+        );
+      }
+    });
     client.on("disconnect", () => set({ socketConnected: false }));
     client.on("room_state", (room) => {
       set((state) => ({

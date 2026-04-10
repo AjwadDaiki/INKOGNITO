@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { MeshBackground } from "@/components/ui/MeshBackground";
 import { useGameStore } from "@/store/useGameStore";
 import { HomeScreen } from "@/screens/HomeScreen";
@@ -40,7 +40,7 @@ export default function App() {
     returnToLobby,
     clearError
   } = useGameStore(
-    (state) => ({
+    useShallow((state) => ({
       init: state.init,
       autoJoinFromUrl: state.autoJoinFromUrl,
       room: state.room,
@@ -68,8 +68,7 @@ export default function App() {
       replayGame: state.replayGame,
       returnToLobby: state.returnToLobby,
       clearError: state.clearError
-    }),
-    shallow
+    }))
   );
 
   useEffect(() => {

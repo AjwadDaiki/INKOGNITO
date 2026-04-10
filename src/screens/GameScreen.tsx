@@ -1,14 +1,41 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { DrawingStroke, PlayerView, ReactionEmoji, RoomView } from "@shared/protocol";
 import { PlayerBoardCard } from "@/components/game/PlayerBoardCard";
 import { DrawingPhase } from "@/components/game/DrawingPhase";
 import { ResolutionShowcase } from "@/components/game/ResolutionShowcase";
 import { PhaseSplash } from "@/components/game/PhaseSplash";
-import { fullCols, previewSize } from "@/components/game/gameHelpers";
-import { useIsMobile } from "@/lib/useIsMobile";
+import { previewSize } from "@/components/game/gameHelpers";
 import { Button } from "@/components/ui/Button";
 import { CountdownPill } from "@/components/ui/CountdownPill";
+
+/**
+ * Compute optimal grid cols so all items fit within given pixel bounds,
+ * accounting for gap, name label, and vote marker space.
+ */
+function fitVoteGrid(
+  count: number,
+  availableWidth: number,
+  availableHeight: number,
+  gap: number,
+  extraPerCard: number
+) {
+  let bestCols = 1;
+  let bestSize = 0;
+
+  for (let cols = 1; cols <= Math.min(count, 8); cols++) {
+    const rows = Math.ceil(count / cols);
+    const cellW = (availableWidth - gap * (cols - 1)) / cols;
+    const cellH = (availableHeight - gap * (rows - 1)) / rows - extraPerCard;
+    const size = Math.floor(Math.min(cellW, cellH));
+    if (size > bestSize) {
+      bestSize = size;
+      bestCols = cols;
+    }
+  }
+
+  return { cols: bestCols, cellSize: Math.max(48, bestSize) };
+}
 
 export function GameScreen({
   room,
@@ -37,7 +64,6 @@ export function GameScreen({
 }) {
   const [pendingVote, setPendingVote] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
-  const isMobile = useIsMobile();
 
   const round = room.round;
   if (!round) return null;
@@ -65,20 +91,9 @@ export function GameScreen({
   const selfHasSubmittedVote = submittedVotePlayerIds.includes(selfPlayer.id);
 
   const suspectPlayer =
-    activeRound.resolution?.suspectPlayerId ? playersById[activeRound.resolution.suspectPlayerId] : null;
-
-  const cols =
-    room.phase === "vote"
-      ? isMobile
-        ? 1
-        : roundPlayers.length >= 8
-          ? 4
-          : roundPlayers.length >= 5
-            ? 3
-            : 2
-      : Math.max(1, fullCols(roundPlayers.length, isMobile));
-  const smallSize = previewSize(otherPlayers.length);
-  const fullSize = previewSize(roundPlayers.length);
+    activeRound.resolution?.suspectPlayerId
+      ? playersById[activeRound.resolution.suspectPlayerId]
+      : null;
 
   const voteMarkersByTarget = useMemo(() => {
     const map: Record<string, PlayerView[]> = {};
@@ -135,6 +150,7 @@ export function GameScreen({
     );
   }
 
+  /* ── Vote bar ── */
   function renderVoteBar() {
     if (room.phase !== "vote") return null;
 
@@ -149,51 +165,36 @@ export function GameScreen({
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="paper-sheet notebook-page desk-shadow shrink-0 rounded-[1.8rem] px-4 py-3 md:px-5"
+        className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-3 py-2 md:px-4 md:py-2.5"
       >
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div className="pl-7 md:pl-8">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
-              Vote en cours
-            </div>
-            <div className="mt-1 font-sketch text-4xl font-semibold leading-none text-ink-950 md:text-5xl">
-              {hasVoted
-                ? `Vote pose sur ${castVoteLabel}`
-                : selectedPlayer
-                  ? `${selfPlayer.profile.emoji} ${selectedPlayer.profile.name}`
-                  : "Choisis une page"}
-            </div>
-            <div className="mt-1 text-sm text-ink-600">
-              {hasVoted
-                ? "Ton marqueur reste visible jusqu a la revelation."
-                : selectedPlayer
-                  ? "Confirme pour verrouiller ton vote."
-                  : "Tape un dessin pour y poser ton marqueur."}
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
             {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
             <span className="ink-chip text-xs font-semibold text-ink-700">
               {voteCount}/{roundPlayers.length}
             </span>
+            <span className="font-sketch text-lg font-semibold text-ink-950 md:text-xl">
+              {hasVoted
+                ? `Vote : ${castVoteLabel}`
+                : selectedPlayer
+                  ? `${selectedPlayer.profile.emoji} ${selectedPlayer.profile.name} ?`
+                  : "Choisis un dessin"}
+            </span>
+          </div>
 
+          <div className="flex items-center gap-2">
             {hasVoted ? (
-              <span className="inline-flex items-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-4 py-2 text-sm font-semibold text-ink-700">
-                Vote valide
-              </span>
+              <span className="ink-chip text-xs font-semibold text-ink-700">Vote validé</span>
             ) : selectedPlayer ? (
               <>
-                <Button onClick={() => onVote(pendingVote)}>Confirmer</Button>
-                <Button tone="ghost" onClick={() => setPendingVote(null)}>
-                  Annuler
-                </Button>
+                <Button onClick={() => onVote(pendingVote)} className="min-h-9 px-3 text-xs">Confirmer</Button>
+                <Button tone="ghost" onClick={() => setPendingVote(null)} className="min-h-9 px-2 text-xs">Annuler</Button>
               </>
             ) : null}
 
             {!hasVoted ? (
-              <Button tone="secondary" onClick={() => onVote(null)}>
-                Vote blanc
+              <Button tone="secondary" onClick={() => onVote(null)} className="min-h-9 px-3 text-xs">
+                Blanc
               </Button>
             ) : null}
           </div>
@@ -203,7 +204,7 @@ export function GameScreen({
   }
 
   return (
-    <div className="relative mx-auto flex h-[100svh] max-h-[100svh] w-full max-w-[1720px] flex-col gap-3 overflow-hidden p-3 md:p-4">
+    <div className="relative mx-auto flex h-[100svh] max-h-[100svh] w-full max-w-[1720px] flex-col gap-2 overflow-hidden p-2 md:gap-3 md:p-3">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={room.phase}
@@ -211,7 +212,7 @@ export function GameScreen({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="flex min-h-0 flex-1 flex-col gap-3"
+          className="flex min-h-0 flex-1 flex-col gap-2 md:gap-3"
         >
           {room.phase === "drawing" ? (
             <DrawingPhase
@@ -223,7 +224,7 @@ export function GameScreen({
               onCommit={onCommit}
               onUndo={onUndo}
               onClear={onClear}
-              renderCard={(player) => makeCard(player, smallSize)}
+              renderCard={(player) => makeCard(player, previewSize(otherPlayers.length))}
             />
           ) : room.phase === "resolution" ? (
             <ResolutionShowcase
@@ -236,13 +237,12 @@ export function GameScreen({
             />
           ) : (
             <>
-              <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-auto rounded-[2rem] px-3 py-4 md:px-4">
-                <div
-                  className="grid items-start gap-4"
-                  style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-                >
-                  {roundPlayers.map((player) => makeCard(player, fullSize))}
-                </div>
+              {/* Vote grid — measured to fit without scroll */}
+              <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-hidden rounded-[1.6rem] p-2 md:p-3">
+                <VoteGrid
+                  players={roundPlayers}
+                  renderCard={makeCard}
+                />
               </div>
               {renderVoteBar()}
             </>
@@ -251,6 +251,56 @@ export function GameScreen({
       </AnimatePresence>
 
       <PhaseSplash show={showSplash} phase={room.phase} />
+    </div>
+  );
+}
+
+/**
+ * Grid that auto-measures its container and computes the optimal
+ * cols / cell size so all player cards fit without scrolling.
+ */
+function VoteGrid({
+  players,
+  renderCard
+}: {
+  players: PlayerView[];
+  renderCard: (player: PlayerView, size: number) => React.ReactNode;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: 600, h: 400 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setDims({
+          w: Math.floor(entry.contentRect.width),
+          h: Math.floor(entry.contentRect.height)
+        });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const gap = 8;
+  // Extra height per card: name (20px) + vote markers (22px) + padding (12px)
+  const extraPerCard = 54;
+  const { cols, cellSize } = fitVoteGrid(players.length, dims.w, dims.h, gap, extraPerCard);
+
+  return (
+    <div ref={containerRef} className="flex h-full w-full items-center justify-center">
+      <div
+        className="grid place-items-center"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gap: `${gap}px`
+        }}
+      >
+        {players.map((player) => renderCard(player, cellSize))}
+      </div>
     </div>
   );
 }

@@ -1,8 +1,60 @@
-import { type ReactNode, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { type ReactNode } from "react";
+import { motion } from "framer-motion";
 import type { DrawingStroke, PlayerView, RoomView, RoundView } from "@shared/protocol";
 import { DrawingCanvas } from "@/components/game/DrawingCanvas";
 import { CountdownPill } from "@/components/ui/CountdownPill";
+import { MiniDrawingCanvas } from "./MiniDrawingCanvas";
+import { useGameStore } from "@/store/useGameStore";
+
+function OtherPreview({ player, size }: { player: PlayerView; size: number }) {
+  const strokes = useGameStore(
+    (s) => s.room?.round?.drawings[player.id]?.strokes ?? []
+  );
+  const previewStroke = useGameStore((s) => s.livePreviews[player.id] ?? null);
+
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <MiniDrawingCanvas
+        strokes={strokes}
+        previewStroke={previewStroke}
+        size={size}
+        className="rounded-[0.6rem]"
+      />
+      <span className="max-w-full truncate text-center font-sketch text-xs font-semibold leading-tight text-ink-950 md:text-sm">
+        {player.profile.name}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Compute optimal grid cols × rows so all items fit without scroll.
+ * Returns { cols, rows, cellSize } where cellSize is the max square side
+ * that fits given available width/height and a name label height.
+ */
+function fitGrid(
+  count: number,
+  availableWidth: number,
+  availableHeight: number,
+  gap: number,
+  labelHeight: number
+) {
+  let bestCols = 1;
+  let bestSize = 0;
+
+  for (let cols = 1; cols <= count; cols++) {
+    const rows = Math.ceil(count / cols);
+    const cellW = (availableWidth - gap * (cols - 1)) / cols;
+    const cellH = (availableHeight - gap * (rows - 1)) / rows - labelHeight;
+    const size = Math.floor(Math.min(cellW, cellH));
+    if (size > bestSize) {
+      bestSize = size;
+      bestCols = cols;
+    }
+  }
+
+  return { cols: bestCols, rows: Math.ceil(count / bestCols), cellSize: Math.max(40, bestSize) };
+}
 
 export function DrawingPhase({
   room,
@@ -13,7 +65,6 @@ export function DrawingPhase({
   onCommit,
   onUndo,
   onClear,
-  renderCard
 }: {
   room: RoomView;
   round: RoundView;
@@ -25,106 +76,95 @@ export function DrawingPhase({
   onClear: () => void;
   renderCard: (player: PlayerView) => ReactNode;
 }) {
-  const [showOthers, setShowOthers] = useState(false);
   const selfDrawing = round.drawings[selfPlayer.id];
-  const cols =
-    otherPlayers.length >= 8 ? 4 : otherPlayers.length >= 5 ? 3 : otherPlayers.length >= 3 ? 2 : 1;
-
-  const othersPanel = (
-    <section className="paper-sheet notebook-page desk-shadow flex h-full min-h-0 flex-col gap-3 overflow-hidden rounded-[1.9rem] px-4 py-4 md:px-5">
-      <div className="flex items-center justify-between gap-3 pl-7 md:pl-8">
-        <div className="font-sketch text-3xl font-semibold leading-none text-ink-950 md:text-4xl">
-          Pages en cours
-        </div>
-        <span className="ink-chip text-xs font-semibold text-ink-700">
-          {otherPlayers.length} dessin{otherPlayers.length > 1 ? "s" : ""}
-        </span>
-      </div>
-      <div className="scrollbar-thin flex-1 overflow-y-auto pr-1">
-        <div
-          className="grid items-start gap-4"
-          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-        >
-          {otherPlayers.map((player) => renderCard(player))}
-        </div>
-      </div>
-    </section>
-  );
+  const n = otherPlayers.length;
 
   return (
-    <>
-      <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <section className="paper-sheet notebook-page desk-shadow flex h-full min-h-0 flex-col gap-3 rounded-[2rem] px-4 py-4 md:px-5">
-          <div className="flex flex-wrap items-start justify-between gap-3 pl-7 md:pl-8">
-            <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
-                Mot secret
-              </div>
-              <div className="mt-1 truncate font-sketch text-5xl font-bold leading-none text-ink-950 md:text-6xl">
-                {round.role.ownWord ?? "???"}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
-              {otherPlayers.length ? (
-                <button
-                  type="button"
-                  onClick={() => setShowOthers(true)}
-                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-4 text-sm font-semibold text-ink-700 transition hover:bg-paper-warm"
-                >
-                  Pages {otherPlayers.length}
-                </button>
-              ) : null}
+    <div className="flex h-full min-h-0 flex-1 flex-col gap-2 lg:flex-row lg:gap-3">
+      {/* Main canvas section */}
+      <section className="paper-sheet notebook-page desk-shadow flex min-h-0 flex-1 flex-col gap-2 overflow-hidden rounded-[1.9rem] px-3 py-3 lg:flex-[1.15] lg:px-4 lg:py-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 pl-7 md:pl-8">
+          <div className="min-w-0">
+            <span className="text-[9px] uppercase tracking-[0.28em] text-ink-500">Mot secret</span>
+            <div className="truncate font-sketch text-3xl font-bold leading-none text-ink-950 md:text-4xl lg:text-5xl">
+              {round.role.ownWord ?? "???"}
             </div>
           </div>
+          {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
+        </div>
+        <div className="min-h-0 flex-1">
+          <DrawingCanvas
+            playerId={selfPlayer.id}
+            strokes={selfDrawing?.strokes ?? []}
+            onPreview={onPreview}
+            onCommit={onCommit}
+            onUndo={onUndo}
+            onClear={onClear}
+          />
+        </div>
+      </section>
 
-          <div className="min-h-0 flex-1">
-            <DrawingCanvas
-              playerId={selfPlayer.id}
-              strokes={selfDrawing?.strokes ?? []}
-              onPreview={onPreview}
-              onCommit={onCommit}
-              onUndo={onUndo}
-              onClear={onClear}
-            />
-          </div>
-        </section>
-      </div>
+      {/* Others panel — fits all previews without scroll */}
+      <section className="paper-sheet notebook-page desk-shadow flex min-h-0 flex-col gap-1.5 overflow-hidden rounded-[1.9rem] px-3 py-3 lg:w-[340px] lg:px-4 lg:py-4 xl:w-[400px]">
+        <div className="flex items-center justify-between pl-7 md:pl-8">
+          <span className="text-[9px] font-bold uppercase tracking-[0.28em] text-ink-500">
+            {n} dessin{n > 1 ? "s" : ""}
+          </span>
+          <span className="text-[9px] text-ink-300 animate-pulse-soft">live</span>
+        </div>
 
-      <AnimatePresence>
-        {showOthers ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 flex bg-[rgba(26,20,16,0.34)] p-3 md:p-4"
-            onClick={() => setShowOthers(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 24, rotate: 1.2 }}
-              animate={{ opacity: 1, y: 0, rotate: 0 }}
-              exit={{ opacity: 0, y: 24, rotate: 1.2 }}
-              transition={{ type: "spring", stiffness: 250, damping: 24 }}
-              className="ml-auto flex h-full min-h-0 w-full max-w-[1120px] flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <div className="font-sketch text-3xl font-semibold text-paper">
-                  Pages en cours
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowOthers(false)}
-                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/20 bg-[rgba(255,255,255,0.12)] px-4 text-sm font-semibold text-paper"
-                >
-                  Fermer
-                </button>
-              </div>
-              {othersPanel}
-            </motion.div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-    </>
+        {/* Auto-fit grid */}
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          <OthersGrid players={otherPlayers} />
+        </div>
+      </section>
+    </div>
   );
 }
+
+/**
+ * Grid that measures its container and computes optimal cell size
+ * so all players fit without scrolling.
+ */
+function OthersGrid({ players }: { players: PlayerView[] }) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [dims, setDims] = React.useState({ w: 300, h: 200 });
+
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setDims({
+          w: Math.floor(entry.contentRect.width),
+          h: Math.floor(entry.contentRect.height)
+        });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const gap = 6;
+  const labelH = 18;
+  const { cols, cellSize } = fitGrid(players.length, dims.w, dims.h, gap, labelH);
+
+  return (
+    <div ref={containerRef} className="h-full w-full">
+      <div
+        className="grid place-items-center"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gap: `${gap}px`
+        }}
+      >
+        {players.map((player) => (
+          <OtherPreview key={player.id} player={player} size={cellSize} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+import React from "react";

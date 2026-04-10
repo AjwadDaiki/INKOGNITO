@@ -1,9 +1,8 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import type { DrawingStroke, PlayerRole, PlayerView, RoomView } from "@shared/protocol";
 import { MiniDrawingCanvas } from "@/components/game/MiniDrawingCanvas";
-import { useGameStore } from "@/store/useGameStore";
 
 function sameVoters(next: PlayerView[], prev: PlayerView[]) {
   if (next.length !== prev.length) return false;
@@ -15,14 +14,13 @@ function sameVoters(next: PlayerView[], prev: PlayerView[]) {
 
 function paperAngle(seed: string) {
   const sum = seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return ((sum % 5) - 2) * 0.8;
+  return ((sum % 5) - 2) * 0.6;
 }
 
 function PlayerBoardCardComponent({
   phase,
   player,
   strokes,
-  drawingUpdatedAt,
   previewSize,
   isSelf = false,
   selectedVoteTargetId,
@@ -47,79 +45,55 @@ function PlayerBoardCardComponent({
   const isVoteSelected = selectedVoteTargetId === player.id;
   const isInteractive = phase === "vote" && !isSelf;
   const tilt = useMemo(() => paperAngle(player.id), [player.id]);
-  const livePreviewStroke = useGameStore((state) => state.livePreviews[player.id] ?? null);
-  const previewStroke = phase === "drawing" ? livePreviewStroke : null;
   const Container = isInteractive ? motion.button : motion.article;
-  const compactVoteMarkers = voteMarkers.slice(0, 4);
-  const hiddenVoteCount = Math.max(0, voteMarkers.length - compactVoteMarkers.length);
 
   return (
     <Container
       {...(isInteractive ? { type: "button" as const, onClick: () => onVote(player.id) } : {})}
-      initial={{ opacity: 0, y: 18, rotate: tilt - 2 }}
+      initial={{ opacity: 0, y: 14, rotate: tilt - 1.5 }}
       animate={{ opacity: 1, y: 0, rotate: tilt }}
       transition={{ type: "spring", stiffness: 280, damping: 22 }}
       className={clsx(
-        "paper-sheet flex w-full max-w-full flex-col gap-2 overflow-hidden px-2.5 py-2.5 text-left shadow-card transition",
+        "paper-sheet flex w-full flex-col items-center gap-1 overflow-hidden px-1.5 py-1.5 text-left shadow-card transition",
         isInteractive && "cursor-pointer hover:-translate-y-0.5 hover:shadow-card-hover active:translate-y-0.5",
-        isSelf && phase === "drawing" && "border-[rgba(212,160,23,0.24)]",
+        isSelf && "border-[rgba(212,160,23,0.24)] opacity-70",
         isVoteSelected && "border-[rgba(212,160,23,0.36)] ring-2 ring-primary/25"
       )}
-      data-drawing-updated-at={drawingUpdatedAt ?? "static"}
     >
-      <div className="relative">
-        <MiniDrawingCanvas
-          strokes={strokes}
-          previewStroke={previewStroke}
-          size={previewSize}
-          className="rounded-[1rem]"
-          frameClassName={phase === "vote" ? "aspect-[4/3]" : "aspect-[5/4]"}
-        />
+      <MiniDrawingCanvas
+        strokes={strokes}
+        size={previewSize}
+        className="rounded-[0.6rem]"
+      />
+
+      {/* Name */}
+      <div className="w-full truncate text-center font-sketch text-sm font-semibold leading-tight text-ink-950">
+        {player.profile.name}
       </div>
 
-      {phase === "vote" ? (
-        <div className="min-h-[2.6rem] px-1">
-          {voteMarkers.length > 0 ? (
-            <>
-              <div className="flex items-center justify-center gap-1.5 sm:hidden">
-                {compactVoteMarkers.map((voter) => (
-                  <div
-                    key={voter.id}
-                    title={voter.profile.name}
-                    aria-label={`Vote de ${voter.profile.name}`}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-[rgba(245,239,229,0.96)] text-sm text-ink-700 shadow-[0_2px_6px_rgba(90,68,47,0.12)]"
-                  >
-                    {voter.profile.emoji}
-                  </div>
-                ))}
-                {hiddenVoteCount > 0 ? (
-                  <div className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-2 text-[11px] font-semibold text-ink-700">
-                    +{hiddenVoteCount}
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="hidden flex-wrap items-center justify-center gap-1.5 sm:flex">
-                {voteMarkers.map((voter) => (
-                  <div
-                    key={voter.id}
-                    className="inline-flex items-center gap-1 rounded-full border border-[rgba(74,60,46,0.12)] bg-[rgba(245,239,229,0.96)] px-2 py-1 text-[11px] text-ink-700 shadow-[0_2px_6px_rgba(90,68,47,0.12)]"
-                  >
-                    <span>{voter.profile.emoji}</span>
-                    <span className="max-w-[74px] truncate">{voter.profile.name}</span>
-                  </div>
-                ))}
-              </div>
-            </>
+      {/* Vote markers — compact emoji row */}
+      {phase === "vote" && voteMarkers.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-0.5">
+          {voteMarkers.slice(0, 6).map((voter) => (
+            <div
+              key={voter.id}
+              title={voter.profile.name}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-[rgba(245,239,229,0.96)] text-[10px] shadow-sm"
+            >
+              {voter.profile.emoji}
+            </div>
+          ))}
+          {voteMarkers.length > 6 ? (
+            <div className="flex h-5 items-center rounded-full bg-paper px-1 text-[9px] font-semibold text-ink-700">
+              +{voteMarkers.length - 6}
+            </div>
           ) : null}
         </div>
       ) : null}
 
-      <div className="px-1 pb-0.5 text-center">
-        <div className="truncate font-sketch text-[1.9rem] font-semibold leading-none text-ink-950">
-          {player.profile.name}
-        </div>
-      </div>
+      {isSelf && phase === "vote" ? (
+        <div className="text-[9px] font-semibold text-ink-400">Toi</div>
+      ) : null}
     </Container>
   );
 }

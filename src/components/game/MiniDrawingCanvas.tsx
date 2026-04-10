@@ -20,8 +20,7 @@ function MiniDrawingCanvasComponent({
   strokes,
   previewStroke,
   size = DRAWING_PREVIEW_SIZE,
-  className,
-  frameClassName
+  className
 }: {
   strokes: DrawingStroke[];
   previewStroke?: DrawingStroke | null;
@@ -102,21 +101,15 @@ function MiniDrawingCanvasComponent({
   }, [previewStroke, strokes, size]);
 
   return (
-    <div className={clsx("relative w-full", className)}>
-      <div
-        className={clsx(
-          "relative flex w-full items-center justify-center overflow-hidden rounded-[1rem] border border-[rgba(74,60,46,0.12)] bg-[#f1e7d8]",
-          frameClassName ?? "aspect-[4/3]"
-        )}
-      >
-        <div className="absolute inset-y-[8%] left-[9%] right-[9%] flex items-center justify-center rounded-[0.8rem] border border-[rgba(74,60,46,0.08)] bg-[#fbf7f0] shadow-inner">
-          <canvas
-            ref={ref}
-            className="aspect-square h-full max-h-full w-auto max-w-full"
-            aria-label="Apercu du dessin"
-          />
-        </div>
-      </div>
+    <div
+      className={clsx("relative", className)}
+      style={{ width: size, height: size, maxWidth: "100%" }}
+    >
+      <canvas
+        ref={ref}
+        className="absolute inset-0 h-full w-full rounded-[inherit] border border-[rgba(74,60,46,0.12)] bg-[#fbf7f0]"
+        aria-label="Apercu du dessin"
+      />
     </div>
   );
 }
@@ -125,7 +118,6 @@ export const MiniDrawingCanvas = memo(MiniDrawingCanvasComponent, (prev, next) =
   return (
     prev.size === next.size &&
     prev.className === next.className &&
-    prev.frameClassName === next.frameClassName &&
     strokesSignature(prev.strokes) === strokesSignature(next.strokes) &&
     strokeSignature(prev.previewStroke) === strokeSignature(next.previewStroke)
   );

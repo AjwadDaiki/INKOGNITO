@@ -55,6 +55,8 @@ function PlayerBoardCardComponent({
   const isInteractive = phase === "vote" && !isSelf;
   const tilt = useMemo(() => paperAngle(player.id), [player.id]);
   const Container = isInteractive ? motion.button : motion.article;
+  const compactVoteMarkers = voteMarkers.slice(0, 4);
+  const hiddenVoteCount = Math.max(0, voteMarkers.length - compactVoteMarkers.length);
 
   return (
     <Container
@@ -78,21 +80,45 @@ function PlayerBoardCardComponent({
           className="rounded-[1rem]"
           frameClassName={phase === "vote" ? "aspect-[4/3]" : "aspect-[5/4]"}
         />
-
-        {phase === "vote" && voteMarkers.length > 0 ? (
-          <div className="pointer-events-none absolute inset-x-2 bottom-2 flex flex-wrap items-center justify-center gap-1.5">
-            {voteMarkers.map((voter) => (
-              <div
-                key={voter.id}
-                className="inline-flex items-center gap-1 rounded-full border border-[rgba(74,60,46,0.12)] bg-[rgba(245,239,229,0.96)] px-2 py-1 text-[11px] text-ink-700 shadow-[0_2px_6px_rgba(90,68,47,0.12)]"
-              >
-                <span>{voter.profile.emoji}</span>
-                <span className="max-w-[74px] truncate">{voter.profile.name}</span>
-              </div>
-            ))}
-          </div>
-        ) : null}
       </div>
+
+      {phase === "vote" ? (
+        <div className="min-h-[2.6rem] px-1">
+          {voteMarkers.length > 0 ? (
+            <>
+              <div className="flex items-center justify-center gap-1.5 sm:hidden">
+                {compactVoteMarkers.map((voter) => (
+                  <div
+                    key={voter.id}
+                    title={voter.profile.name}
+                    aria-label={`Vote de ${voter.profile.name}`}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-[rgba(245,239,229,0.96)] text-sm text-ink-700 shadow-[0_2px_6px_rgba(90,68,47,0.12)]"
+                  >
+                    {voter.profile.emoji}
+                  </div>
+                ))}
+                {hiddenVoteCount > 0 ? (
+                  <div className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-2 text-[11px] font-semibold text-ink-700">
+                    +{hiddenVoteCount}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="hidden flex-wrap items-center justify-center gap-1.5 sm:flex">
+                {voteMarkers.map((voter) => (
+                  <div
+                    key={voter.id}
+                    className="inline-flex items-center gap-1 rounded-full border border-[rgba(74,60,46,0.12)] bg-[rgba(245,239,229,0.96)] px-2 py-1 text-[11px] text-ink-700 shadow-[0_2px_6px_rgba(90,68,47,0.12)]"
+                  >
+                    <span>{voter.profile.emoji}</span>
+                    <span className="max-w-[74px] truncate">{voter.profile.name}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="px-1 pb-0.5 text-center">
         <div className="truncate font-sketch text-[1.9rem] font-semibold leading-none text-ink-950">

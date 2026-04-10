@@ -60,8 +60,11 @@ export function ResolutionShowcase({
   }, [playersById, round.resolution]);
 
   const allPlayers = useMemo(
-    () => room.players.filter((player) => player.connected),
-    [room.players]
+    () =>
+      Object.keys(round.resolution.revealedRoles)
+        .map((playerId) => playersById[playerId])
+        .filter((player): player is PlayerView => Boolean(player)),
+    [playersById, round.resolution.revealedRoles]
   );
   const scoreEntries = useMemo(
     () =>
@@ -73,14 +76,19 @@ export function ResolutionShowcase({
         .sort((left, right) => right.points - left.points),
     [allPlayers, round.resolution]
   );
+  const suspectVoters = suspectPlayer ? votesByTarget[suspectPlayer.id] ?? [] : [];
+  const suspectVoteCount = suspectVoters.length;
+  const denseReveal = allPlayers.length >= 7;
+  const compactReveal = allPlayers.length >= 5;
+  const revealPreviewSize = denseReveal ? 144 : compactReveal ? 164 : 180;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
-      <div className="grid gap-4 xl:grid-cols-[0.78fr_1.22fr]">
+      <div className={`grid gap-4 ${denseReveal ? "xl:grid-cols-[0.72fr_1.28fr]" : "xl:grid-cols-[0.78fr_1.22fr]"}`}>
         <motion.div
           initial={{ opacity: 0, y: 16, rotate: -1.2 }}
           animate={{ opacity: 1, y: 0, rotate: -0.6 }}
-          className="paper-sheet desk-shadow relative overflow-hidden px-5 py-5"
+          className="paper-sheet notebook-page desk-shadow relative overflow-hidden px-5 py-5"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.2 }}
@@ -94,13 +102,18 @@ export function ResolutionShowcase({
           />
 
           <div className="relative">
-            <div className="mt-1 font-sketch text-5xl font-bold text-ink-950 md:text-6xl">
+            <div className="pl-7 md:pl-8">
+              <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
+                Verdict du tour
+              </div>
+            </div>
+            <div className="mt-1 pl-7 font-sketch text-5xl font-bold text-ink-950 md:pl-8 md:text-6xl">
               {isCaught ? "Pris dans l'encre" : "Mauvaise page"}
             </div>
-            <p className="mt-1 text-sm text-ink-700">
+            <p className="mt-1 pl-7 text-sm text-ink-700 md:pl-8">
               {suspectPlayer
-                ? `${suspectPlayer.profile.name} etait au centre des soupcons.`
-                : "Le tour est termine."}
+                ? `${suspectPlayer.profile.name} était au centre des soupçons.`
+                : "Le tour est terminé."}
             </p>
 
             {suspectPlayer ? (
@@ -108,7 +121,7 @@ export function ResolutionShowcase({
                 initial={{ opacity: 0, y: 14, rotate: 4 }}
                 animate={{ opacity: 1, y: 0, rotate: 1.6 }}
                 transition={{ delay: 0.12, type: "spring", stiffness: 260, damping: 24 }}
-                className="paper-sheet relative mt-5 overflow-hidden px-4 py-4"
+                className="paper-sheet relative mt-5 overflow-hidden px-4 py-4 md:px-5"
               >
                 <motion.div
                   initial={{ scale: 0.1, opacity: 0 }}
@@ -135,17 +148,33 @@ export function ResolutionShowcase({
                   className="pointer-events-none absolute -bottom-10 -right-6 h-20 w-20 rounded-full bg-ink-950"
                 />
                 <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-ink-950/8" />
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
+                      Page accusée
+                    </div>
+                    <div className="mt-1 font-sketch text-5xl font-semibold leading-none text-ink-950">
+                      {suspectPlayer.profile.name}
+                    </div>
+                  </div>
+                  <div
+                    className={`mt-1 inline-flex -rotate-3 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] shadow-[0_6px_14px_rgba(90,68,47,0.14)] ${
+                      isCaught
+                        ? "border-[rgba(196,62,46,0.24)] bg-tertiary-light text-tertiary"
+                        : "border-[rgba(139,105,20,0.24)] bg-primary-light text-primary-dark"
+                    }`}
+                  >
+                    {isCaught ? "Démasqué" : "Innocent"}
+                  </div>
+                </div>
                 <MiniDrawingCanvas
                   strokes={round.drawings[suspectPlayer.id]?.strokes ?? []}
                   size={220}
                   className="rounded-[1rem] bg-[#fbf7f0]"
                 />
-                <div className="mt-3 text-center">
-                  <div className="font-sketch text-4xl font-semibold leading-none text-ink-950">
-                    {suspectPlayer.profile.name}
-                  </div>
+                <div className="mt-4 text-center">
                   <div
-                    className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${roleTone(suspectRole)}`}
+                    className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${roleTone(suspectRole)}`}
                   >
                     {roleLabel(suspectRole)}
                   </div>
@@ -154,6 +183,49 @@ export function ResolutionShowcase({
                     <span className="ink-chip">
                       Undercover : {round.resolution.undercoverWord}
                     </span>
+                  </div>
+                </div>
+
+                <div className="paper-divider my-4" />
+
+                <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
+                      Pression du groupe
+                    </div>
+                    <div className="mt-1 font-sketch text-3xl leading-none text-ink-950">
+                      {suspectVoteCount} voix posées sur cette page
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {suspectVoters.length ? (
+                        suspectVoters.map((voter) => (
+                          <div
+                            key={voter.id}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-2 py-1 text-sm text-ink-900"
+                          >
+                            <span>{voter.profile.emoji}</span>
+                            <span>{voter.profile.name}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-sm text-ink-500">Aucune accusation posée.</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    className={`rounded-[1.4rem] border px-4 py-3 text-center ${
+                      isCaught
+                        ? "border-[rgba(196,62,46,0.18)] bg-tertiary-light/80 text-tertiary"
+                        : "border-[rgba(139,105,20,0.2)] bg-primary-light/80 text-primary-dark"
+                    }`}
+                  >
+                    <div className="text-[10px] uppercase tracking-[0.22em]">
+                      Rôle révélé
+                    </div>
+                    <div className="mt-1 font-sketch text-3xl leading-none">
+                      {roleLabel(suspectRole)}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -171,7 +243,7 @@ export function ResolutionShowcase({
                 }}
               >
                 <div className="font-sketch text-3xl font-semibold text-primary-dark">
-                  Derniere chance
+                  Dernière chance
                 </div>
                 <div className="mt-1 text-sm text-ink-700">
                   Devine le mot civil pour revenir dans la partie.
@@ -205,7 +277,13 @@ export function ResolutionShowcase({
             ) : null}
           </div>
 
-          <div className="scrollbar-thin grid max-h-[46vh] gap-3 overflow-y-auto pr-1 md:grid-cols-2 2xl:grid-cols-3">
+          <div
+            className={`scrollbar-thin grid overflow-y-auto pr-1 ${
+              denseReveal
+                ? "max-h-[50vh] gap-2.5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+                : "max-h-[46vh] gap-3 md:grid-cols-2 2xl:grid-cols-3"
+            }`}
+          >
             {allPlayers.map((player, index) => {
               const revealedRole = round.resolution!.revealedRoles[player.id];
               const voters = votesByTarget[player.id] ?? [];
@@ -223,7 +301,9 @@ export function ResolutionShowcase({
                     stiffness: 250,
                     damping: 22
                   }}
-                  className={`paper-sheet overflow-hidden px-3 py-3 ${isSuspect ? "ring-2 ring-tertiary/25" : ""}`}
+                  className={`paper-sheet overflow-hidden ${
+                    denseReveal ? "px-2.5 py-2.5" : "px-3 py-3"
+                  } ${isSuspect ? "ring-2 ring-tertiary/25" : ""}`}
                 >
                   {isSuspect ? (
                     <motion.div
@@ -236,12 +316,16 @@ export function ResolutionShowcase({
 
                   <MiniDrawingCanvas
                     strokes={round.drawings[player.id]?.strokes ?? []}
-                    size={180}
+                    size={revealPreviewSize}
                     className="rounded-[1rem] bg-[#fbf7f0]"
                   />
 
                   <div className="mt-3 min-w-0">
-                    <div className="truncate font-sketch text-3xl font-semibold leading-none text-ink-950">
+                    <div
+                      className={`truncate font-sketch font-semibold leading-none text-ink-950 ${
+                        denseReveal ? "text-[2rem]" : "text-3xl"
+                      }`}
+                    >
                       {player.profile.name}
                     </div>
                     <div className="mt-1 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-700">
@@ -249,16 +333,26 @@ export function ResolutionShowcase({
                     </div>
                   </div>
 
-                  <div className="mt-3 rounded-[1.2rem] border border-[rgba(74,60,46,0.1)] bg-paper/70 px-3 py-2">
+                  <div
+                    className={`mt-3 rounded-[1.2rem] border border-[rgba(74,60,46,0.1)] bg-paper/70 ${
+                      denseReveal ? "px-2.5 py-2" : "px-3 py-2"
+                    }`}
+                  >
                     {voters.length ? (
                       <div className="mt-1 flex flex-wrap gap-1.5">
                         {voters.map((voter) => (
                           <div
                             key={voter.id}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-2 py-1 text-sm text-ink-900"
+                            className={`inline-flex items-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper text-ink-900 ${
+                              denseReveal ? "gap-1 px-1.5 py-1 text-xs" : "gap-1.5 px-2 py-1 text-sm"
+                            }`}
                           >
-                            <span className="text-base">{voter.profile.emoji}</span>
-                            <span>{voter.profile.name}</span>
+                            <span className={denseReveal ? "text-sm" : "text-base"}>
+                              {voter.profile.emoji}
+                            </span>
+                            <span className={denseReveal ? "max-w-[62px] truncate" : ""}>
+                              {voter.profile.name}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -278,18 +372,22 @@ export function ResolutionShowcase({
               Points du tour
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className={`mt-3 flex flex-wrap ${denseReveal ? "gap-1.5" : "gap-2"}`}>
             {scoreEntries.map(({ player, points }) => (
               <div
                 key={player.id}
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${
+                className={`inline-flex items-center rounded-full border ${
+                  denseReveal ? "gap-1.5 px-2.5 py-1.5 text-xs" : "gap-2 px-3 py-2 text-sm"
+                } ${
                   points > 0
                     ? "border-[rgba(139,105,20,0.22)] bg-primary-light text-primary-dark"
                     : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
                 }`}
               >
                 <span>{player.profile.emoji}</span>
-                <span>{player.profile.name}</span>
+                <span className={denseReveal ? "max-w-[92px] truncate" : ""}>
+                  {player.profile.name}
+                </span>
                 <span className="font-semibold">{points > 0 ? `+${points}` : points}</span>
               </div>
             ))}

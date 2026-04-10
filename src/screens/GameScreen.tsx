@@ -153,14 +153,14 @@ export function GameScreen({
             </div>
             <div className="mt-1 font-sketch text-4xl font-semibold leading-none text-ink-950 md:text-5xl">
               {hasVoted
-                ? `Vote pose sur ${castPlayer?.profile.name ?? "blanc"}`
+                ? `Vote posé sur ${castPlayer?.profile.name ?? "blanc"}`
                 : selectedPlayer
                   ? `${selfPlayer.profile.emoji} ${selectedPlayer.profile.name}`
                   : "Choisis une page"}
             </div>
             <div className="mt-1 text-sm text-ink-600">
               {hasVoted
-                ? "Ton marqueur reste visible jusqu'a la revelation."
+                ? "Ton marqueur reste visible jusqu'à la révélation."
                 : selectedPlayer
                   ? "Confirme pour verrouiller ton vote."
                   : "Tape un dessin pour y poser ton marqueur."}
@@ -175,7 +175,7 @@ export function GameScreen({
 
             {hasVoted ? (
               <span className="inline-flex items-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-4 py-2 text-sm font-semibold text-ink-700">
-                Vote valide
+                Vote validé
               </span>
             ) : selectedPlayer ? (
               <>

@@ -11,15 +11,15 @@ export function phaseLabel(phase: RoomView["phase"]) {
   if (phase === "drawing") return "Croquis";
   if (phase === "gallery") return "Pages";
   if (phase === "vote") return "Vote";
-  if (phase === "resolution") return "Revelation";
+  if (phase === "resolution") return "Révélation";
   return phase;
 }
 
 export function phaseSubtitle(phase: RoomView["phase"]) {
   if (phase === "drawing") return "Une page pour laisser parler l'encre";
-  if (phase === "gallery") return "Les pages se repondent";
+  if (phase === "gallery") return "Les pages se répondent";
   if (phase === "vote") return "Pose ton vote sur une page";
-  if (phase === "resolution") return "L'encre dit enfin la verite";
+  if (phase === "resolution") return "L'encre dit enfin la vérité";
   return "";
 }
 

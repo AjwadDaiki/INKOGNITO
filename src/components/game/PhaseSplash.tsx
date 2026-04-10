@@ -11,7 +11,7 @@ export function PhaseSplash({ show, phase }: { show: boolean; phase: RoomView["p
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center overflow-hidden"
+          className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.35 }}

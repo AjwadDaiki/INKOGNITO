@@ -1,3 +1,4 @@
+/* Fonts loaded via <link rel="preload"> in index.html for faster LCP */
 @import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@500;600;700&display=swap");
 
 @tailwind base;
@@ -101,6 +102,7 @@ textarea {
 .glass-panel,
 .paper-sheet {
   position: relative;
+  contain: layout style;
   background-color: #f0e6d6;
   background-image:
     url("data:image/svg+xml,%3Csvg width='160' height='160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.84' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.16'/%3E%3C/svg%3E"),

@@ -74,6 +74,9 @@ export function drawStroke(
   ctx.restore();
 }
 
+// Reuse a single offscreen canvas for snapshot exports
+let _exportCanvas: HTMLCanvasElement | null = null;
+
 export function getCanvasSnapshot(canvas: HTMLCanvasElement) {
   const maxSize = 320;
   const longestEdge = Math.max(canvas.width, canvas.height);
@@ -82,16 +85,19 @@ export function getCanvasSnapshot(canvas: HTMLCanvasElement) {
   }
 
   const scale = maxSize / longestEdge;
-  const exportCanvas = document.createElement("canvas");
-  exportCanvas.width = Math.max(1, Math.round(canvas.width * scale));
-  exportCanvas.height = Math.max(1, Math.round(canvas.height * scale));
-  const exportContext = exportCanvas.getContext("2d");
-  if (!exportContext) {
+  const w = Math.max(1, Math.round(canvas.width * scale));
+  const h = Math.max(1, Math.round(canvas.height * scale));
+
+  if (!_exportCanvas) _exportCanvas = document.createElement("canvas");
+  _exportCanvas.width = w;
+  _exportCanvas.height = h;
+  const ctx = _exportCanvas.getContext("2d");
+  if (!ctx) {
     return canvas.toDataURL("image/webp", 0.72);
   }
-  exportContext.imageSmoothingEnabled = true;
-  exportContext.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
-  return exportCanvas.toDataURL("image/webp", 0.72);
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(canvas, 0, 0, w, h);
+  return _exportCanvas.toDataURL("image/webp", 0.72);
 }
 
 export function normalizePointerPosition(
@@ -105,6 +111,11 @@ export function normalizePointerPosition(
   };
 }
 
+/**
+ * Scanline-based flood fill — much faster than naive stack approach.
+ * Processes whole horizontal spans at once, reducing push/pop overhead
+ * from O(pixels) to O(spans).
+ */
 function floodFill(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -118,44 +129,94 @@ function floodFill(
   const startX = Math.max(0, Math.min(width - 1, Math.round(x)));
   const startY = Math.max(0, Math.min(height - 1, Math.round(y)));
   const targetIndex = (startY * width + startX) * 4;
-  const targetColor: [number, number, number, number] = [
-    pixels[targetIndex],
-    pixels[targetIndex + 1],
-    pixels[targetIndex + 2],
-    pixels[targetIndex + 3]
-  ];
+  const tR = pixels[targetIndex];
+  const tG = pixels[targetIndex + 1];
+  const tB = pixels[targetIndex + 2];
+  const tA = pixels[targetIndex + 3];
   const replacement = hexToRgba(fillColor);
+  const tolerance = 8;
 
-  if (colorsMatch(targetColor, replacement)) {
+  if (
+    Math.abs(tR - replacement[0]) <= tolerance &&
+    Math.abs(tG - replacement[1]) <= tolerance &&
+    Math.abs(tB - replacement[2]) <= tolerance &&
+    Math.abs(tA - replacement[3]) <= tolerance
+  ) {
     return;
   }
 
-  const stack: Array<[number, number]> = [[startX, startY]];
+  function matches(i: number) {
+    return (
+      Math.abs(pixels[i] - tR) <= tolerance &&
+      Math.abs(pixels[i + 1] - tG) <= tolerance &&
+      Math.abs(pixels[i + 2] - tB) <= tolerance &&
+      Math.abs(pixels[i + 3] - tA) <= tolerance
+    );
+  }
+
+  function fill(i: number) {
+    pixels[i] = replacement[0];
+    pixels[i + 1] = replacement[1];
+    pixels[i + 2] = replacement[2];
+    pixels[i + 3] = replacement[3];
+  }
+
+  // Scanline stack: [leftX, rightX, y, parentY]
+  const stack: number[] = [];
+  stack.push(startX, startX, startY, -1);
+
   while (stack.length > 0) {
-    const [currentX, currentY] = stack.pop()!;
-    if (currentX < 0 || currentX >= width || currentY < 0 || currentY >= height) {
-      continue;
+    const parentY = stack.pop()!;
+    const sy = stack.pop()!;
+    let sr = stack.pop()!;
+    let sl = stack.pop()!;
+
+    if (sy < 0 || sy >= height) continue;
+
+    let idx = (sy * width + sl) * 4;
+    if (!matches(idx)) continue;
+
+    // Expand left
+    while (sl > 0 && matches(idx - 4)) {
+      sl--;
+      idx -= 4;
     }
-    const index = (currentY * width + currentX) * 4;
-    const currentColor: [number, number, number, number] = [
-      pixels[index],
-      pixels[index + 1],
-      pixels[index + 2],
-      pixels[index + 3]
-    ];
-    if (!colorsMatch(currentColor, targetColor)) {
-      continue;
+    // Expand right
+    let rIdx = (sy * width + sr) * 4;
+    while (sr < width - 1 && matches(rIdx + 4)) {
+      sr++;
+      rIdx += 4;
     }
 
-    pixels[index] = replacement[0];
-    pixels[index + 1] = replacement[1];
-    pixels[index + 2] = replacement[2];
-    pixels[index + 3] = replacement[3];
+    // Fill the span
+    idx = (sy * width + sl) * 4;
+    for (let cx = sl; cx <= sr; cx++, idx += 4) {
+      if (matches(idx)) fill(idx);
+    }
 
-    stack.push([currentX + 1, currentY]);
-    stack.push([currentX - 1, currentY]);
-    stack.push([currentX, currentY + 1]);
-    stack.push([currentX, currentY - 1]);
+    // Scan above and below
+    for (const ny of [sy - 1, sy + 1]) {
+      if (ny < 0 || ny >= height || ny === parentY) continue;
+      let inSpan = false;
+      let spanLeft = 0;
+      for (let cx = sl; cx <= sr; cx++) {
+        const nIdx = (ny * width + cx) * 4;
+        if (matches(nIdx)) {
+          if (!inSpan) {
+            spanLeft = cx;
+            inSpan = true;
+          }
+        } else {
+          if (inSpan) {
+            stack.push(spanLeft, cx - 1, ny, sy);
+            inSpan = false;
+          }
+        }
+      }
+      if (inSpan) {
+        stack.push(spanLeft, sr, ny, sy);
+      }
+    }
   }
 
   ctx.putImageData(imageData, 0, 0);

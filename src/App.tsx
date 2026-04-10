@@ -205,11 +205,11 @@ export default function App() {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={screen.key}
-          initial={{ opacity: 0, scale: 0.985, y: 18 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 1.01, y: -12 }}
-          transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-10 h-full"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="relative z-10 h-full will-change-transform"
         >
           {screen.node}
         </motion.div>

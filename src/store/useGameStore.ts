@@ -296,39 +296,37 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   }
 }));
 
+function updateLivePreviews(
+  prev: Record<string, DrawingStroke | null>,
+  playerId: string,
+  value: DrawingStroke | null
+): Record<string, DrawingStroke | null> {
+  // Avoid creating a new object if the value is already the same reference
+  if (prev[playerId] === value) return prev;
+  return { ...prev, [playerId]: value };
+}
+
 function applyDrawingStreamMessage(
   message: DrawingStreamMessage,
   set: (partial: Partial<GameStoreState> | ((state: GameStoreState) => Partial<GameStoreState>)) => void
 ) {
   set((state) => {
     if (message.type === "preview") {
-      return {
-        livePreviews: {
-          ...state.livePreviews,
-          [message.playerId]: message.stroke ?? null
-        }
-      };
+      const next = updateLivePreviews(state.livePreviews, message.playerId, message.stroke ?? null);
+      return next === state.livePreviews ? {} : { livePreviews: next };
     }
 
     const room = state.room;
     const round = room?.round;
     if (!room || !round) {
-      return {
-        livePreviews: {
-          ...state.livePreviews,
-          [message.playerId]: null
-        }
-      };
+      const next = updateLivePreviews(state.livePreviews, message.playerId, null);
+      return next === state.livePreviews ? {} : { livePreviews: next };
     }
 
     const currentDrawing = round.drawings[message.playerId];
     if (!currentDrawing) {
-      return {
-        livePreviews: {
-          ...state.livePreviews,
-          [message.playerId]: null
-        }
-      };
+      const next = updateLivePreviews(state.livePreviews, message.playerId, null);
+      return next === state.livePreviews ? {} : { livePreviews: next };
     }
 
     let nextDrawing = currentDrawing;
@@ -354,6 +352,8 @@ function applyDrawingStreamMessage(
       };
     }
 
+    const nextPreviews = updateLivePreviews(state.livePreviews, message.playerId, null);
+
     return {
       room:
         nextDrawing === currentDrawing
@@ -368,10 +368,7 @@ function applyDrawingStreamMessage(
                 }
               }
             },
-      livePreviews: {
-        ...state.livePreviews,
-        [message.playerId]: null
-      }
+      ...(nextPreviews === state.livePreviews ? {} : { livePreviews: nextPreviews })
     };
   });
 }

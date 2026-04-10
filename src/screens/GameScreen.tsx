@@ -302,17 +302,21 @@ function VoteGrid({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    let rafId = 0;
     const ro = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        setDims({
-          w: Math.floor(entry.contentRect.width),
-          h: Math.floor(entry.contentRect.height)
-        });
-      }
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const entry = entries[0];
+        if (entry) {
+          setDims({
+            w: Math.floor(entry.contentRect.width),
+            h: Math.floor(entry.contentRect.height)
+          });
+        }
+      });
     });
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => { cancelAnimationFrame(rafId); ro.disconnect(); };
   }, []);
 
   const gap = 8;

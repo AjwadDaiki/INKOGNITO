@@ -224,7 +224,6 @@ export function GameScreen({
               onCommit={onCommit}
               onUndo={onUndo}
               onClear={onClear}
-              renderCard={(player) => makeCard(player, previewSize(otherPlayers.length))}
             />
           ) : room.phase === "resolution" ? (
             <ResolutionShowcase

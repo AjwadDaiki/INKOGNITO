@@ -95,7 +95,7 @@ export function HomeScreen({
 
               <div className="grid gap-2 sm:grid-cols-2">
                 <Button onClick={onCreate} disabled={loading} fullWidth>
-                  {loading ? "..." : "Creer une salle"}
+                  {loading ? "..." : "Créer une salle"}
                 </Button>
                 <Button
                   tone="secondary"

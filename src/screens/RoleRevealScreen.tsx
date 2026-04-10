@@ -24,7 +24,7 @@ function roleTone(room: RoomView) {
   return {
     chip: "border-[rgba(139,105,20,0.24)] bg-primary-light text-primary-dark",
     title: "Civil",
-    subtitle: "Tu connais le vrai mot. Fais-le comprendre sans l'ecrire."
+    subtitle: "Tu connais le vrai mot. Fais-le comprendre sans l'écrire."
   };
 }
 
@@ -56,7 +56,7 @@ export function RoleRevealScreen({
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
-              <div className="text-xs uppercase tracking-[0.18em] text-ink-500">Carte secrete</div>
+              <div className="text-xs uppercase tracking-[0.18em] text-ink-500">Carte secrète</div>
               <div className="mt-1 font-sketch text-5xl font-bold leading-none text-ink-950 md:text-6xl">
                 {selfPlayer.profile.name}
               </div>
@@ -87,9 +87,9 @@ export function RoleRevealScreen({
             <div className="rounded-[1.5rem] border border-[rgba(74,60,46,0.1)] bg-paper/80 px-4 py-4">
               <div className="font-sketch text-3xl font-semibold text-ink-900">Avant de passer</div>
               <div className="mt-2 space-y-1.5 text-sm text-ink-700">
-                <div>Memorise ton role et ton mot.</div>
-                <div>Cache cet ecran aux autres.</div>
-                <div>Clique seulement quand tu es pret.</div>
+                <div>Mémorise ton rôle et ton mot.</div>
+                <div>Cache cet écran aux autres.</div>
+                <div>Clique seulement quand tu es prêt.</div>
               </div>
             </div>
 
@@ -98,13 +98,13 @@ export function RoleRevealScreen({
               <div className="mt-2 font-sketch text-5xl font-bold leading-none">
                 {confirmedCount}/{room.players.length}
               </div>
-              <div className="mt-2 text-sm text-paper/70">pages deja refermees</div>
+              <div className="mt-2 text-sm text-paper/70">pages déjà refermées</div>
             </div>
           </div>
 
           <div className="mt-6">
             <Button onClick={onConfirm} fullWidth>
-              J'ai memorise
+              J'ai mémorisé
             </Button>
           </div>
         </div>

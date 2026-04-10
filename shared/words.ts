@@ -17,6 +17,12 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "food-fromage-beurre", civilWord: "Fromage", undercoverWord: "Beurre", difficulty: "normal", category: "Nourriture" },
   { id: "food-gateau-tarte", civilWord: "Gâteau", undercoverWord: "Tarte", difficulty: "normal", category: "Nourriture" },
   { id: "food-bonbon-chocolat", civilWord: "Bonbon", undercoverWord: "Chocolat", difficulty: "easy", category: "Nourriture" },
+  { id: "food-kebab-hotdog", civilWord: "Kebab", undercoverWord: "Hot-dog", difficulty: "normal", category: "Nourriture" },
+  { id: "food-cookie-macaron", civilWord: "Cookie", undercoverWord: "Macaron", difficulty: "normal", category: "Nourriture" },
+  { id: "food-churros-beignet", civilWord: "Churros", undercoverWord: "Beignet", difficulty: "normal", category: "Nourriture" },
+  { id: "food-ravioli-dumpling", civilWord: "Ravioli", undercoverWord: "Dumpling", difficulty: "hard", category: "Nourriture" },
+  { id: "food-nuggets-cordonbleu", civilWord: "Nuggets", undercoverWord: "Cordon bleu", difficulty: "normal", category: "Nourriture" },
+  { id: "food-waffle-gaufre", civilWord: "Gaufre", undercoverWord: "Pancake", difficulty: "hard", category: "Nourriture" },
 
   // ─── Boissons (10) ───
   { id: "drink-cafe-the", civilWord: "Café", undercoverWord: "Thé", difficulty: "easy", category: "Boissons" },
@@ -29,6 +35,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "drink-milkshake-frappuccino", civilWord: "Milkshake", undercoverWord: "Frappuccino", difficulty: "hard", category: "Boissons" },
   { id: "drink-sirop-miel", civilWord: "Sirop", undercoverWord: "Miel", difficulty: "normal", category: "Boissons" },
   { id: "drink-biere-cidre", civilWord: "Bière", undercoverWord: "Cidre", difficulty: "normal", category: "Boissons" },
+  { id: "drink-bubbletea-granite", civilWord: "Bubble tea", undercoverWord: "Granité", difficulty: "normal", category: "Boissons" },
+  { id: "drink-soda-eaugazeuse", civilWord: "Soda", undercoverWord: "Eau gazeuse", difficulty: "normal", category: "Boissons" },
+  { id: "drink-tisane-infusion", civilWord: "Tisane", undercoverWord: "Infusion", difficulty: "hard", category: "Boissons" },
+  { id: "drink-juspomme-compote", civilWord: "Jus de pomme", undercoverWord: "Compote", difficulty: "normal", category: "Boissons" },
 
   // ─── Animaux (15) ───
   { id: "animal-chat-tigre", civilWord: "Chat", undercoverWord: "Tigre", difficulty: "easy", category: "Animaux" },
@@ -46,6 +56,13 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "animal-souris-hamster", civilWord: "Souris", undercoverWord: "Hamster", difficulty: "normal", category: "Animaux" },
   { id: "animal-lion-leopard", civilWord: "Lion", undercoverWord: "Léopard", difficulty: "hard", category: "Animaux" },
   { id: "animal-poule-dinde", civilWord: "Poule", undercoverWord: "Dinde", difficulty: "normal", category: "Animaux" },
+  { id: "animal-koala-paresseux", civilWord: "Koala", undercoverWord: "Paresseux", difficulty: "normal", category: "Animaux" },
+  { id: "animal-flamant-perroquet", civilWord: "Flamant rose", undercoverWord: "Perroquet", difficulty: "normal", category: "Animaux" },
+  { id: "animal-araignee-scorpion", civilWord: "Araignée", undercoverWord: "Scorpion", difficulty: "normal", category: "Animaux" },
+  { id: "animal-herisson-porcepic", civilWord: "Hérisson", undercoverWord: "Porc-épic", difficulty: "hard", category: "Animaux" },
+  { id: "animal-renard-coyote", civilWord: "Renard", undercoverWord: "Coyote", difficulty: "hard", category: "Animaux" },
+  { id: "animal-girafe-autruche", civilWord: "Girafe", undercoverWord: "Autruche", difficulty: "easy", category: "Animaux" },
+  { id: "animal-phoque-morse", civilWord: "Phoque", undercoverWord: "Morse", difficulty: "hard", category: "Animaux" },
 
   // ─── Objets (15) ───
   { id: "object-chaise-tabouret", civilWord: "Chaise", undercoverWord: "Tabouret", difficulty: "normal", category: "Objets" },
@@ -63,6 +80,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "object-ciseaux-tondeuse", civilWord: "Ciseaux", undercoverWord: "Tondeuse", difficulty: "normal", category: "Objets" },
   { id: "object-miroir-vitre", civilWord: "Miroir", undercoverWord: "Vitre", difficulty: "hard", category: "Objets" },
   { id: "object-balai-aspirateur", civilWord: "Balai", undercoverWord: "Aspirateur", difficulty: "normal", category: "Objets" },
+  { id: "object-aimant-boussole", civilWord: "Aimant", undercoverWord: "Boussole", difficulty: "normal", category: "Objets" },
+  { id: "object-de-domino", civilWord: "Dé", undercoverWord: "Domino", difficulty: "easy", category: "Objets" },
+  { id: "object-oreiller-coussin", civilWord: "Oreiller", undercoverWord: "Coussin", difficulty: "hard", category: "Objets" },
+  { id: "object-loupe-telescope", civilWord: "Loupe", undercoverWord: "Télescope", difficulty: "normal", category: "Objets" },
+  { id: "object-pinceau-rouleau", civilWord: "Pinceau", undercoverWord: "Rouleau", difficulty: "normal", category: "Objets" },
 
   // ─── Lieux (15) ───
   { id: "place-toureiffel-liberte", civilWord: "Tour Eiffel", undercoverWord: "Statue de la Liberté", difficulty: "easy", category: "Lieux" },
@@ -80,6 +102,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "place-grotte-tunnel", civilWord: "Grotte", undercoverWord: "Tunnel", difficulty: "normal", category: "Lieux" },
   { id: "place-ile-continent", civilWord: "Île", undercoverWord: "Continent", difficulty: "hard", category: "Lieux" },
   { id: "place-zoo-aquarium", civilWord: "Zoo", undercoverWord: "Aquarium", difficulty: "easy", category: "Lieux" },
+  { id: "place-phare-tour", civilWord: "Phare", undercoverWord: "Tour", difficulty: "normal", category: "Lieux" },
+  { id: "place-igloo-tipi", civilWord: "Igloo", undercoverWord: "Tipi", difficulty: "easy", category: "Lieux" },
+  { id: "place-labyrinthe-grotte2", civilWord: "Labyrinthe", undercoverWord: "Grotte", difficulty: "normal", category: "Lieux" },
+  { id: "place-volcan-montagne2", civilWord: "Volcan", undercoverWord: "Montagne", difficulty: "easy", category: "Lieux" },
+  { id: "place-camping-cabane", civilWord: "Camping", undercoverWord: "Cabane", difficulty: "normal", category: "Lieux" },
 
   // ─── Sports (15) ───
   { id: "sport-foot-rugby", civilWord: "Football", undercoverWord: "Rugby", difficulty: "easy", category: "Sports" },
@@ -97,6 +124,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "sport-catch-judo", civilWord: "Catch", undercoverWord: "Judo", difficulty: "hard", category: "Sports" },
   { id: "sport-ping-pong-squash", civilWord: "Ping-pong", undercoverWord: "Squash", difficulty: "hard", category: "Sports" },
   { id: "sport-arc-flechettes", civilWord: "Tir à l'arc", undercoverWord: "Fléchettes", difficulty: "normal", category: "Sports" },
+  { id: "sport-yoga-pilates", civilWord: "Yoga", undercoverWord: "Pilates", difficulty: "hard", category: "Sports" },
+  { id: "sport-escrime-sabre", civilWord: "Escrime", undercoverWord: "Sabre", difficulty: "normal", category: "Sports" },
+  { id: "sport-parachute-deltaplane", civilWord: "Parachute", undercoverWord: "Deltaplane", difficulty: "normal", category: "Sports" },
+  { id: "sport-musculation-fitness", civilWord: "Musculation", undercoverWord: "Fitness", difficulty: "hard", category: "Sports" },
+  { id: "sport-trampoline-toboggan", civilWord: "Trampoline", undercoverWord: "Toboggan", difficulty: "easy", category: "Sports" },
 
   // ─── Métiers (12) ───
   { id: "job-pompier-policier", civilWord: "Pompier", undercoverWord: "Policier", difficulty: "easy", category: "Métiers" },
@@ -111,6 +143,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "job-pirate-viking", civilWord: "Pirate", undercoverWord: "Viking", difficulty: "normal", category: "Métiers" },
   { id: "job-espion-detective", civilWord: "Espion", undercoverWord: "Détective", difficulty: "normal", category: "Métiers" },
   { id: "job-ninja-samourai", civilWord: "Ninja", undercoverWord: "Samouraï", difficulty: "normal", category: "Métiers" },
+  { id: "job-veterinaire-docteur", civilWord: "Vétérinaire", undercoverWord: "Docteur", difficulty: "normal", category: "Métiers" },
+  { id: "job-facteur-livreur", civilWord: "Facteur", undercoverWord: "Livreur", difficulty: "normal", category: "Métiers" },
+  { id: "job-fermier-jardinier", civilWord: "Fermier", undercoverWord: "Jardinier", difficulty: "easy", category: "Métiers" },
+  { id: "job-artiste-sculpteur", civilWord: "Artiste", undercoverWord: "Sculpteur", difficulty: "normal", category: "Métiers" },
+  { id: "job-serveur-barman", civilWord: "Serveur", undercoverWord: "Barman", difficulty: "normal", category: "Métiers" },
 
   // ─── Vêtements & Mode (10) ───
   { id: "cloth-chapeau-casquette", civilWord: "Chapeau", undercoverWord: "Casquette", difficulty: "easy", category: "Vêtements" },
@@ -123,6 +160,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "cloth-short-pantalon", civilWord: "Short", undercoverWord: "Pantalon", difficulty: "easy", category: "Vêtements" },
   { id: "cloth-tong-sandale", civilWord: "Tong", undercoverWord: "Sandale", difficulty: "normal", category: "Vêtements" },
   { id: "cloth-costume-pyjama", civilWord: "Costume", undercoverWord: "Pyjama", difficulty: "normal", category: "Vêtements" },
+  { id: "cloth-manteau-impermeable", civilWord: "Manteau", undercoverWord: "Imperméable", difficulty: "normal", category: "Vêtements" },
+  { id: "cloth-ceinture-bretelles", civilWord: "Ceinture", undercoverWord: "Bretelles", difficulty: "hard", category: "Vêtements" },
+  { id: "cloth-maillot-short", civilWord: "Maillot de bain", undercoverWord: "Short de bain", difficulty: "hard", category: "Vêtements" },
+  { id: "cloth-bonnet-cagoule", civilWord: "Bonnet", undercoverWord: "Cagoule", difficulty: "normal", category: "Vêtements" },
+  { id: "cloth-lunettes-soleil-visiere", civilWord: "Lunettes de soleil", undercoverWord: "Visière", difficulty: "normal", category: "Vêtements" },
 
   // ─── Transport (10) ───
   { id: "trans-voiture-camion", civilWord: "Voiture", undercoverWord: "Camion", difficulty: "easy", category: "Transport" },
@@ -135,6 +177,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "trans-tank-bulldozer", civilWord: "Tank", undercoverWord: "Bulldozer", difficulty: "normal", category: "Transport" },
   { id: "trans-mongolfiere-parachute", civilWord: "Montgolfière", undercoverWord: "Parachute", difficulty: "normal", category: "Transport" },
   { id: "trans-quad-motoneige", civilWord: "Quad", undercoverWord: "Motoneige", difficulty: "hard", category: "Transport" },
+  { id: "trans-jetski-canoe", civilWord: "Jet ski", undercoverWord: "Canoë", difficulty: "normal", category: "Transport" },
+  { id: "trans-trottinette-skate", civilWord: "Trottinette", undercoverWord: "Skateboard", difficulty: "easy", category: "Transport" },
+  { id: "trans-telepherique-funiculaire", civilWord: "Téléphérique", undercoverWord: "Funiculaire", difficulty: "hard", category: "Transport" },
+  { id: "trans-caravane-campingcar", civilWord: "Caravane", undercoverWord: "Camping-car", difficulty: "hard", category: "Transport" },
 
   // ─── Nature (10) ───
   { id: "nat-soleil-lune", civilWord: "Soleil", undercoverWord: "Lune", difficulty: "easy", category: "Nature" },
@@ -147,6 +193,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "nat-riviere-fleuve", civilWord: "Rivière", undercoverWord: "Fleuve", difficulty: "hard", category: "Nature" },
   { id: "nat-etoile-comete", civilWord: "Étoile", undercoverWord: "Comète", difficulty: "normal", category: "Nature" },
   { id: "nat-arbre-buisson", civilWord: "Arbre", undercoverWord: "Buisson", difficulty: "easy", category: "Nature" },
+  { id: "nat-tornade-cyclone", civilWord: "Tornade", undercoverWord: "Cyclone", difficulty: "hard", category: "Nature" },
+  { id: "nat-glacier-iceberg", civilWord: "Glacier", undercoverWord: "Iceberg", difficulty: "normal", category: "Nature" },
+  { id: "nat-desert-oasis", civilWord: "Désert", undercoverWord: "Oasis", difficulty: "normal", category: "Nature" },
+  { id: "nat-corail-algue", civilWord: "Corail", undercoverWord: "Algue", difficulty: "normal", category: "Nature" },
+  { id: "nat-champignon-mousse", civilWord: "Champignon", undercoverWord: "Mousse", difficulty: "hard", category: "Nature" },
 
   // ─── Technologie (10) ───
   { id: "tech-ordi-laptop", civilWord: "Ordinateur", undercoverWord: "Laptop", difficulty: "hard", category: "Technologie" },
@@ -159,6 +210,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "tech-camera-webcam", civilWord: "Caméra", undercoverWord: "Webcam", difficulty: "normal", category: "Technologie" },
   { id: "tech-enceinte-micro", civilWord: "Enceinte", undercoverWord: "Microphone", difficulty: "normal", category: "Technologie" },
   { id: "tech-imprimante-scanner", civilWord: "Imprimante", undercoverWord: "Scanner", difficulty: "normal", category: "Technologie" },
+  { id: "tech-qrcode-codebarres", civilWord: "QR code", undercoverWord: "Code-barres", difficulty: "normal", category: "Technologie" },
+  { id: "tech-smartwatch-montre", civilWord: "Smartwatch", undercoverWord: "Montre connectée", difficulty: "hard", category: "Technologie" },
+  { id: "tech-gps-boussole", civilWord: "GPS", undercoverWord: "Boussole", difficulty: "normal", category: "Technologie" },
+  { id: "tech-ecran-projecteur", civilWord: "Écran", undercoverWord: "Projecteur", difficulty: "normal", category: "Technologie" },
 
   // ─── Musique & Instruments (10) ───
   { id: "music-piano-orgue", civilWord: "Piano", undercoverWord: "Orgue", difficulty: "normal", category: "Musique" },
@@ -171,6 +226,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "music-rap-slam", civilWord: "Rap", undercoverWord: "Slam", difficulty: "hard", category: "Musique" },
   { id: "music-concert-festival", civilWord: "Concert", undercoverWord: "Festival", difficulty: "normal", category: "Musique" },
   { id: "music-karaoke-chorale", civilWord: "Karaoké", undercoverWord: "Chorale", difficulty: "normal", category: "Musique" },
+  { id: "music-guitare-ukulele", civilWord: "Guitare", undercoverWord: "Ukulélé", difficulty: "normal", category: "Musique" },
+  { id: "music-violon-violoncelle", civilWord: "Violon", undercoverWord: "Violoncelle", difficulty: "hard", category: "Musique" },
+  { id: "music-xylophone-marimba", civilWord: "Xylophone", undercoverWord: "Marimba", difficulty: "hard", category: "Musique" },
+  { id: "music-tambour-djembe", civilWord: "Tambour", undercoverWord: "Djembé", difficulty: "normal", category: "Musique" },
+  { id: "music-banjo-mandoline", civilWord: "Banjo", undercoverWord: "Mandoline", difficulty: "hard", category: "Musique" },
 
   // ─── Pop Culture & Jeux vidéo (20) ───
   { id: "pop-mario-sonic", civilWord: "Mario", undercoverWord: "Sonic", difficulty: "easy", category: "Pop Culture" },
@@ -193,6 +253,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "pop-totoro-pikachu2", civilWord: "Totoro", undercoverWord: "Snorlax", difficulty: "hard", category: "Pop Culture" },
   { id: "pop-ironman-optimus", civilWord: "Iron Man", undercoverWord: "Optimus Prime", difficulty: "normal", category: "Pop Culture" },
   { id: "pop-yoda-dumbledore", civilWord: "Yoda", undercoverWord: "Dumbledore", difficulty: "normal", category: "Pop Culture" },
+  { id: "pop-stitch-babyyoda", civilWord: "Stitch", undercoverWord: "Baby Yoda", difficulty: "easy", category: "Pop Culture" },
+  { id: "pop-deadpool-wolverine", civilWord: "Deadpool", undercoverWord: "Wolverine", difficulty: "normal", category: "Pop Culture" },
+  { id: "pop-avengers-justiceleague", civilWord: "Avengers", undercoverWord: "Justice League", difficulty: "hard", category: "Pop Culture" },
+  { id: "pop-groot-baymax", civilWord: "Groot", undercoverWord: "Baymax", difficulty: "normal", category: "Pop Culture" },
+  { id: "pop-neo-morpheus", civilWord: "Neo", undercoverWord: "Morpheus", difficulty: "hard", category: "Pop Culture" },
 
   // ─── Maison & Meubles (10) ───
   { id: "home-lit-canape", civilWord: "Lit", undercoverWord: "Canapé", difficulty: "easy", category: "Maison" },
@@ -205,6 +270,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "home-tapis-moquette", civilWord: "Tapis", undercoverWord: "Moquette", difficulty: "hard", category: "Maison" },
   { id: "home-rideau-store", civilWord: "Rideau", undercoverWord: "Store", difficulty: "hard", category: "Maison" },
   { id: "home-evier-lavabo", civilWord: "Évier", undercoverWord: "Lavabo", difficulty: "hard", category: "Maison" },
+  { id: "home-cheminee-radiateur", civilWord: "Cheminée", undercoverWord: "Radiateur", difficulty: "normal", category: "Maison" },
+  { id: "home-aquarium-terrarium", civilWord: "Aquarium", undercoverWord: "Terrarium", difficulty: "hard", category: "Maison" },
+  { id: "home-ventilateur-climatiseur", civilWord: "Ventilateur", undercoverWord: "Climatiseur", difficulty: "normal", category: "Maison" },
+  { id: "home-poubelle-compost", civilWord: "Poubelle", undercoverWord: "Compost", difficulty: "normal", category: "Maison" },
 
   // ─── École & Savoir (10) ───
   { id: "school-crayon-stylo", civilWord: "Crayon", undercoverWord: "Stylo", difficulty: "easy", category: "École" },
@@ -217,6 +286,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "school-calcul-geometrie", civilWord: "Calcul", undercoverWord: "Géométrie", difficulty: "hard", category: "École" },
   { id: "school-examen-controle", civilWord: "Examen", undercoverWord: "Contrôle", difficulty: "hard", category: "École" },
   { id: "school-recreation-sieste", civilWord: "Récréation", undercoverWord: "Sieste", difficulty: "normal", category: "École" },
+  { id: "school-dictionnaire-encyclopedie", civilWord: "Dictionnaire", undercoverWord: "Encyclopédie", difficulty: "hard", category: "École" },
+  { id: "school-compas-rapporteur", civilWord: "Compas", undercoverWord: "Rapporteur", difficulty: "hard", category: "École" },
+  { id: "school-colle-scotch", civilWord: "Colle", undercoverWord: "Scotch", difficulty: "easy", category: "École" },
+  { id: "school-labo-salleclasse", civilWord: "Laboratoire", undercoverWord: "Salle de classe", difficulty: "normal", category: "École" },
 
   // ─── Fêtes & Événements (10) ───
   { id: "fete-noel-halloween", civilWord: "Noël", undercoverWord: "Halloween", difficulty: "easy", category: "Fêtes" },
@@ -229,6 +302,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "fete-oeuf-paques-lapin", civilWord: "Oeuf de Pâques", undercoverWord: "Lapin de Pâques", difficulty: "hard", category: "Fêtes" },
   { id: "fete-sapin-guirlande", civilWord: "Sapin", undercoverWord: "Guirlande", difficulty: "normal", category: "Fêtes" },
   { id: "fete-gateau-bougie-anniv", civilWord: "Gâteau d'anniversaire", undercoverWord: "Bougie d'anniversaire", difficulty: "hard", category: "Fêtes" },
+  { id: "fete-confetti-serpentin", civilWord: "Confetti", undercoverWord: "Serpentin", difficulty: "normal", category: "Fêtes" },
+  { id: "fete-bonhomme-igloo", civilWord: "Bonhomme de neige", undercoverWord: "Igloo", difficulty: "easy", category: "Fêtes" },
+  { id: "fete-citrouille-lanterne", civilWord: "Citrouille", undercoverWord: "Lanterne", difficulty: "normal", category: "Fêtes" },
+  { id: "fete-couronne-galette", civilWord: "Couronne", undercoverWord: "Galette des rois", difficulty: "normal", category: "Fêtes" },
 
   // ─── Corps humain (10) ───
   { id: "body-oeil-oreille", civilWord: "Oeil", undercoverWord: "Oreille", difficulty: "easy", category: "Corps" },
@@ -241,6 +318,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "body-nez-bouche", civilWord: "Nez", undercoverWord: "Bouche", difficulty: "easy", category: "Corps" },
   { id: "body-crane-squelette", civilWord: "Crâne", undercoverWord: "Squelette", difficulty: "normal", category: "Corps" },
   { id: "body-poumon-estomac", civilWord: "Poumon", undercoverWord: "Estomac", difficulty: "hard", category: "Corps" },
+  { id: "body-genou-coude", civilWord: "Genou", undercoverWord: "Coude", difficulty: "normal", category: "Corps" },
+  { id: "body-langue-levre", civilWord: "Langue", undercoverWord: "Lèvre", difficulty: "normal", category: "Corps" },
+  { id: "body-sourcil-cil", civilWord: "Sourcil", undercoverWord: "Cil", difficulty: "hard", category: "Corps" },
+  { id: "body-pouce-index", civilWord: "Pouce", undercoverWord: "Index", difficulty: "hard", category: "Corps" },
 
   // ─── Émotions & Expressions (10) ───
   { id: "emo-rire-pleurer", civilWord: "Rire", undercoverWord: "Pleurer", difficulty: "easy", category: "Émotions" },
@@ -253,6 +334,9 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "emo-timide-confiant", civilWord: "Timide", undercoverWord: "Confiant", difficulty: "hard", category: "Émotions" },
   { id: "emo-ennui-paresse", civilWord: "Ennui", undercoverWord: "Paresse", difficulty: "hard", category: "Émotions" },
   { id: "emo-surprise-choc", civilWord: "Surprise", undercoverWord: "Choc", difficulty: "hard", category: "Émotions" },
+  { id: "emo-jalousie-envie", civilWord: "Jalousie", undercoverWord: "Envie", difficulty: "hard", category: "Émotions" },
+  { id: "emo-courage-temerite", civilWord: "Courage", undercoverWord: "Témérité", difficulty: "hard", category: "Émotions" },
+  { id: "emo-amour-passion", civilWord: "Amour", undercoverWord: "Passion", difficulty: "hard", category: "Émotions" },
 
   // ─── Chaos / Concepts abstraits (15) ───
   { id: "abs-amour-amitie", civilWord: "Amour", undercoverWord: "Amitié", difficulty: "hard", category: "Chaos" },
@@ -270,6 +354,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "abs-lumiere-ombre", civilWord: "Lumière", undercoverWord: "Ombre", difficulty: "normal", category: "Chaos" },
   { id: "abs-genie-idiot", civilWord: "Génie", undercoverWord: "Idiot", difficulty: "normal", category: "Chaos" },
   { id: "abs-gravite-apesanteur", civilWord: "Gravité", undercoverWord: "Apesanteur", difficulty: "hard", category: "Chaos" },
+  { id: "abs-infini-zero", civilWord: "Infini", undercoverWord: "Zéro", difficulty: "hard", category: "Chaos" },
+  { id: "abs-paradis-enfer", civilWord: "Paradis", undercoverWord: "Enfer", difficulty: "normal", category: "Chaos" },
+  { id: "abs-debut-fin", civilWord: "Début", undercoverWord: "Fin", difficulty: "easy", category: "Chaos" },
+  { id: "abs-nord-sud", civilWord: "Nord", undercoverWord: "Sud", difficulty: "easy", category: "Chaos" },
+  { id: "abs-vrai-faux", civilWord: "Vrai", undercoverWord: "Faux", difficulty: "hard", category: "Chaos" },
 
   // ─── Espace & Science-fiction (10) ───
   { id: "space-terre-mars", civilWord: "Terre", undercoverWord: "Mars", difficulty: "normal", category: "Espace" },
@@ -282,6 +371,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "space-blackhole-tornado", civilWord: "Trou noir", undercoverWord: "Tornade", difficulty: "normal", category: "Espace" },
   { id: "space-sabre-laser-epee", civilWord: "Sabre laser", undercoverWord: "Épée magique", difficulty: "normal", category: "Espace" },
   { id: "space-vaisseau-fusee", civilWord: "Vaisseau spatial", undercoverWord: "Fusée", difficulty: "normal", category: "Espace" },
+  { id: "space-station-iss", civilWord: "Station spatiale", undercoverWord: "Satellite", difficulty: "normal", category: "Espace" },
+  { id: "space-lune-saturne", civilWord: "Lune", undercoverWord: "Saturne", difficulty: "normal", category: "Espace" },
+  { id: "space-rover-robot2", civilWord: "Rover", undercoverWord: "Robot", difficulty: "normal", category: "Espace" },
+  { id: "space-comete-etoilefilante", civilWord: "Comète", undercoverWord: "Étoile filante", difficulty: "hard", category: "Espace" },
 
   // ─── Contes & Légendes (10) ───
   { id: "tale-dragon-dinosaure", civilWord: "Dragon", undercoverWord: "Dinosaure", difficulty: "easy", category: "Contes" },
@@ -294,6 +387,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "tale-tresor-coffre", civilWord: "Trésor", undercoverWord: "Coffre", difficulty: "normal", category: "Contes" },
   { id: "tale-chateau-tour", civilWord: "Château fort", undercoverWord: "Tour de garde", difficulty: "hard", category: "Contes" },
   { id: "tale-baguette-magique-baton", civilWord: "Baguette magique", undercoverWord: "Bâton de sorcier", difficulty: "hard", category: "Contes" },
+  { id: "tale-minotaure-centaure", civilWord: "Minotaure", undercoverWord: "Centaure", difficulty: "normal", category: "Contes" },
+  { id: "tale-phoenix-griffon", civilWord: "Phénix", undercoverWord: "Griffon", difficulty: "hard", category: "Contes" },
+  { id: "tale-lutin-farfadet", civilWord: "Lutin", undercoverWord: "Farfadet", difficulty: "hard", category: "Contes" },
+  { id: "tale-gobelin-nain", civilWord: "Gobelin", undercoverWord: "Nain", difficulty: "normal", category: "Contes" },
+  { id: "tale-sorciere-magicien", civilWord: "Sorcière", undercoverWord: "Magicien", difficulty: "easy", category: "Contes" },
 
   // ─── Manga / Anime (18) ───
   { id: "anime-naruto-luffy", civilWord: "Naruto", undercoverWord: "Luffy", difficulty: "easy", category: "Manga / Anime" },
@@ -314,6 +412,16 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "anime-pokemon-pokeball", civilWord: "Pokémon", undercoverWord: "Poké Ball", difficulty: "easy", category: "Manga / Anime" },
   { id: "anime-mecha-gundam", civilWord: "Mecha", undercoverWord: "Gundam", difficulty: "hard", category: "Manga / Anime" },
   { id: "anime-ramen-bento", civilWord: "Ramen", undercoverWord: "Bento", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-zoro-sanji", civilWord: "Zoro", undercoverWord: "Sanji", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-kakashi-jiraiya", civilWord: "Kakashi", undercoverWord: "Jiraiya", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-light-l", civilWord: "Light Yagami", undercoverWord: "L", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-eren-mikasa", civilWord: "Eren", undercoverWord: "Mikasa", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-saitama-genos", civilWord: "Saitama", undercoverWord: "Genos", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-killua-gon", civilWord: "Killua", undercoverWord: "Gon", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-asta-yuno", civilWord: "Asta", undercoverWord: "Yuno", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-lelouch-suzaku", civilWord: "Lelouch", undercoverWord: "Suzaku", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-senku-chrome", civilWord: "Senku", undercoverWord: "Chrome", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-goku-freezer", civilWord: "Goku", undercoverWord: "Freezer", difficulty: "easy", category: "Manga / Anime" },
 
   // ─── Jeux vidéo (18) ───
   { id: "game-mario-luigi", civilWord: "Mario", undercoverWord: "Luigi", difficulty: "easy", category: "Jeux vidéo" },
@@ -334,6 +442,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "game-potion-elixir", civilWord: "Potion", undercoverWord: "Élixir", difficulty: "normal", category: "Jeux vidéo" },
   { id: "game-joystick-console", civilWord: "Joystick", undercoverWord: "Console", difficulty: "easy", category: "Jeux vidéo" },
   { id: "game-speedrun-checkpoint", civilWord: "Speedrun", undercoverWord: "Checkpoint", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-steve-alex", civilWord: "Steve", undercoverWord: "Alex", difficulty: "easy", category: "Jeux vidéo" },
+  { id: "game-pikachu-mewtwo", civilWord: "Pikachu", undercoverWord: "Mewtwo", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-lara-nathan", civilWord: "Lara Croft", undercoverWord: "Nathan Drake", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-megaman-astroboy", civilWord: "Mega Man", undercoverWord: "Astro Boy", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-ganondorf-bowser2", civilWord: "Ganondorf", undercoverWord: "Bowser", difficulty: "normal", category: "Jeux vidéo" },
 
   // ─── Cinéma / Séries (18) ───
   { id: "screen-harry-hermione", civilWord: "Harry Potter", undercoverWord: "Hermione", difficulty: "normal", category: "Cinéma / Séries" },
@@ -354,6 +467,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "screen-spongebob-patrick-series", civilWord: "SpongeBob", undercoverWord: "Patrick", difficulty: "easy", category: "Cinéma / Séries" },
   { id: "screen-rick-morty", civilWord: "Rick", undercoverWord: "Morty", difficulty: "normal", category: "Cinéma / Séries" },
   { id: "screen-gandalf-saruman", civilWord: "Gandalf", undercoverWord: "Saroumane", difficulty: "hard", category: "Cinéma / Séries" },
+  { id: "screen-bond-bourne", civilWord: "James Bond", undercoverWord: "Jason Bourne", difficulty: "hard", category: "Cinéma / Séries" },
+  { id: "screen-shrek-fiona", civilWord: "Shrek", undercoverWord: "Fiona", difficulty: "easy", category: "Cinéma / Séries" },
+  { id: "screen-hagrid-dobby", civilWord: "Hagrid", undercoverWord: "Dobby", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-jackpearl-barbossa", civilWord: "Jack Sparrow", undercoverWord: "Barbossa", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-eleven-dustin", civilWord: "Eleven", undercoverWord: "Dustin", difficulty: "normal", category: "Cinéma / Séries" },
 
   // ─── Fruits & Legumes (18) ───
   { id: "fruit-pomme-poire", civilWord: "Pomme", undercoverWord: "Poire", difficulty: "easy", category: "Fruits & Légumes" },
@@ -374,6 +492,11 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "veg-brocoli-choufleur", civilWord: "Brocoli", undercoverWord: "Chou-fleur", difficulty: "normal", category: "Fruits & Légumes" },
   { id: "veg-patate-douce", civilWord: "Pomme de terre", undercoverWord: "Patate douce", difficulty: "hard", category: "Fruits & Légumes" },
   { id: "veg-champignon-truffe", civilWord: "Champignon", undercoverWord: "Truffe", difficulty: "hard", category: "Fruits & Légumes" },
+  { id: "fruit-abricot-peche", civilWord: "Abricot", undercoverWord: "Pêche", difficulty: "hard", category: "Fruits & Légumes" },
+  { id: "fruit-litchi-grenade", civilWord: "Litchi", undercoverWord: "Grenade", difficulty: "hard", category: "Fruits & Légumes" },
+  { id: "veg-poireau-asperge", civilWord: "Poireau", undercoverWord: "Asperge", difficulty: "normal", category: "Fruits & Légumes" },
+  { id: "veg-betterave-radis", civilWord: "Betterave", undercoverWord: "Radis", difficulty: "normal", category: "Fruits & Légumes" },
+  { id: "veg-haricot-petitpois", civilWord: "Haricot", undercoverWord: "Petit pois", difficulty: "normal", category: "Fruits & Légumes" },
 
   // ─── Cuisine (18) ───
   { id: "cook-poele-casserole", civilWord: "Poêle", undercoverWord: "Casserole", difficulty: "easy", category: "Cuisine" },
@@ -394,6 +517,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "cook-pain-brioche", civilWord: "Pain", undercoverWord: "Brioche", difficulty: "normal", category: "Cuisine" },
   { id: "cook-gateau-biscuit", civilWord: "Gâteau", undercoverWord: "Biscuit", difficulty: "easy", category: "Cuisine" },
   { id: "cook-pizza-lasagne", civilWord: "Pizza", undercoverWord: "Lasagnes", difficulty: "normal", category: "Cuisine" },
+  { id: "cook-cocotte-marmite", civilWord: "Cocotte", undercoverWord: "Marmite", difficulty: "hard", category: "Cuisine" },
+  { id: "cook-tablier-torchon", civilWord: "Tablier", undercoverWord: "Torchon", difficulty: "normal", category: "Cuisine" },
+  { id: "cook-rouleau-moule", civilWord: "Rouleau à pâtisserie", undercoverWord: "Moule", difficulty: "normal", category: "Cuisine" },
+  { id: "cook-passoire-tamis", civilWord: "Passoire", undercoverWord: "Tamis", difficulty: "hard", category: "Cuisine" },
 
   // ─── Objets du quotidien (18) ───
   { id: "daily-clef-badge", civilWord: "Clé", undercoverWord: "Badge", difficulty: "easy", category: "Objets du quotidien" },
@@ -414,6 +541,10 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "daily-parapluie-kway", civilWord: "Parapluie", undercoverWord: "K-way", difficulty: "hard", category: "Objets du quotidien" },
   { id: "daily-lunettes-masque", civilWord: "Lunettes", undercoverWord: "Masque", difficulty: "normal", category: "Objets du quotidien" },
   { id: "daily-bouteille-gourde", civilWord: "Bouteille", undercoverWord: "Gourde", difficulty: "normal", category: "Objets du quotidien" },
+  { id: "daily-coussin-couverture", civilWord: "Coussin", undercoverWord: "Couverture", difficulty: "easy", category: "Objets du quotidien" },
+  { id: "daily-cintre-etendoir", civilWord: "Cintre", undercoverWord: "Étendoir", difficulty: "normal", category: "Objets du quotidien" },
+  { id: "daily-reveil-minuteur", civilWord: "Réveil", undercoverWord: "Minuteur", difficulty: "normal", category: "Objets du quotidien" },
+  { id: "daily-ciseaux-scotch2", civilWord: "Ciseaux", undercoverWord: "Scotch", difficulty: "easy", category: "Objets du quotidien" },
 
   // ─── Ville & Commerce (18) ───
   { id: "city-boulangerie-patisserie", civilWord: "Boulangerie", undercoverWord: "Pâtisserie", difficulty: "easy", category: "Ville & Commerce" },
@@ -434,26 +565,31 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "city-camping-hotel", civilWord: "Camping", undercoverWord: "Hôtel", difficulty: "easy", category: "Ville & Commerce" },
   { id: "city-marche-brocante", civilWord: "Marché", undercoverWord: "Brocante", difficulty: "hard", category: "Ville & Commerce" },
   { id: "city-bus-tram", civilWord: "Bus", undercoverWord: "Tram", difficulty: "easy", category: "Ville & Commerce" },
+  { id: "city-poste-boiteauxlettres", civilWord: "Poste", undercoverWord: "Boîte aux lettres", difficulty: "normal", category: "Ville & Commerce" },
+  { id: "city-fontaine-statue", civilWord: "Fontaine", undercoverWord: "Statue", difficulty: "normal", category: "Ville & Commerce" },
+  { id: "city-pont-tunnel2", civilWord: "Pont", undercoverWord: "Tunnel", difficulty: "normal", category: "Ville & Commerce" },
+  { id: "city-aeroport-port", civilWord: "Aéroport", undercoverWord: "Port", difficulty: "normal", category: "Ville & Commerce" },
+  { id: "city-gratteciel-tour", civilWord: "Gratte-ciel", undercoverWord: "Tour", difficulty: "easy", category: "Ville & Commerce" },
 
-  // ─── Dessins animés (18) ───
-  { id: "cartoon-mickey-minnie", civilWord: "Mickey", undercoverWord: "Minnie", difficulty: "easy", category: "Dessins animés" },
-  { id: "cartoon-tom-jerry", civilWord: "Tom", undercoverWord: "Jerry", difficulty: "easy", category: "Dessins animés" },
-  { id: "cartoon-spongebob-patrick2", civilWord: "SpongeBob", undercoverWord: "Patrick", difficulty: "easy", category: "Dessins animés" },
-  { id: "cartoon-bugs-daffy", civilWord: "Bugs Bunny", undercoverWord: "Daffy Duck", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-scooby-shaggy", civilWord: "Scooby-Doo", undercoverWord: "Sammy", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-finn-jake", civilWord: "Finn", undercoverWord: "Jake", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-gumball-darwin", civilWord: "Gumball", undercoverWord: "Darwin", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-simba-nala", civilWord: "Simba", undercoverWord: "Nala", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-elsa-olaf", civilWord: "Elsa", undercoverWord: "Olaf", difficulty: "easy", category: "Dessins animés" },
-  { id: "cartoon-buzz-woody", civilWord: "Buzz l'Éclair", undercoverWord: "Woody", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-po-shifu", civilWord: "Po", undercoverWord: "Shifu", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-shrek-ane", civilWord: "Shrek", undercoverWord: "Âne", difficulty: "easy", category: "Dessins animés" },
-  { id: "cartoon-peter-lois", civilWord: "Peter Griffin", undercoverWord: "Lois", difficulty: "hard", category: "Dessins animés" },
-  { id: "cartoon-rick-morty2", civilWord: "Rick", undercoverWord: "Morty", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-marinette-chatnoir", civilWord: "Marinette", undercoverWord: "Chat Noir", difficulty: "hard", category: "Dessins animés" },
-  { id: "cartoon-aladdin-genie", civilWord: "Aladdin", undercoverWord: "Génie", difficulty: "normal", category: "Dessins animés" },
-  { id: "cartoon-hercule-pegase", civilWord: "Hercule", undercoverWord: "Pégase", difficulty: "hard", category: "Dessins animés" },
-  { id: "cartoon-vaiana-maui", civilWord: "Vaiana", undercoverWord: "Maui", difficulty: "normal", category: "Dessins animés" },
+  // ─── Manga / Anime — suite (18) ───
+  { id: "cartoon-mickey-minnie", civilWord: "Mickey", undercoverWord: "Minnie", difficulty: "easy", category: "Manga / Anime" },
+  { id: "cartoon-tom-jerry", civilWord: "Tom", undercoverWord: "Jerry", difficulty: "easy", category: "Manga / Anime" },
+  { id: "cartoon-spongebob-patrick2", civilWord: "SpongeBob", undercoverWord: "Patrick", difficulty: "easy", category: "Manga / Anime" },
+  { id: "cartoon-bugs-daffy", civilWord: "Bugs Bunny", undercoverWord: "Daffy Duck", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-scooby-shaggy", civilWord: "Scooby-Doo", undercoverWord: "Sammy", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-finn-jake", civilWord: "Finn", undercoverWord: "Jake", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-gumball-darwin", civilWord: "Gumball", undercoverWord: "Darwin", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-simba-nala", civilWord: "Simba", undercoverWord: "Nala", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-elsa-olaf", civilWord: "Elsa", undercoverWord: "Olaf", difficulty: "easy", category: "Manga / Anime" },
+  { id: "cartoon-buzz-woody", civilWord: "Buzz l'Éclair", undercoverWord: "Woody", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-po-shifu", civilWord: "Po", undercoverWord: "Shifu", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-shrek-ane", civilWord: "Shrek", undercoverWord: "Âne", difficulty: "easy", category: "Manga / Anime" },
+  { id: "cartoon-peter-lois", civilWord: "Peter Griffin", undercoverWord: "Lois", difficulty: "hard", category: "Manga / Anime" },
+  { id: "cartoon-rick-morty2", civilWord: "Rick", undercoverWord: "Morty", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-marinette-chatnoir", civilWord: "Marinette", undercoverWord: "Chat Noir", difficulty: "hard", category: "Manga / Anime" },
+  { id: "cartoon-aladdin-genie", civilWord: "Aladdin", undercoverWord: "Génie", difficulty: "normal", category: "Manga / Anime" },
+  { id: "cartoon-hercule-pegase", civilWord: "Hercule", undercoverWord: "Pégase", difficulty: "hard", category: "Manga / Anime" },
+  { id: "cartoon-vaiana-maui", civilWord: "Vaiana", undercoverWord: "Maui", difficulty: "normal", category: "Manga / Anime" },
 
   // ─── Vacances & Loisirs (18) ───
   { id: "leisure-plage-piscine", civilWord: "Plage", undercoverWord: "Piscine", difficulty: "easy", category: "Vacances & Loisirs" },
@@ -473,7 +609,12 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "leisure-valise-passeport", civilWord: "Valise", undercoverWord: "Passeport", difficulty: "normal", category: "Vacances & Loisirs" },
   { id: "leisure-hotel-camping2", civilWord: "Hôtel", undercoverWord: "Camping", difficulty: "easy", category: "Vacances & Loisirs" },
   { id: "leisure-soleil-cremesolaire", civilWord: "Soleil", undercoverWord: "Crème solaire", difficulty: "normal", category: "Vacances & Loisirs" },
-  { id: "leisure-cerfvolant-drone", civilWord: "Cerf-volant", undercoverWord: "Drone", difficulty: "hard", category: "Vacances & Loisirs" }
+  { id: "leisure-cerfvolant-drone", civilWord: "Cerf-volant", undercoverWord: "Drone", difficulty: "hard", category: "Vacances & Loisirs" },
+  { id: "leisure-hamac-transat", civilWord: "Hamac", undercoverWord: "Transat", difficulty: "normal", category: "Vacances & Loisirs" },
+  { id: "leisure-chateausable-seau", civilWord: "Château de sable", undercoverWord: "Seau", difficulty: "easy", category: "Vacances & Loisirs" },
+  { id: "leisure-trampoline-toboggan2", civilWord: "Trampoline", undercoverWord: "Toboggan", difficulty: "easy", category: "Vacances & Loisirs" },
+  { id: "leisure-feudecamp-barbecue2", civilWord: "Feu de camp", undercoverWord: "Barbecue", difficulty: "normal", category: "Vacances & Loisirs" },
+  { id: "leisure-tuba-masqueplongee", civilWord: "Tuba", undercoverWord: "Masque de plongée", difficulty: "hard", category: "Vacances & Loisirs" }
 ];
 
 export const WORD_CATEGORIES = [...new Set(BASE_WORD_PAIRS.map((pair) => pair.category))].sort(

@@ -64,13 +64,16 @@ export function FinalScreen({
                 Table des scores
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button onClick={onReplay} disabled={!selfPlayer.isHost}>
                 Rejouer
               </Button>
               <Button tone="secondary" onClick={onReturnToLobby} disabled={!selfPlayer.isHost}>
                 Retour lobby
               </Button>
+              {!selfPlayer.isHost ? (
+                <span className="text-xs text-ink-400">L'hôte décide</span>
+              ) : null}
             </div>
           </div>
 
@@ -89,12 +92,12 @@ export function FinalScreen({
                       initial={{ opacity: 0, y: 12, rotate: index % 2 === 0 ? -1 : 1 }}
                       animate={{ opacity: 1, y: 0, rotate: index % 2 === 0 ? -1 : 1 }}
                       transition={{ delay: index * 0.05, type: "spring", stiffness: 240, damping: 22 }}
-                      className={`paper-sheet px-4 py-3 ${isSelf ? "border-[rgba(212,160,23,0.22)]" : ""}`}
+                      className={`paper-sheet px-4 py-3 ${isSelf ? "border-[rgba(212,160,23,0.22)]" : ""} ${entry.rank === 1 ? "ring-2 ring-primary/30" : ""}`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <div className="font-sketch text-3xl font-semibold leading-none text-ink-950">
-                            #{entry.rank} {player?.profile.name}
+                            {entry.rank === 1 ? "👑" : `#${entry.rank}`} {player?.profile.name}
                           </div>
                           <div className="mt-1 text-sm text-ink-500">{player?.profile.emoji}</div>
                         </div>

@@ -95,7 +95,7 @@ export function ResolutionShowcase({
           }}
         >
           <div className="font-sketch text-xl font-semibold text-primary-dark">
-            Derniere chance — Devine le mot civil
+            Dernière chance — Devine le mot civil
           </div>
           <div className="mt-2 flex gap-2">
             <input

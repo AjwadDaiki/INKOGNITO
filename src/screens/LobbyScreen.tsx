@@ -127,10 +127,10 @@ export function LobbyScreen({
 
             <div className="relative z-10 flex flex-wrap items-center gap-2">
               <span className="ink-chip text-xs font-semibold text-ink-700">
-                {readyCount}/{connectedPlayers.length} prets
+                {readyCount}/{connectedPlayers.length} prêts
               </span>
               <span className="ink-chip text-xs font-semibold text-ink-700">
-                {canLaunch ? "tout le monde est pret" : "en attente"}
+                {canLaunch ? "tout le monde est prêt" : "en attente"}
               </span>
               <Button tone="secondary" onClick={copyRoomCode} className="min-h-10 px-4 text-xs">
                 Copier le code
@@ -139,7 +139,7 @@ export function LobbyScreen({
                 Copier le lien
               </Button>
               <Button tone={selfPlayer.ready ? "secondary" : "primary"} onClick={onToggleReady}>
-                {selfPlayer.ready ? "Annuler" : "Je suis pret"}
+                {selfPlayer.ready ? "Annuler" : "Je suis prêt"}
               </Button>
               {selfPlayer.isHost ? (
                 <Button onClick={onStartGame} disabled={!canLaunch}>
@@ -180,7 +180,7 @@ export function LobbyScreen({
                             {player.profile.name}
                           </div>
                           <div className="mt-1 text-[11px] text-ink-500">
-                            {player.isHost ? "hote" : "joueur"} - {player.ready ? "pret" : "attend"}
+                            {player.isHost ? "hôte" : "joueur"} — {player.ready ? "prêt" : "attend"}
                           </div>
                         </div>
                       </div>
@@ -193,7 +193,7 @@ export function LobbyScreen({
             <div className="grid min-h-0 gap-4 lg:grid-rows-[auto_auto_minmax(0,1fr)]">
               <div className="rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/84 px-4 py-4 md:px-5">
                 <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">
-                  Regles de la manche
+                  Règles de la manche
                 </div>
                 <div className={`grid gap-3 md:grid-cols-2${selfPlayer.isHost ? "" : " pointer-events-none opacity-50"}`}>
                   <div>
@@ -224,7 +224,7 @@ export function LobbyScreen({
                   </div>
                   <div>
                     <div className="mb-2 text-xs uppercase tracking-[0.18em] text-ink-500">
-                      Difficulte
+                      Difficulté
                     </div>
                     <PillGroup
                       options={["easy", "normal", "hard"] as const}
@@ -243,7 +243,7 @@ export function LobbyScreen({
 
               <div className="rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/84 px-4 py-4 md:px-5">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <div className="font-sketch text-3xl font-semibold text-ink-900">Categories</div>
+                  <div className="font-sketch text-3xl font-semibold text-ink-900">Catégories</div>
                   <span className="ink-chip text-xs font-semibold text-ink-700">
                     {selectedCategories.includes("Tout")
                       ? "Tout"

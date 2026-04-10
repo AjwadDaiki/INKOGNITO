@@ -73,30 +73,36 @@ function PlayerBoardCardComponent({
         {player.profile.name}
       </div>
 
-      {/* Vote markers — confirmed (color) + pending (grayscale) */}
+      {/* Vote markers — confirmed (solid) + pending (dashed, faded) */}
       {phase === "vote" && (voteMarkers.length > 0 || pendingMarkers.length > 0) ? (
-        <div className="flex flex-wrap justify-center gap-0.5">
-          {voteMarkers.slice(0, 6).map((voter) => (
-            <div
+        <div className="flex flex-wrap justify-center gap-1 pt-0.5">
+          {voteMarkers.slice(0, 8).map((voter) => (
+            <motion.div
               key={voter.id}
-              title={`${voter.profile.name} (voté)`}
-              className="flex h-5 w-5 items-center justify-center rounded-full border border-[rgba(74,60,46,0.18)] bg-[rgba(245,239,229,0.96)] text-[10px] shadow-sm"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
+              title={voter.profile.name}
+              className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[rgba(74,60,46,0.22)] bg-[rgba(245,239,229,0.96)] text-lg shadow-sm"
             >
               {voter.profile.emoji}
-            </div>
+            </motion.div>
           ))}
-          {pendingMarkers.slice(0, 6 - voteMarkers.length).map((voter) => (
-            <div
+          {pendingMarkers.slice(0, 8 - voteMarkers.length).map((voter) => (
+            <motion.div
               key={voter.id}
-              title={`${voter.profile.name} (en attente)`}
-              className="flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-[rgba(74,60,46,0.15)] bg-[rgba(245,239,229,0.5)] text-[10px] opacity-50 grayscale"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1, opacity: 0.5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
+              title={`${voter.profile.name} (hésite)`}
+              className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-[rgba(74,60,46,0.18)] bg-[rgba(245,239,229,0.5)] text-lg grayscale"
             >
               {voter.profile.emoji}
-            </div>
+            </motion.div>
           ))}
-          {voteMarkers.length + pendingMarkers.length > 6 ? (
-            <div className="flex h-5 items-center rounded-full bg-paper px-1 text-[9px] font-semibold text-ink-700">
-              +{voteMarkers.length + pendingMarkers.length - 6}
+          {voteMarkers.length + pendingMarkers.length > 8 ? (
+            <div className="flex h-8 items-center rounded-full bg-paper px-2 text-xs font-bold text-ink-700">
+              +{voteMarkers.length + pendingMarkers.length - 8}
             </div>
           ) : null}
         </div>

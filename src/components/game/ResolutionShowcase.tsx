@@ -7,14 +7,14 @@ import { CountdownPill } from "@/components/ui/CountdownPill";
 import { InkBleed } from "@/components/ui/InkBleed";
 
 function roleLabel(role: PlayerRole | null | undefined) {
-  if (role === "undercover") return "UNDERCOVER";
-  if (role === "mr_white") return "MR WHITE";
-  return "CIVIL";
+  if (role === "undercover") return "Undercover";
+  if (role === "mr_white") return "Mr White";
+  return "Civil";
 }
 
 function roleBadgeClass(role: PlayerRole | null | undefined) {
-  if (role === "undercover") return "border-[rgba(196,62,46,0.3)] bg-tertiary-light text-tertiary";
-  if (role === "mr_white") return "border-[rgba(139,105,20,0.3)] bg-primary-light text-primary-dark";
+  if (role === "undercover") return "border-[rgba(196,62,46,0.35)] bg-tertiary-light text-tertiary";
+  if (role === "mr_white") return "border-[rgba(139,105,20,0.35)] bg-primary-light text-primary-dark";
   return "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700";
 }
 
@@ -54,30 +54,74 @@ export function ResolutionShowcase({
     [playersById, resolution.revealedRoles]
   );
 
-  const dense = allPlayers.length >= 7;
-  const previewSize = dense ? 120 : allPlayers.length >= 5 ? 140 : 160;
+  const suspectWord =
+    suspectRole === "civil"
+      ? resolution.civilWord
+      : suspectRole === "undercover"
+        ? resolution.undercoverWord
+        : "???";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden md:gap-3">
-      {/* Header — verdict + words */}
+      {/* Verdict banner — big & dramatic */}
       <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-4 py-3 text-center"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 22 }}
+        className="paper-sheet desk-shadow shrink-0 rounded-[1.6rem] px-5 py-4 md:px-6 md:py-5"
       >
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
-          <div className="font-sketch text-2xl font-bold text-ink-950 md:text-3xl">
-            {isCaught ? "Pris dans l'encre !" : suspectPlayer ? "Innocent..." : "Pas de suspect"}
+        <div className="flex flex-col items-center gap-3 md:flex-row md:justify-between">
+          {/* Left: verdict */}
+          <div className="text-center md:text-left">
+            <div className="flex items-center justify-center gap-3 md:justify-start">
+              {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="font-sketch text-3xl font-bold text-ink-950 md:text-4xl"
+              >
+                {isCaught ? "Pris dans l'encre !" : suspectPlayer ? "Innocent..." : "Pas de suspect"}
+              </motion.div>
+            </div>
+            {suspectPlayer ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mt-1 flex items-center justify-center gap-2 md:justify-start"
+              >
+                <span className="text-2xl">{suspectPlayer.profile.emoji}</span>
+                <span className="font-sketch text-xl font-semibold text-ink-800">
+                  {suspectPlayer.profile.name}
+                </span>
+                <span className={`rounded-full border-2 border-dashed px-3 py-1 font-sketch text-sm font-bold uppercase tracking-wider ${roleBadgeClass(suspectRole)}`}>
+                  {roleLabel(suspectRole)}
+                </span>
+              </motion.div>
+            ) : null}
           </div>
-        </div>
-        <div className="mt-1 flex flex-wrap items-center justify-center gap-3 text-sm">
-          <span className="rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-3 py-1 font-semibold text-ink-800">
-            Civil : <InkBleed>{resolution.civilWord}</InkBleed>
-          </span>
-          <span className="rounded-full border border-[rgba(196,62,46,0.2)] bg-tertiary-light px-3 py-1 font-semibold text-tertiary">
-            Undercover : <InkBleed intensity={1.3}>{resolution.undercoverWord}</InkBleed>
-          </span>
+
+          {/* Right: words revealed */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.25, type: "spring", stiffness: 200, damping: 22 }}
+            className="flex flex-col gap-2"
+          >
+            <div className="rounded-[1.1rem] border border-[rgba(74,60,46,0.15)] bg-paper px-4 py-2.5">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-ink-400">Mot civil</div>
+              <div className="font-sketch text-2xl font-bold text-ink-950">
+                <InkBleed>{resolution.civilWord}</InkBleed>
+              </div>
+            </div>
+            <div className="rounded-[1.1rem] border border-[rgba(196,62,46,0.2)] bg-tertiary-light/50 px-4 py-2.5">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-tertiary/60">Mot undercover</div>
+              <div className="font-sketch text-2xl font-bold text-tertiary">
+                <InkBleed intensity={1.3}>{resolution.undercoverWord}</InkBleed>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.div>
 
@@ -87,7 +131,7 @@ export function ResolutionShowcase({
         <motion.form
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-4 py-3"
+          className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-5 py-4"
           onSubmit={(event) => {
             event.preventDefault();
             if (!guess.trim()) return;
@@ -111,66 +155,80 @@ export function ResolutionShowcase({
         </motion.form>
       ) : null}
 
-      {/* All players grid */}
-      <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-hidden rounded-[1.6rem] p-2 md:p-3">
-        <div className="scrollbar-thin flex h-full items-start justify-center overflow-y-auto">
+      {/* All players — scrollable grid */}
+      <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-hidden rounded-[1.6rem] p-3 md:p-4">
+        <div className="scrollbar-thin flex h-full items-start justify-center overflow-y-auto pl-6 md:pl-8">
           <div
-            className={`grid place-items-center gap-2 ${
-              dense
-                ? "sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
-                : allPlayers.length <= 4
-                  ? "sm:grid-cols-2 md:grid-cols-4"
-                  : "sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
+            className={`grid w-full place-items-center gap-3 ${
+              allPlayers.length <= 3
+                ? "sm:grid-cols-2 md:grid-cols-3"
+                : allPlayers.length <= 5
+                  ? "sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
+                  : "sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6"
             }`}
           >
             {allPlayers.map((player, index) => {
               const role = resolution.revealedRoles[player.id];
-              const isUndercover = role === "undercover" || role === "mr_white";
+              const isImpostor = role === "undercover" || role === "mr_white";
               const isSuspect = player.id === suspectPlayer?.id;
               const points = resolution.pointsAwarded[player.id] ?? 0;
-              const word = role === "civil"
-                ? resolution.civilWord
-                : role === "undercover"
-                  ? resolution.undercoverWord
-                  : "???";
+              const word =
+                role === "civil"
+                  ? resolution.civilWord
+                  : role === "undercover"
+                    ? resolution.undercoverWord
+                    : "???";
               const tilt = pageAngle(player.id);
+              const previewSize = allPlayers.length <= 4 ? 160 : allPlayers.length <= 6 ? 130 : 110;
 
               return (
                 <motion.div
                   key={player.id}
-                  initial={{ opacity: 0, y: 16, rotate: tilt - 1.5 }}
+                  initial={{ opacity: 0, y: 20, rotate: tilt - 2 }}
                   animate={{ opacity: 1, y: 0, rotate: tilt }}
-                  transition={{ delay: index * 0.04, type: "spring", stiffness: 260, damping: 22 }}
-                  className={`paper-sheet flex w-full flex-col items-center gap-1 overflow-hidden px-2 py-2 shadow-card ${
-                    isUndercover ? "ring-2 ring-tertiary/30" : ""
-                  } ${isSuspect ? "border-[rgba(196,62,46,0.2)]" : ""}`}
+                  transition={{ delay: 0.3 + index * 0.06, type: "spring", stiffness: 240, damping: 22 }}
+                  className={`paper-sheet flex w-full flex-col items-center gap-1.5 overflow-hidden px-2.5 py-2.5 shadow-card ${
+                    isImpostor ? "ring-2 ring-tertiary/40" : ""
+                  } ${isSuspect ? "border-[rgba(196,62,46,0.25)]" : ""}`}
                 >
                   <MiniDrawingCanvas
                     strokes={round.drawings[player.id]?.strokes ?? []}
                     size={previewSize}
-                    className="rounded-[0.6rem]"
+                    className="rounded-[0.7rem]"
                   />
 
-                  {/* Name */}
-                  <div className="w-full truncate text-center font-sketch text-sm font-semibold leading-tight text-ink-950">
-                    {player.profile.emoji} {player.profile.name}
+                  {/* Name + emoji */}
+                  <div className="flex w-full items-center justify-center gap-1.5">
+                    <span className="text-lg">{player.profile.emoji}</span>
+                    <span className="truncate font-sketch text-base font-semibold leading-tight text-ink-950">
+                      {player.profile.name}
+                    </span>
                   </div>
 
-                  {/* Role badge */}
-                  <div className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${roleBadgeClass(role)}`}>
+                  {/* Role stamp */}
+                  <div className={`rounded-full border-2 border-dashed px-3 py-1 text-xs font-bold uppercase tracking-wider ${roleBadgeClass(role)}`}>
                     {roleLabel(role)}
                   </div>
 
                   {/* Word */}
-                  <div className="text-[10px] font-medium text-ink-500">
+                  <div className="font-sketch text-sm font-medium text-ink-500">
                     <InkBleed intensity={0.8}>{word}</InkBleed>
                   </div>
 
                   {/* Points */}
                   {points !== 0 ? (
-                    <div className={`text-xs font-bold ${points > 0 ? "text-[#6a8a20]" : "text-tertiary"}`}>
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.5 + index * 0.06, type: "spring", stiffness: 300 }}
+                      className={`rounded-full px-2.5 py-0.5 text-sm font-bold ${
+                        points > 0
+                          ? "bg-[#e8f2d8] text-[#4a7a20]"
+                          : "bg-tertiary-light text-tertiary"
+                      }`}
+                    >
                       {points > 0 ? `+${points}` : points} pt{Math.abs(points) > 1 ? "s" : ""}
-                    </div>
+                    </motion.div>
                   ) : null}
                 </motion.div>
               );

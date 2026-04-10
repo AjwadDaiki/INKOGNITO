@@ -319,9 +319,9 @@ function VoteGrid({
     return () => { cancelAnimationFrame(rafId); ro.disconnect(); };
   }, []);
 
-  const gap = 8;
-  // Extra height per card: name (20px) + vote markers (22px) + padding (12px)
-  const extraPerCard = 54;
+  const gap = 10;
+  // Extra height per card: name (22px) + vote markers (36px) + padding (12px)
+  const extraPerCard = 70;
   const { cols, cellSize } = fitVoteGrid(players.length, dims.w, dims.h, gap, extraPerCard);
 
   return (

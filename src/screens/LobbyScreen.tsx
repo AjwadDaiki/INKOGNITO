@@ -68,9 +68,11 @@ export function LobbyScreen({
     () => connectedPlayers.filter((player) => player.ready).length,
     [connectedPlayers]
   );
-  const everyoneReady =
-    connectedPlayers.length >= MIN_PLAYERS && readyCount === connectedPlayers.length;
-  const canLaunch = connectedPlayers.length >= MIN_PLAYERS;
+  const othersReady = connectedPlayers
+    .filter((player) => !player.isHost)
+    .every((player) => player.ready);
+  const canLaunch =
+    connectedPlayers.length >= MIN_PLAYERS && othersReady;
   const selectedCategories = room.settings.selectedCategories?.length
     ? room.settings.selectedCategories
     : ["Tout"];
@@ -132,7 +134,7 @@ export function LobbyScreen({
                 {readyCount}/{connectedPlayers.length} prets
               </span>
               <span className="ink-chip text-xs font-semibold text-ink-700">
-                {everyoneReady ? "tout le monde est pret" : "en attente"}
+                {canLaunch ? "tout le monde est pret" : "en attente"}
               </span>
               <Button tone="secondary" onClick={copyRoomCode} className="min-h-10 px-4 text-xs">
                 Copier le code
@@ -144,7 +146,7 @@ export function LobbyScreen({
                 {selfPlayer.ready ? "Annuler" : "Je suis pret"}
               </Button>
               {selfPlayer.isHost ? (
-                <Button onClick={onStartGame} disabled={!everyoneReady}>
+                <Button onClick={onStartGame} disabled={!canLaunch}>
                   Lancer
                 </Button>
               ) : null}

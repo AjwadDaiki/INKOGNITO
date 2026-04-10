@@ -154,7 +154,7 @@ export function DrawingCanvas({
       id: createId("stroke"),
       playerId,
       tool: activeTool,
-      color: activeTool === "eraser" ? "#FFFFFF" : activeColor,
+      color: activeTool === "eraser" ? "#fbf7f0" : activeColor,
       size: brushSize,
       points: [point],
       createdAt: Date.now()

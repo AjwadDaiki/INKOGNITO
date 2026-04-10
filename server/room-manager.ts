@@ -264,12 +264,13 @@ export class RoomManager {
     }
 
     const connectedPlayers = room.players.filter((entry) => entry.connected);
+    const readyCount = connectedPlayers.filter((entry) => entry.ready).length;
     if (connectedPlayers.length < MIN_PLAYERS) {
-      this.sendErrorToPlayer(player, `Il faut au moins ${MIN_PLAYERS} joueurs connectes.`);
+      this.sendErrorToPlayer(player, `Il faut au moins ${MIN_PLAYERS} joueurs connectés.`);
       return;
     }
-    if (!canStartGame(connectedPlayers.length, connectedPlayers.length)) {
-      this.sendErrorToPlayer(player, `Impossible de lancer la partie.`);
+    if (!canStartGame(readyCount, connectedPlayers.length)) {
+      this.sendErrorToPlayer(player, `Tous les joueurs doivent être prêts.`);
       return;
     }
 
@@ -306,24 +307,8 @@ export class RoomManager {
     }
   }
 
-  readyForNextPhase(payload: { roomCode: string; clientId: string }) {
-    const located = this.findPlayer(payload.roomCode, payload.clientId);
-    if (!located || !located.room.round || located.room.phase !== "gallery") {
-      return;
-    }
-    const { room, player } = located;
-    const round = room.round!;
-    round.readyForPhaseAdvance.add(player.id);
-    this.touch(player);
-    this.emitRoomState(room);
-
-    const everyoneReady = room.players.every(
-      (entry) => !entry.connected || round.readyForPhaseAdvance.has(entry.id)
-    );
-    if (everyoneReady) {
-      room.systemNotice = "Qui est l'Undercover ?";
-      this.setPhase(room, "vote", room.settings.voteSeconds * 1000);
-    }
+  readyForNextPhase(_payload: { roomCode: string; clientId: string }) {
+    // Gallery phase removed — no-op kept for protocol compatibility
   }
 
   drawingStroke(payload: { roomCode: string; clientId: string; stroke: DrawingStroke }) {
@@ -440,7 +425,7 @@ export class RoomManager {
     if (
       !located ||
       !located.room.round ||
-      !["gallery", "discussion", "resolution"].includes(located.room.phase)
+      located.room.phase !== "resolution"
     ) {
       return;
     }
@@ -463,37 +448,12 @@ export class RoomManager {
     this.emitRoomState(room);
   }
 
-  pointFinger(payload: {
+  pointFinger(_payload: {
     roomCode: string;
     clientId: string;
     targetPlayerId: string | null;
   }) {
-    const located = this.findPlayer(payload.roomCode, payload.clientId);
-    if (!located || !located.room.round || located.room.phase !== "discussion") {
-      return;
-    }
-    const { room, player } = located;
-    const round = room.round!;
-    if (payload.targetPlayerId === player.id) {
-      return;
-    }
-    round.pointers[player.id] = payload.targetPlayerId;
-    if (payload.targetPlayerId) {
-      const target = room.players.find((entry) => entry.id === payload.targetPlayerId);
-      if (target) {
-        target.stats.totalPointedAt += 1;
-      }
-    }
-    this.touch(player);
-    const everyonePointed = room.players
-      .filter((entry) => entry.connected)
-      .every((entry) => round.pointers[entry.id]);
-    if (everyonePointed) {
-      room.systemNotice = "Tout le monde a choisi un suspect.";
-      this.setPhase(room, "vote", room.settings.voteSeconds * 1000);
-      return;
-    }
-    this.emitRoomState(room);
+    // Discussion phase removed — no-op kept for protocol compatibility
   }
 
   chatMessage(payload: { roomCode: string; clientId: string; text: string }) {

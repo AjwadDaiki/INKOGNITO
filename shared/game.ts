@@ -48,17 +48,7 @@ export function clampSettings(settings?: Partial<RoomSettings>): RoomSettings {
     drawingSeconds: [30, 45, 60, 90].includes(settings?.drawingSeconds ?? 45)
       ? (settings?.drawingSeconds ?? 45)
       : DEFAULT_SETTINGS.drawingSeconds,
-    discussionSeconds: clampNumber(
-      settings?.discussionSeconds ?? DEFAULT_SETTINGS.discussionSeconds,
-      20,
-      60
-    ),
     voteSeconds: clampNumber(settings?.voteSeconds ?? DEFAULT_SETTINGS.voteSeconds, 20, 45),
-    gallerySeconds: clampNumber(
-      settings?.gallerySeconds ?? DEFAULT_SETTINGS.gallerySeconds,
-      8,
-      20
-    ),
     resolutionSeconds: clampNumber(
       settings?.resolutionSeconds ?? DEFAULT_SETTINGS.resolutionSeconds,
       8,
@@ -130,7 +120,7 @@ export function normalizeProfile(profile: PlayerProfile): PlayerProfile {
 }
 
 export function canStartGame(readyCount: number, playerCount: number) {
-  return playerCount >= MIN_PLAYERS && playerCount <= MAX_PLAYERS && readyCount >= MIN_PLAYERS;
+  return playerCount >= MIN_PLAYERS && playerCount <= MAX_PLAYERS && readyCount >= playerCount;
 }
 
 export function getRoleCounts(playerCount: number, mode: RoomSettings["mode"]) {

@@ -13,7 +13,7 @@ export function renderStrokeCanvas(
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#fbf7f0";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 
@@ -37,7 +37,7 @@ export function drawStroke(
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = stroke.tool === "eraser" ? "#FFFFFF" : stroke.color;
+  ctx.strokeStyle = stroke.tool === "eraser" ? "#fbf7f0" : stroke.color;
   ctx.lineWidth = Math.max(1, stroke.size * scale);
   ctx.globalCompositeOperation = "source-over";
   ctx.globalAlpha = stroke.tool === "brush" ? 0.86 : 1;
@@ -51,7 +51,7 @@ export function drawStroke(
   if (points.length === 1) {
     ctx.beginPath();
     ctx.arc(start.x * scale, start.y * scale, Math.max(1, stroke.size * scale * 0.5), 0, Math.PI * 2);
-    ctx.fillStyle = stroke.tool === "eraser" ? "#FFFFFF" : stroke.color;
+    ctx.fillStyle = stroke.tool === "eraser" ? "#fbf7f0" : stroke.color;
     ctx.fill();
     ctx.restore();
     return;

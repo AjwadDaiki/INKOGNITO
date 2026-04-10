@@ -13,8 +13,6 @@ export type GamePhase =
   | "lobby"
   | "role_reveal"
   | "drawing"
-  | "gallery"
-  | "discussion"
   | "vote"
   | "resolution"
   | "final";
@@ -36,9 +34,7 @@ export interface RoomSettings {
   mode: GameMode;
   rounds: number;
   drawingSeconds: number;
-  discussionSeconds: number;
   voteSeconds: number;
-  gallerySeconds: number;
   resolutionSeconds: number;
   difficulty: Difficulty;
   selectedCategories: string[];

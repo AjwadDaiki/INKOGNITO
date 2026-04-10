@@ -137,6 +137,8 @@ export interface RoundView {
   drawings: Record<string, DrawingStateView>;
   selfVote: string | null;
   votedPlayerIds: string[];
+  /** Live votes visible to everyone: { voterId -> targetId | null } */
+  liveVotes: Record<string, string | null>;
   pointers: Record<string, string | null>;
   readyForPhaseAdvance: string[];
   reactions: ReactionEvent[];

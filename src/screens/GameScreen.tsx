@@ -10,6 +10,7 @@ import { fullCols, previewSize } from "@/components/game/gameHelpers";
 import { useIsMobile } from "@/lib/useIsMobile";
 import { Button } from "@/components/ui/Button";
 import { ChatPanel } from "@/components/ui/ChatPanel";
+import { CountdownPill } from "@/components/ui/CountdownPill";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 
 export function GameScreen({
@@ -84,6 +85,19 @@ export function GameScreen({
     window.setTimeout(() => setCopied(false), 1400);
   }
 
+  /* ── Compute voters per target from liveVotes ── */
+  const votersByTarget = useMemo(() => {
+    const map: Record<string, PlayerView[]> = {};
+    for (const [voterId, targetId] of Object.entries(round.liveVotes)) {
+      if (targetId) {
+        if (!map[targetId]) map[targetId] = [];
+        const voter = playersById[voterId];
+        if (voter) map[targetId].push(voter);
+      }
+    }
+    return map;
+  }, [round.liveVotes, playersById]);
+
   /* ── Card factory ── */
   function makeCard(player: PlayerView, size: number) {
     const isSelf = player.id === selfPlayer.id;
@@ -100,6 +114,7 @@ export function GameScreen({
         isSelf={isSelf}
         selectedVoteTargetId={displayVote}
         hasVoted={round.votedPlayerIds.includes(player.id)}
+        voters={votersByTarget[player.id] ?? []}
         revealedRole={round.resolution?.revealedRoles[player.id]}
         pointsAwarded={round.resolution?.pointsAwarded[player.id]}
         onVote={
@@ -113,7 +128,7 @@ export function GameScreen({
     );
   }
 
-  /* ── Vote bar (bottom) ── */
+  /* ── Vote bar (bottom) — includes timer + round info ── */
   function renderVoteBar() {
     if (room.phase !== "vote") return null;
     const hasVoted = round.selfVote !== null;
@@ -124,19 +139,22 @@ export function GameScreen({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 24 }}
-        className="shrink-0 rounded-[20px] bg-surface-card/90 px-4 py-3 shadow-[0_-4px_20px_rgba(26,20,16,0.08)] backdrop-blur-md"
+        className="shrink-0 rounded-[18px] bg-surface-card/90 px-3 py-2 shadow-[0_-4px_20px_rgba(26,20,16,0.08)] backdrop-blur-md"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {/* Round + Timer */}
+          <span className="shrink-0 text-[10px] font-bold text-ink-400">R{round.roundNumber}/{room.totalRounds}</span>
+          {room.phaseEndsAt && <CountdownPill endsAt={room.phaseEndsAt} />}
+
           {/* Vote progress */}
           <motion.div
             key={voteCount}
             initial={{ scale: 1.2 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 16 }}
-            className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-low px-3 py-1.5"
+            className="shrink-0 rounded-full bg-surface-low px-2.5 py-1 text-xs font-extrabold text-ink-950"
           >
-            <span className="text-sm font-extrabold text-ink-950">{voteCount}/{connectedCount}</span>
-            <span className="text-[10px] text-ink-400">votes</span>
+            {voteCount}/{connectedCount}
           </motion.div>
 
           {/* Vote status */}
@@ -148,12 +166,11 @@ export function GameScreen({
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1.5"
                 >
-                  <span className="text-base">✅</span>
-                  <span className="text-sm font-bold text-ink-950">
+                  <span className="text-xs font-bold text-ink-950">
                     {playersById[round.selfVote!]?.profile.emoji}{" "}
-                    {playersById[round.selfVote!]?.profile.name ?? "Blanc"}
+                    {playersById[round.selfVote!]?.profile.name ?? "Blanc"} ✓
                   </span>
                 </motion.div>
               ) : pendingVote ? (
@@ -164,16 +181,15 @@ export function GameScreen({
                   exit={{ opacity: 0, x: 10 }}
                   className="flex items-center gap-2"
                 >
-                  <span className="text-sm text-ink-600">
+                  <span className="text-xs text-ink-700">
                     <strong className="text-ink-950">
                       {playersById[pendingVote]?.profile.emoji} {playersById[pendingVote]?.profile.name}
-                    </strong>{" "}
-                    ?
+                    </strong>{" "}?
                   </span>
-                  <Button onClick={() => onVote(pendingVote)} className="min-h-8 px-4 text-xs">
-                    Confirmer
+                  <Button onClick={() => onVote(pendingVote)} className="min-h-7 px-3 text-[11px]">
+                    OK
                   </Button>
-                  <Button tone="ghost" onClick={() => setPendingVote(null)} className="min-h-8 px-2 text-xs">
+                  <Button tone="ghost" onClick={() => setPendingVote(null)} className="min-h-7 px-2 text-[11px]">
                     ✕
                   </Button>
                 </motion.div>
@@ -183,7 +199,7 @@ export function GameScreen({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="text-sm text-ink-500"
+                  className="text-xs text-ink-500"
                 >
                   Clique sur un joueur
                 </motion.span>
@@ -193,7 +209,7 @@ export function GameScreen({
 
           {/* Blank vote */}
           {!hasVoted && (
-            <Button tone="ghost" onClick={() => onVote(null)} className="shrink-0 min-h-8 px-3 text-xs text-ink-400">
+            <Button tone="ghost" onClick={() => onVote(null)} className="shrink-0 min-h-7 px-2 text-[10px] text-ink-400">
               Blanc
             </Button>
           )}
@@ -202,36 +218,22 @@ export function GameScreen({
     );
   }
 
-  /* ── Gallery bar ── */
-  function renderGalleryBar() {
-    if (room.phase !== "gallery") return null;
-    return (
-      <div className="flex shrink-0 items-center justify-between gap-3 rounded-[20px] bg-surface-card/80 px-4 py-2.5 backdrop-blur-md">
-        <span className="text-sm text-ink-500">Observe les dessins</span>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-ink-400">
-            {round.readyForPhaseAdvance.length}/{connectedCount}
-          </span>
-          <Button tone="secondary" onClick={onReadyForNextPhase} className="min-h-9 px-4 text-xs">
-            Passer au vote
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative mx-auto flex h-[100svh] max-h-[100svh] w-full max-w-[1720px] flex-col gap-2 overflow-hidden p-2.5 md:p-3">
 
-      <GameTopBar
-        room={room}
-        round={round}
-        selfPlayer={selfPlayer}
-        chatOpen={chatOpen}
-        copied={copied}
-        onToggleChat={() => setChatOpen((v) => !v)}
-        onCopyLink={copyLink}
-      />
+      {/* Top bar — only during drawing phase (vote has its own bar, resolution has its own layout) */}
+      {room.phase === "drawing" && (
+        <GameTopBar
+          room={room}
+          round={round}
+          selfPlayer={selfPlayer}
+          chatOpen={chatOpen}
+          copied={copied}
+          onToggleChat={() => setChatOpen((v) => !v)}
+          onCopyLink={copyLink}
+        />
+      )}
 
       {/* Main content */}
       <AnimatePresence mode="wait" initial={false}>
@@ -266,10 +268,7 @@ export function GameScreen({
             />
           ) : (
             <>
-              {/* Gallery bar */}
-              {renderGalleryBar()}
-
-              {/* Player grid */}
+              {/* Player grid — vote phase */}
               <GlassPanel className="flex min-h-0 flex-1 flex-col overflow-hidden p-2">
                 <div
                   className="grid min-h-0 flex-1 gap-2 overflow-hidden"

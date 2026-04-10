@@ -634,12 +634,8 @@ export class RoomManager {
 
     switch (room.phase) {
       case "drawing":
-        room.systemNotice = "Posez les crayons.";
-        room.round?.readyForPhaseAdvance.clear();
-        this.setPhase(room, "gallery", room.settings.gallerySeconds * 1000);
-        break;
-      case "gallery":
         room.systemNotice = "Qui est l'Undercover ?";
+        room.round?.readyForPhaseAdvance.clear();
         this.setPhase(room, "vote", room.settings.voteSeconds * 1000);
         break;
       case "vote":
@@ -841,6 +837,11 @@ export class RoomManager {
             votedPlayerIds: Object.entries(room.round.votes)
               .filter(([, target]) => target !== null)
               .map(([playerId]) => playerId),
+            liveVotes: room.phase === "vote" || room.phase === "resolution" || room.phase === "final"
+              ? Object.fromEntries(
+                  Object.entries(room.round.votes).filter(([, target]) => target !== null)
+                )
+              : {},
             pointers: room.round.pointers,
             readyForPhaseAdvance: [...room.round.readyForPhaseAdvance],
             reactions: room.round.reactions,

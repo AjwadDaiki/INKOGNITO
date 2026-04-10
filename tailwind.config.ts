@@ -6,15 +6,15 @@ const config: Config = {
     extend: {
       colors: {
         surface: {
-          DEFAULT: "#d8cfc3",
-          card: "#ebe2d6",
-          low: "#e2d8ca",
-          high: "#cbbfae"
+          DEFAULT: "#c8aa87",
+          card: "#eadfce",
+          low: "#ddcfbb",
+          high: "#b99570"
         },
         paper: {
-          DEFAULT: "#f5efe5",
-          warm: "#f1e8da",
-          aged: "#e6dbc8"
+          DEFAULT: "#f5efe2",
+          warm: "#efe4d3",
+          aged: "#e4d2b9"
         },
         primary: {
           DEFAULT: "#D4A017",

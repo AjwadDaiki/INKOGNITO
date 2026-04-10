@@ -15,13 +15,11 @@ function PillGroup<T extends string | number>({
   options,
   value,
   onChange,
-  disabled,
   format
 }: {
   options: T[];
   value: T;
   onChange: (v: T) => void;
-  disabled?: boolean;
   format?: (v: T) => string;
 }) {
   return (
@@ -32,13 +30,12 @@ function PillGroup<T extends string | number>({
           <button
             key={String(opt)}
             type="button"
-            disabled={disabled}
             onClick={() => onChange(opt)}
             className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
               active
                 ? "border-ink-950 bg-ink-950 text-paper"
                 : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
-            } disabled:opacity-45`}
+            }`}
           >
             {format ? format(opt) : String(opt)}
           </button>
@@ -64,11 +61,11 @@ export function LobbyScreen({
   onSendChat: (message: string) => void;
 }) {
   const connectedPlayers = useMemo(
-    () => room.players.filter((p) => p.connected),
+    () => room.players.filter((player) => player.connected),
     [room.players]
   );
   const readyCount = useMemo(
-    () => connectedPlayers.filter((p) => p.ready).length,
+    () => connectedPlayers.filter((player) => player.ready).length,
     [connectedPlayers]
   );
   const everyoneReady =
@@ -77,6 +74,26 @@ export function LobbyScreen({
   const selectedCategories = room.settings.selectedCategories?.length
     ? room.settings.selectedCategories
     : ["Tout"];
+  const visibleCategories = useMemo(() => {
+    const preferredOrder = [
+      "Animaux",
+      "Objets",
+      "Nourriture",
+      "Lieux",
+      "Sports",
+      "Métiers",
+      "Jeux vidéo",
+      "Manga / Anime",
+      "Cinéma / Séries",
+      "Dessins animés"
+    ];
+    const selectedVisible = selectedCategories.filter(
+      (category) => category !== "Tout" && WORD_CATEGORIES.includes(category)
+    );
+    return [...new Set([...selectedVisible, ...preferredOrder, ...WORD_CATEGORIES])]
+      .filter((category) => category !== "Tout")
+      .slice(0, 10);
+  }, [selectedCategories]);
 
   async function copyRoomCode() {
     await navigator.clipboard.writeText(room.roomCode);
@@ -116,7 +133,7 @@ export function LobbyScreen({
         <div className="absolute right-8 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
         <div className="absolute bottom-8 left-10 h-16 w-16 rounded-full bg-ink-950/6" />
 
-        <div className="pl-7 md:pl-10">
+        <div className="flex min-h-0 flex-1 flex-col pl-7 md:pl-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="font-sketch text-4xl font-bold text-ink-950 md:text-5xl">
@@ -151,18 +168,18 @@ export function LobbyScreen({
 
           <div className="paper-divider my-5" />
 
-          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="flex min-h-0 flex-col gap-4">
-              <div className="rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/88 px-4 py-4 md:px-5">
+          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[1.16fr_0.84fr]">
+            <div className="min-h-0 rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/88 px-4 py-4 md:px-5">
+              <div className="flex h-full min-h-0 flex-col">
                 <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">Lobby</div>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid flex-1 auto-rows-min gap-2.5 overflow-hidden sm:grid-cols-2 xl:grid-cols-3">
                   {room.players.map((player, index) => (
                     <motion.div
                       key={player.id}
-                      initial={{ opacity: 0, y: 12, rotate: index % 2 === 0 ? -1.2 : 1.1 }}
-                      animate={{ opacity: 1, y: 0, rotate: index % 2 === 0 ? -1.2 : 1.1 }}
-                      transition={{ delay: index * 0.05, type: "spring", stiffness: 260, damping: 22 }}
-                      className={`rounded-[1.45rem] border px-4 py-3 shadow-card ${
+                      initial={{ opacity: 0, y: 12, rotate: index % 2 === 0 ? -1.1 : 1 }}
+                      animate={{ opacity: 1, y: 0, rotate: index % 2 === 0 ? -1.1 : 1 }}
+                      transition={{ delay: index * 0.04, type: "spring", stiffness: 240, damping: 22 }}
+                      className={`rounded-[1.3rem] border px-3 py-2.5 shadow-card ${
                         player.id === selfPlayer.id
                           ? "border-[rgba(212,160,23,0.22)] bg-primary-light/50"
                           : "border-[rgba(74,60,46,0.1)] bg-paper"
@@ -170,16 +187,16 @@ export function LobbyScreen({
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper text-2xl"
+                          className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper text-xl"
                           style={{ boxShadow: "0 8px 18px rgba(90,68,47,0.12)" }}
                         >
                           {player.profile.emoji}
                         </div>
                         <div className="min-w-0">
-                          <div className="truncate font-sketch text-2xl font-semibold text-ink-950">
+                          <div className="truncate font-sketch text-[1.55rem] font-semibold leading-none text-ink-950">
                             {player.profile.name}
                           </div>
-                          <div className="text-xs text-ink-500">
+                          <div className="mt-1 text-[11px] text-ink-500">
                             {player.isHost ? "hote" : "joueur"} - {player.ready ? "pret" : "attend"}
                           </div>
                         </div>
@@ -188,17 +205,21 @@ export function LobbyScreen({
                   ))}
                 </div>
               </div>
+            </div>
 
+            <div className="grid min-h-0 gap-4 lg:grid-rows-[auto_auto_minmax(0,1fr)]">
               <div className="rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/84 px-4 py-4 md:px-5">
-                <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">Regles de la manche</div>
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">
+                  Regles de la manche
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
                   <div>
                     <div className="mb-2 text-xs uppercase tracking-[0.18em] text-ink-500">Mode</div>
                     <PillGroup
                       options={["classic", "mr_white"] as const}
                       value={room.settings.mode}
-                      onChange={(v) => onUpdateSettings({ mode: v })}
-                      format={(v) => (v === "classic" ? "Classique" : "Mr White")}
+                      onChange={(value) => onUpdateSettings({ mode: value })}
+                      format={(value) => (value === "classic" ? "Classique" : "Mr White")}
                     />
                   </div>
                   <div>
@@ -206,8 +227,8 @@ export function LobbyScreen({
                     <PillGroup
                       options={[30, 45, 60, 90] as const}
                       value={room.settings.drawingSeconds}
-                      onChange={(v) => onUpdateSettings({ drawingSeconds: v })}
-                      format={(v) => `${v}s`}
+                      onChange={(value) => onUpdateSettings({ drawingSeconds: value })}
+                      format={(value) => `${value}s`}
                     />
                   </div>
                   <div>
@@ -215,65 +236,76 @@ export function LobbyScreen({
                     <PillGroup
                       options={[3, 4, 5] as const}
                       value={room.settings.rounds}
-                      onChange={(v) => onUpdateSettings({ rounds: v })}
+                      onChange={(value) => onUpdateSettings({ rounds: value })}
                     />
                   </div>
                   <div>
-                    <div className="mb-2 text-xs uppercase tracking-[0.18em] text-ink-500">Difficulte</div>
+                    <div className="mb-2 text-xs uppercase tracking-[0.18em] text-ink-500">
+                      Difficulte
+                    </div>
                     <PillGroup
                       options={["easy", "normal", "hard"] as const}
                       value={room.settings.difficulty === "random" ? "normal" : room.settings.difficulty}
-                      onChange={(v) => onUpdateSettings({ difficulty: v })}
-                      format={(v) => (v === "easy" ? "Facile" : v === "normal" ? "Normal" : "Difficile")}
+                      onChange={(value) => onUpdateSettings({ difficulty: value })}
+                      format={(value) =>
+                        value === "easy" ? "Facile" : value === "normal" ? "Normal" : "Difficile"
+                      }
                     />
                   </div>
                 </div>
+              </div>
 
-                <div className="paper-divider my-4" />
+              <div className="rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/84 px-4 py-4 md:px-5">
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                  <div className="font-sketch text-3xl font-semibold text-ink-900">Categories</div>
+                  <span className="ink-chip text-xs font-semibold text-ink-700">
+                    {selectedCategories.includes("Tout")
+                      ? "Tout"
+                      : `${selectedCategories.length} choix`}
+                  </span>
+                </div>
+                <div className="mb-3 text-xs uppercase tracking-[0.18em] text-ink-500">
+                  Selection rapide
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    aria-pressed={selectedCategories.includes("Tout")}
+                    onClick={() => toggleCategory("Tout")}
+                    className={`rounded-[1rem] border px-3 py-2 text-left text-xs font-semibold transition ${
+                      selectedCategories.includes("Tout")
+                        ? "border-ink-950 bg-ink-950 text-paper"
+                        : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
+                    }`}
+                  >
+                    Tout
+                  </button>
+                  {visibleCategories.map((category) => {
+                    const active =
+                      !selectedCategories.includes("Tout") && selectedCategories.includes(category);
 
-                <div>
-                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                    <div className="text-xs uppercase tracking-[0.18em] text-ink-500">
-                      Modes de mots
-                    </div>
-                    <span className="ink-chip text-xs font-semibold text-ink-700">
-                      {selectedCategories.includes("Tout")
-                        ? "Tout"
-                        : `${selectedCategories.length} catégorie${selectedCategories.length > 1 ? "s" : ""}`}
-                    </span>
-                  </div>
-                  <div className="mb-3 text-sm text-ink-600">
-                    Coche une ou plusieurs catégories. Par défaut, tout le carnet est mélangé.
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {["Tout", ...WORD_CATEGORIES].map((category) => {
-                      const active =
-                        category === "Tout"
-                          ? selectedCategories.includes("Tout")
-                          : !selectedCategories.includes("Tout") && selectedCategories.includes(category);
-
-                      return (
-                        <button
-                          key={category}
-                          type="button"
-                          onClick={() => toggleCategory(category)}
-                          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                            active
-                              ? "border-ink-950 bg-ink-950 text-paper"
-                              : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
-                          } disabled:opacity-45`}
-                        >
-                          {category}
-                        </button>
-                      );
-                    })}
-                  </div>
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => toggleCategory(category)}
+                        className={`rounded-[1rem] border px-3 py-2 text-left text-xs font-semibold transition ${
+                          active
+                            ? "border-ink-950 bg-ink-950 text-paper"
+                            : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
 
-            <div className="min-h-0 rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/82 px-4 py-4 md:px-5">
-              <ChatPanel title="Chat" players={room.players} messages={room.roomChat} onSend={onSendChat} />
+              <div className="min-h-0 rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/82 px-4 py-4 md:px-5">
+                <ChatPanel title="Chat" players={room.players} messages={room.roomChat} onSend={onSendChat} />
+              </div>
             </div>
           </div>
         </div>

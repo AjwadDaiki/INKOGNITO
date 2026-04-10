@@ -30,7 +30,7 @@ export function InkSplatter({
   size = 160,
   color = "#1a1410",
   opacity = 0.05,
-  animate = true,
+  animate = false,
 }: {
   variant?: number;
   className?: string;

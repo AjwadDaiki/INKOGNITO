@@ -47,37 +47,6 @@ export function drawStroke(
   }
 
   const start = points[0];
-  const end = points[points.length - 1];
-  if (stroke.tool === "line") {
-    ctx.beginPath();
-    ctx.moveTo(start.x * scale, start.y * scale);
-    ctx.lineTo(end.x * scale, end.y * scale);
-    ctx.stroke();
-    ctx.restore();
-    return;
-  }
-
-  if (stroke.tool === "rect") {
-    const x = Math.min(start.x, end.x) * scale;
-    const y = Math.min(start.y, end.y) * scale;
-    const width = Math.abs(end.x - start.x) * scale;
-    const height = Math.abs(end.y - start.y) * scale;
-    ctx.strokeRect(x, y, width, height);
-    ctx.restore();
-    return;
-  }
-
-  if (stroke.tool === "ellipse") {
-    ctx.beginPath();
-    const centerX = ((start.x + end.x) / 2) * scale;
-    const centerY = ((start.y + end.y) / 2) * scale;
-    const radiusX = (Math.abs(end.x - start.x) / 2) * scale;
-    const radiusY = (Math.abs(end.y - start.y) / 2) * scale;
-    ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-    return;
-  }
 
   if (points.length === 1) {
     ctx.beginPath();
@@ -106,7 +75,23 @@ export function drawStroke(
 }
 
 export function getCanvasSnapshot(canvas: HTMLCanvasElement) {
-  return canvas.toDataURL("image/webp", 0.82);
+  const maxSize = 320;
+  const longestEdge = Math.max(canvas.width, canvas.height);
+  if (longestEdge <= maxSize) {
+    return canvas.toDataURL("image/webp", 0.72);
+  }
+
+  const scale = maxSize / longestEdge;
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = Math.max(1, Math.round(canvas.width * scale));
+  exportCanvas.height = Math.max(1, Math.round(canvas.height * scale));
+  const exportContext = exportCanvas.getContext("2d");
+  if (!exportContext) {
+    return canvas.toDataURL("image/webp", 0.72);
+  }
+  exportContext.imageSmoothingEnabled = true;
+  exportContext.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
+  return exportCanvas.toDataURL("image/webp", 0.72);
 }
 
 export function normalizePointerPosition(

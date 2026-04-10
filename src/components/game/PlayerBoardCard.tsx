@@ -3,12 +3,7 @@ import clsx from "clsx";
 import { motion } from "framer-motion";
 import type { DrawingStroke, PlayerRole, PlayerView, RoomView } from "@shared/protocol";
 import { MiniDrawingCanvas } from "@/components/game/MiniDrawingCanvas";
-
-function previewSignature(stroke?: DrawingStroke | null) {
-  if (!stroke) return "";
-  const lastPoint = stroke.points[stroke.points.length - 1];
-  return `${stroke.id}:${stroke.points.length}:${lastPoint?.x ?? 0}:${lastPoint?.y ?? 0}`;
-}
+import { useGameStore } from "@/store/useGameStore";
 
 function sameVoters(next: PlayerView[], prev: PlayerView[]) {
   if (next.length !== prev.length) return false;
@@ -28,7 +23,6 @@ function PlayerBoardCardComponent({
   player,
   strokes,
   drawingUpdatedAt,
-  previewStroke,
   previewSize,
   isSelf = false,
   selectedVoteTargetId,
@@ -39,7 +33,6 @@ function PlayerBoardCardComponent({
   player: PlayerView;
   strokes: DrawingStroke[];
   drawingUpdatedAt: number | null;
-  previewStroke?: DrawingStroke | null;
   previewSize: number;
   dense?: boolean;
   isSelf?: boolean;
@@ -54,6 +47,8 @@ function PlayerBoardCardComponent({
   const isVoteSelected = selectedVoteTargetId === player.id;
   const isInteractive = phase === "vote" && !isSelf;
   const tilt = useMemo(() => paperAngle(player.id), [player.id]);
+  const livePreviewStroke = useGameStore((state) => state.livePreviews[player.id] ?? null);
+  const previewStroke = phase === "drawing" ? livePreviewStroke : null;
   const Container = isInteractive ? motion.button : motion.article;
   const compactVoteMarkers = voteMarkers.slice(0, 4);
   const hiddenVoteCount = Math.max(0, voteMarkers.length - compactVoteMarkers.length);
@@ -75,7 +70,7 @@ function PlayerBoardCardComponent({
       <div className="relative">
         <MiniDrawingCanvas
           strokes={strokes}
-          previewStroke={phase === "drawing" ? previewStroke : null}
+          previewStroke={previewStroke}
           size={previewSize}
           className="rounded-[1rem]"
           frameClassName={phase === "vote" ? "aspect-[4/3]" : "aspect-[5/4]"}
@@ -144,7 +139,6 @@ export const PlayerBoardCard = memo(PlayerBoardCardComponent, (prev, next) => {
     prev.isSelf === next.isSelf &&
     prev.selectedVoteTargetId === next.selectedVoteTargetId &&
     sameVoters(prev.voteMarkers ?? [], next.voteMarkers ?? []) &&
-    previewSignature(prev.previewStroke) === previewSignature(next.previewStroke) &&
     sameVoters(prev.voters ?? [], next.voters ?? []) &&
     prev.revealedRole === next.revealedRole &&
     prev.pointsAwarded === next.pointsAwarded

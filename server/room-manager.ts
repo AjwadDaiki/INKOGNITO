@@ -264,16 +264,12 @@ export class RoomManager {
     }
 
     const connectedPlayers = room.players.filter((entry) => entry.connected);
-    const readyCount = connectedPlayers.filter((entry) => entry.ready).length;
     if (connectedPlayers.length < MIN_PLAYERS) {
       this.sendErrorToPlayer(player, `Il faut au moins ${MIN_PLAYERS} joueurs connectes.`);
       return;
     }
-    if (readyCount !== connectedPlayers.length || !canStartGame(readyCount, connectedPlayers.length)) {
-      this.sendErrorToPlayer(
-        player,
-        `Impossible de lancer: ${readyCount}/${connectedPlayers.length} joueurs connectes sont prets. Tout le monde doit etre pret.`
-      );
+    if (!canStartGame(connectedPlayers.length, connectedPlayers.length)) {
+      this.sendErrorToPlayer(player, `Impossible de lancer la partie.`);
       return;
     }
 

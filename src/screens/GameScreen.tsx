@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useGameStore } from "@/store/useGameStore";
 import type { DrawingStroke, PlayerView, ReactionEmoji, RoomView } from "@shared/protocol";
 import { PlayerBoardCard } from "@/components/game/PlayerBoardCard";
 import { DrawingPhase } from "@/components/game/DrawingPhase";
@@ -39,10 +38,10 @@ export function GameScreen({
   const [pendingVote, setPendingVote] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const isMobile = useIsMobile();
-  const livePreviews = useGameStore((state) => state.livePreviews);
 
   const round = room.round;
   if (!round) return null;
+  const activeRound = round;
   void onReaction;
   void onReadyForNextPhase;
   void onSendChat;
@@ -56,17 +55,17 @@ export function GameScreen({
       Object.keys(round.drawings)
         .map((playerId) => playersById[playerId])
         .filter((player): player is PlayerView => Boolean(player)),
-    [playersById, round.drawings]
+    [playersById, activeRound.drawings]
   );
   const otherPlayers = useMemo(
     () => room.players.filter((player) => player.id !== selfPlayer.id),
     [room.players, selfPlayer.id]
   );
-  const submittedVotePlayerIds = round.votedPlayerIds;
+  const submittedVotePlayerIds = activeRound.votedPlayerIds;
   const selfHasSubmittedVote = submittedVotePlayerIds.includes(selfPlayer.id);
 
   const suspectPlayer =
-    round.resolution?.suspectPlayerId ? playersById[round.resolution.suspectPlayerId] : null;
+    activeRound.resolution?.suspectPlayerId ? playersById[activeRound.resolution.suspectPlayerId] : null;
 
   const cols =
     room.phase === "vote"
@@ -83,7 +82,7 @@ export function GameScreen({
 
   const voteMarkersByTarget = useMemo(() => {
     const map: Record<string, PlayerView[]> = {};
-    for (const [voterId, targetId] of Object.entries(round.liveVotes)) {
+    for (const [voterId, targetId] of Object.entries(activeRound.liveVotes)) {
       if (!targetId) continue;
       const voter = playersById[voterId];
       if (!voter) continue;
@@ -97,7 +96,7 @@ export function GameScreen({
       }
     }
     return map;
-  }, [pendingVote, playersById, room.phase, round.liveVotes, selfHasSubmittedVote, selfPlayer]);
+  }, [activeRound.liveVotes, pendingVote, playersById, room.phase, selfHasSubmittedVote, selfPlayer]);
 
   useEffect(() => {
     setShowSplash(true);
@@ -108,23 +107,22 @@ export function GameScreen({
 
   function makeCard(player: PlayerView, size: number) {
     const isSelf = player.id === selfPlayer.id;
-    const displayVote = selfHasSubmittedVote ? round.selfVote : pendingVote;
+    const displayVote = selfHasSubmittedVote ? activeRound.selfVote : pendingVote;
 
     return (
       <PlayerBoardCard
         key={player.id}
         phase={room.phase}
         player={player}
-        strokes={round.drawings[player.id]?.strokes ?? []}
-        drawingUpdatedAt={round.drawings[player.id]?.lastUpdatedAt ?? null}
-        previewStroke={livePreviews[player.id]}
+        strokes={activeRound.drawings[player.id]?.strokes ?? []}
+        drawingUpdatedAt={activeRound.drawings[player.id]?.lastUpdatedAt ?? null}
         previewSize={size}
         isSelf={isSelf}
         selectedVoteTargetId={displayVote}
         hasVoted={submittedVotePlayerIds.includes(player.id)}
         voters={[]}
-        revealedRole={round.resolution?.revealedRoles[player.id]}
-        pointsAwarded={round.resolution?.pointsAwarded[player.id]}
+        revealedRole={activeRound.resolution?.revealedRoles[player.id]}
+        pointsAwarded={activeRound.resolution?.pointsAwarded[player.id]}
         voteMarkers={room.phase === "vote" ? voteMarkersByTarget[player.id] ?? [] : []}
         onVote={
           isSelf
@@ -143,8 +141,9 @@ export function GameScreen({
     const hasVoted = selfHasSubmittedVote;
     const voteCount = submittedVotePlayerIds.length;
     const selectedPlayer = pendingVote ? playersById[pendingVote] : null;
-    const castPlayer = round.selfVote ? playersById[round.selfVote] : null;
-    const castVoteLabel = round.selfVote === null ? "blanc" : castPlayer?.profile.name ?? "inconnu";
+    const castPlayer = activeRound.selfVote ? playersById[activeRound.selfVote] : null;
+    const castVoteLabel =
+      activeRound.selfVote === null ? "blanc" : castPlayer?.profile.name ?? "inconnu";
 
     return (
       <motion.div

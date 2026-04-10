@@ -21,6 +21,13 @@ const SIZE_PRESETS = [
 const MIN_POINT_DIST_SQ = 4;
 const PREVIEW_THROTTLE_MS = 80;
 
+function strokesSignature(strokes: DrawingStroke[]) {
+  if (strokes.length === 0) return "0";
+  const first = strokes[0];
+  const last = strokes[strokes.length - 1];
+  return `${strokes.length}:${first.id}:${last.id}:${last.points.length}`;
+}
+
 interface DrawingCanvasProps {
   playerId: string;
   strokes: DrawingStroke[];
@@ -44,12 +51,18 @@ export function DrawingCanvas({
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const bufferRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const bufferCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const draftRef = useRef<DrawingStroke | null>(null);
+  const renderedCountRef = useRef(0);
+  const renderedSignatureRef = useRef("0");
   const rafRef = useRef(0);
+  const framePendingRef = useRef(false);
   const lastPreviewTime = useRef(0);
   const onPreviewRef = useRef(onPreview);
   const onCommitRef = useRef(onCommit);
   const strokesRef = useRef(strokes);
+  const strokesSignatureValue = strokesSignature(strokes);
   onPreviewRef.current = onPreview;
   onCommitRef.current = onCommit;
   strokesRef.current = strokes;
@@ -64,21 +77,28 @@ export function DrawingCanvas({
       ctx.fillRect(0, 0, DRAWING_SIZE, DRAWING_SIZE);
     }
     bufferRef.current = buffer;
+    bufferCtxRef.current = ctx;
 
     if (canvasRef.current) {
       canvasRef.current.width = DRAWING_SIZE;
       canvasRef.current.height = DRAWING_SIZE;
+      const canvasCtx = canvasRef.current.getContext("2d");
+      if (canvasCtx) {
+        canvasCtx.imageSmoothingEnabled = true;
+      }
+      canvasCtxRef.current = canvasCtx;
     }
   }, []);
 
   const renderFrame = useCallback(() => {
-    cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
+      framePendingRef.current = false;
       const canvas = canvasRef.current;
       const buffer = bufferRef.current;
       if (!canvas || !buffer) return;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvasCtxRef.current ?? canvas.getContext("2d");
       if (!ctx) return;
+      canvasCtxRef.current = ctx;
       ctx.clearRect(0, 0, DRAWING_SIZE, DRAWING_SIZE);
       ctx.drawImage(buffer, 0, 0);
       const draft = draftRef.current;
@@ -86,13 +106,48 @@ export function DrawingCanvas({
     });
   }, []);
 
+  const scheduleFrame = useCallback(() => {
+    if (framePendingRef.current) return;
+    framePendingRef.current = true;
+    renderFrame();
+  }, [renderFrame]);
+
   useEffect(() => {
     if (!bufferRef.current) return;
-    renderStrokeCanvas(bufferRef.current, strokes);
-    renderFrame();
-  }, [renderFrame, strokes]);
+    if (
+      strokes.length < renderedCountRef.current ||
+      (strokes.length === renderedCountRef.current && strokesSignatureValue !== renderedSignatureRef.current)
+    ) {
+      renderStrokeCanvas(bufferRef.current, strokes);
+      renderedCountRef.current = strokes.length;
+      renderedSignatureRef.current = strokesSignatureValue;
+      scheduleFrame();
+      return;
+    }
 
-  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+    if (strokes.length > renderedCountRef.current) {
+      const ctx = bufferCtxRef.current ?? bufferRef.current.getContext("2d");
+      if (ctx) {
+        bufferCtxRef.current = ctx;
+        for (let index = renderedCountRef.current; index < strokes.length; index += 1) {
+          drawStroke(ctx, strokes[index]);
+        }
+      } else {
+        renderStrokeCanvas(bufferRef.current, strokes);
+      }
+      renderedCountRef.current = strokes.length;
+      renderedSignatureRef.current = strokesSignatureValue;
+      scheduleFrame();
+    }
+  }, [scheduleFrame, strokes, strokesSignatureValue]);
+
+  useEffect(
+    () => () => {
+      framePendingRef.current = false;
+      cancelAnimationFrame(rafRef.current);
+    },
+    []
+  );
 
   function buildStroke(point: { x: number; y: number }): DrawingStroke {
     return {
@@ -122,15 +177,17 @@ export function DrawingCanvas({
       if (bufferRef.current) {
         renderStrokeCanvas(bufferRef.current, [...strokesRef.current, stroke]);
       }
-      renderFrame();
-      const snapshot = getCanvasSnapshot(canvasRef.current);
+      renderedCountRef.current = strokesRef.current.length + 1;
+      renderedSignatureRef.current = strokesSignature([...strokesRef.current, stroke]);
+      scheduleFrame();
+      const snapshot = bufferRef.current ? getCanvasSnapshot(bufferRef.current) : null;
       onCommitRef.current(stroke, snapshot);
       return;
     }
 
     canvasRef.current.setPointerCapture(event.pointerId);
     draftRef.current = stroke;
-    renderFrame();
+    scheduleFrame();
     sendPreview(stroke);
   }
 
@@ -143,7 +200,7 @@ export function DrawingCanvas({
     const dy = point.y - last.y;
     if (dx * dx + dy * dy < MIN_POINT_DIST_SQ) return;
     draft.points.push(point);
-    renderFrame();
+    scheduleFrame();
     sendPreview(draft);
   }
 
@@ -156,13 +213,15 @@ export function DrawingCanvas({
     }
 
     if (bufferRef.current) {
-      const ctx = bufferRef.current.getContext("2d");
+      const ctx = bufferCtxRef.current ?? bufferRef.current.getContext("2d");
       if (ctx) drawStroke(ctx, draft);
     }
+    renderedCountRef.current = strokesRef.current.length + 1;
+    renderedSignatureRef.current = strokesSignature([...strokesRef.current, draft]);
     draftRef.current = null;
-    renderFrame();
+    scheduleFrame();
 
-    const snapshot = getCanvasSnapshot(canvasRef.current);
+    const snapshot = bufferRef.current ? getCanvasSnapshot(bufferRef.current) : null;
     onCommitRef.current(draft, snapshot);
   }
 

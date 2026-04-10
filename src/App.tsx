@@ -4,16 +4,17 @@ import { useShallow } from "zustand/react/shallow";
 import { MeshBackground } from "@/components/ui/MeshBackground";
 import { useGameStore } from "@/store/useGameStore";
 import { HomeScreen } from "@/screens/HomeScreen";
+import { InviteJoinScreen } from "@/screens/InviteJoinScreen";
 import { LobbyScreen } from "@/screens/LobbyScreen";
 import { RoleRevealScreen } from "@/screens/RoleRevealScreen";
 import { GameScreen } from "@/screens/GameScreen";
 import { FinalScreen } from "@/screens/FinalScreen";
 import { Button } from "@/components/ui/Button";
+import { getRoomCodeFromUrl } from "@/lib/session";
 
 export default function App() {
   const {
     init,
-    autoJoinFromUrl,
     room,
     profile,
     loading,
@@ -42,7 +43,6 @@ export default function App() {
   } = useGameStore(
     useShallow((state) => ({
       init: state.init,
-      autoJoinFromUrl: state.autoJoinFromUrl,
       room: state.room,
       profile: state.profile,
       loading: state.loading,
@@ -75,16 +75,29 @@ export default function App() {
     init();
   }, [init]);
 
-  useEffect(() => {
-    if (!room) autoJoinFromUrl();
-  }, [autoJoinFromUrl, room]);
-
   const selfPlayer = useMemo(
     () => room?.players.find((player) => player.id === room.selfId) ?? null,
     [room]
   );
+  const inviteRoomCode = useMemo(() => (!room ? getRoomCodeFromUrl() : null), [room]);
 
   const screen = useMemo(() => {
+    if (!room && inviteRoomCode) {
+      return {
+        key: "invite",
+        node: (
+          <InviteJoinScreen
+            roomCode={inviteRoomCode}
+            profile={profile}
+            loading={loading}
+            error={error}
+            onProfileChange={updateProfile}
+            onJoin={() => joinRoom(inviteRoomCode)}
+          />
+        )
+      };
+    }
+
     if (!room || !selfPlayer) {
       return {
         key: "home",
@@ -159,6 +172,7 @@ export default function App() {
   }, [
     room,
     selfPlayer,
+    inviteRoomCode,
     profile,
     loading,
     error,

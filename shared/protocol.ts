@@ -136,6 +136,7 @@ export interface RoundView {
   role: RoundRoleView;
   drawings: Record<string, DrawingStateView>;
   selfVote: string | null;
+  votedPlayerIds: string[];
   pointers: Record<string, string | null>;
   readyForPhaseAdvance: string[];
   reactions: ReactionEvent[];

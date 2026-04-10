@@ -36,8 +36,7 @@ export function PlayerAvatar({
             highlighted && "ring-2 ring-primary ring-offset-2"
           )}
           style={{
-            background: `linear-gradient(160deg, ${player.profile.color}44, ${player.profile.color}18)`,
-            boxShadow: `0 2px 14px ${player.profile.color}50`
+            background: `linear-gradient(160deg, ${player.profile.color}44, ${player.profile.color}18)`
           }}
         >
           <span className={clsx(player.profile.shape === "diamond" && "-rotate-45")}>

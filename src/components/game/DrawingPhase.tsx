@@ -38,7 +38,7 @@ export function DrawingPhase({
         <div className="flex items-center justify-between gap-2 rounded-[20px] bg-surface-low/60 px-3 py-2">
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-400">Ton mot</div>
-            <div className="truncate font-display text-xl font-extrabold text-ink-950 md:text-3xl">
+            <div className="truncate font-sketch text-2xl font-bold text-ink-950 md:text-4xl">
               {round.role.ownWord ?? "???"}
             </div>
           </div>

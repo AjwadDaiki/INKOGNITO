@@ -4,6 +4,7 @@ import { MIN_PLAYERS } from "@shared/constants";
 import type { PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
 import { ChatPanel } from "@/components/ui/ChatPanel";
+import { InkSplatter } from "@/components/ui/InkSplatter";
 
 function roomLink(roomCode: string) {
   return `${window.location.origin}?room=${roomCode}`;
@@ -35,8 +36,8 @@ function PillGroup<T extends string | number>({
             onClick={() => onChange(opt)}
             className={`flex-1 rounded-2xl py-2 text-xs font-bold transition ${
               active
-                ? "bg-gradient-to-br from-primary to-[#FFD700] text-ink-950 shadow-primary"
-                : "bg-white/60 text-ink-700 hover:bg-white/80"
+                ? "bg-gradient-to-br from-primary to-[#C49000] text-ink-950 shadow-primary"
+                : "bg-surface-low text-ink-700 hover:bg-surface-high"
             } disabled:opacity-40`}
           >
             {format ? format(opt) : String(opt)}
@@ -107,15 +108,14 @@ export function LobbyScreen({
               player.id === selfPlayer.id
                 ? "border-[rgba(240,192,0,0.3)] bg-primary-light"
                 : player.ready
-                  ? "border-[rgba(34,197,94,0.2)] bg-[#ecfdf5]"
-                  : "border-[rgba(15,23,42,0.06)] bg-white/60"
+                  ? "border-[rgba(93,138,74,0.2)] bg-[#edf5e8]"
+                  : "border-[rgba(15,23,42,0.06)] bg-surface-low/60"
             }`}
           >
             <div
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-2xl"
               style={{
-                background: `linear-gradient(160deg,${player.profile.color}44,${player.profile.color}18)`,
-                boxShadow: `0 3px 12px ${player.profile.color}40`
+                background: `linear-gradient(160deg,${player.profile.color}44,${player.profile.color}18)`
               }}
             >
               {player.profile.emoji}
@@ -133,7 +133,7 @@ export function LobbyScreen({
                 <span
                   className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
                     player.ready
-                      ? "bg-[#dcfce7] text-[#15803d]"
+                      ? "bg-[#e0eddb] text-[#3d6b30]"
                       : "bg-surface-low text-ink-500"
                   }`}
                 >
@@ -251,56 +251,80 @@ export function LobbyScreen({
   ];
 
   return (
-    <div className="flex h-[100svh] flex-col gap-2.5 overflow-hidden p-3 md:p-4">
+    <div className="relative flex h-[100svh] flex-col gap-2.5 overflow-hidden p-3 md:p-4">
+
+      {/* Ink splatters */}
+      <InkSplatter variant={0} className="left-[3%] top-[15%]" size={180} opacity={0.04} />
+      <InkSplatter variant={2} className="bottom-[8%] right-[5%]" size={150} opacity={0.05} />
+      <InkSplatter variant={3} className="right-[30%] top-[5%]" size={100} opacity={0.03} />
 
       {/* Top bar */}
       <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 350, damping: 24 }}
-        className="bento-card flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 py-3"
+        initial={{ opacity: 0, y: -20, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 22 }}
+        className="bento-card relative flex shrink-0 flex-wrap items-center justify-between gap-3 px-4 py-3"
       >
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xl font-extrabold tracking-[0.22em] text-ink-950 md:text-2xl">
+          <motion.span
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 400, damping: 18 }}
+            className="font-mono text-xl font-extrabold tracking-[0.22em] text-ink-950 md:text-2xl"
+          >
             {room.roomCode}
-          </span>
+          </motion.span>
           <motion.span
             key={connectedPlayers.length}
-            initial={{ scale: 1.2 }}
+            initial={{ scale: 1.3 }}
             animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            transition={{ type: "spring", stiffness: 400, damping: 16 }}
             className="rounded-full bg-surface-low px-3 py-1 text-xs font-bold text-ink-500"
           >
             {connectedPlayers.length} joueur{connectedPlayers.length > 1 ? "s" : ""}
           </motion.span>
         </div>
-        <div className="flex gap-2">
+        <motion.div
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15, type: "spring", stiffness: 350, damping: 22 }}
+          className="flex gap-2"
+        >
           <Button tone="secondary" onClick={copyRoomCode} className="min-h-9 px-3 text-xs">
             Code
           </Button>
           <Button tone="secondary" onClick={copyRoomLink} className="min-h-9 px-3 text-xs">
             Lien
           </Button>
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* ── Mobile tabs (visible < lg) ── */}
-      <div className="flex shrink-0 gap-1.5 lg:hidden">
-        {tabs.map((tab) => (
-          <button
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, type: "spring", stiffness: 350, damping: 22 }}
+        className="flex shrink-0 gap-1.5 lg:hidden"
+      >
+        {tabs.map((tab, i) => (
+          <motion.button
             key={tab.key}
             type="button"
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 + i * 0.05, type: "spring", stiffness: 400, damping: 22 }}
             onClick={() => setMobileTab(tab.key)}
             className={`flex-1 rounded-2xl py-2 text-xs font-bold transition ${
               mobileTab === tab.key
-                ? "bg-gradient-to-br from-primary to-[#FFD700] text-ink-950 shadow-primary"
-                : "bg-white/60 text-ink-700"
+                ? "bg-gradient-to-br from-primary to-[#C49000] text-ink-950 shadow-primary"
+                : "bg-surface-low text-ink-700 hover:bg-surface-high"
             }`}
           >
             {tab.label}
-          </button>
+          </motion.button>
         ))}
-      </div>
+      </motion.div>
 
       {/* ── Mobile: single panel (< lg) ── */}
       <div className="min-h-0 flex-1 lg:hidden">

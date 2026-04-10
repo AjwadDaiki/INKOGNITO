@@ -44,7 +44,7 @@ function EmojiCarousel({
       </button>
 
       {/* Track */}
-      <div className="relative flex h-14 flex-1 items-center justify-center overflow-hidden">
+      <div className="relative flex h-14 flex-1 items-center justify-center overflow-hidden rounded-2xl">
         <div className="flex items-center justify-center gap-1">
           <AnimatePresence mode="popLayout" initial={false}>
             {slots.map(({ emoji, offset }) => (
@@ -105,10 +105,10 @@ function ColorDots({
             className="h-9 w-9 rounded-full border-[3px] transition-all"
             style={{
               backgroundColor: color,
-              borderColor: active ? "#0F172A" : "transparent",
+              borderColor: active ? "#1a1410" : "transparent",
               boxShadow: active
-                ? `0 0 0 2px white, 0 0 0 4px ${color}, 0 4px 12px ${color}88`
-                : `0 3px 8px ${color}55`
+                ? `0 0 0 2px white, 0 0 0 4px ${color}`
+                : "none"
             }}
             aria-label={`Couleur ${color}`}
           />
@@ -137,10 +137,12 @@ export function ProfileEditor({
         {/* Avatar preview */}
         <motion.div
           layout
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-3xl shadow-card"
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          transition={{ type: "spring", stiffness: 400, damping: 18 }}
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-3xl"
           style={{
             background: `linear-gradient(160deg,${profile.color}44,${profile.color}18)`,
-            boxShadow: `0 4px 16px ${profile.color}55, 0 3px 0 ${profile.color}33`
+            boxShadow: `0 3px 10px ${profile.color}35`
           }}
         >
           {profile.emoji}

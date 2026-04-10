@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import type { PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
+import { InkSplatter } from "@/components/ui/InkSplatter";
 
 function roleTone(room: RoomView) {
   const role = room.round?.role.role;
   if (role === "mr_white") {
     return {
       panel: "from-[#fff4d6] to-[#ffe3a3]",
-      chip: "bg-[#FEF3C7] text-[#92400e]",
+      chip: "bg-[#f5e8c0] text-[#8B6914]",
       title: "Mr White",
       subtitle: "Tu n'as pas de mot. Observe, bluffe, puis devine a la fin."
     };
@@ -44,7 +45,10 @@ export function RoleRevealScreen({
   const tone = roleTone(room);
 
   return (
-    <div className="flex h-[100svh] items-center justify-center overflow-hidden p-4">
+    <div className="relative flex h-[100svh] items-center justify-center overflow-hidden p-4">
+      {/* Ink splatters */}
+      <InkSplatter variant={1} className="left-[10%] top-[15%]" size={170} opacity={0.04} />
+      <InkSplatter variant={3} className="bottom-[15%] right-[10%]" size={140} opacity={0.05} />
       <motion.div
         initial={{ opacity: 0, scale: 0.92, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -55,7 +59,7 @@ export function RoleRevealScreen({
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7 }}
-          className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-3xl"
+          className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink-950/8 blur-3xl"
         />
 
         <div className="bento-card relative overflow-hidden p-6 md:p-8">
@@ -79,13 +83,13 @@ export function RoleRevealScreen({
             transition={{ delay: 0.1, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             className={`rounded-[32px] bg-gradient-to-br ${tone.panel} px-6 py-8 text-center shadow-card`}
           >
-            <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-ink-500">
+            <div className="mb-3 font-sketch text-sm font-bold uppercase tracking-[0.12em] text-ink-500">
               {ownWord ? "Ton mot" : "Aucun mot"}
             </div>
             <div className="font-display text-5xl font-extrabold tracking-[-0.03em] text-ink-950 md:text-6xl">
               {ownWord ?? "?"}
             </div>
-            <div className="mx-auto mt-4 max-w-xl text-sm text-ink-700 md:text-base">
+            <div className="mx-auto mt-4 max-w-xl font-sketch text-base text-ink-700 md:text-lg">
               {tone.subtitle}
             </div>
           </motion.div>

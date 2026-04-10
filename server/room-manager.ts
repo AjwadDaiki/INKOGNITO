@@ -319,7 +319,8 @@ export class RoomManager {
       (entry) => !entry.connected || round.readyForPhaseAdvance.has(entry.id)
     );
     if (everyoneReady) {
-      this.setPhase(room, "discussion", room.settings.discussionSeconds * 1000);
+      room.systemNotice = "Qui est l'Undercover ?";
+      this.setPhase(room, "vote", room.settings.voteSeconds * 1000);
     }
   }
 
@@ -638,10 +639,6 @@ export class RoomManager {
         this.setPhase(room, "gallery", room.settings.gallerySeconds * 1000);
         break;
       case "gallery":
-        room.systemNotice = "Discutez. Accusez. Bluffez.";
-        this.setPhase(room, "discussion", room.settings.discussionSeconds * 1000);
-        break;
-      case "discussion":
         room.systemNotice = "Qui est l'Undercover ?";
         this.setPhase(room, "vote", room.settings.voteSeconds * 1000);
         break;
@@ -841,6 +838,9 @@ export class RoomManager {
             },
             drawings: room.round.drawings,
             selfVote: room.round.votes[selfId] ?? null,
+            votedPlayerIds: Object.entries(room.round.votes)
+              .filter(([, target]) => target !== null)
+              .map(([playerId]) => playerId),
             pointers: room.round.pointers,
             readyForPhaseAdvance: [...room.round.readyForPhaseAdvance],
             reactions: room.round.reactions,

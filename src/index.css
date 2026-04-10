@@ -1,13 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Root — Kinetic Joy, warm off-white ─── */
+/* ─── Root — Craft paper / Sketchbook ─── */
 :root {
-  color: #0f172a;
-  background-color: #e9edf2;
+  color: #1a1410;
+  background-color: #e8e0d4;
   font-family: "Be Vietnam Pro", sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -33,11 +33,14 @@ body {
   margin: 0;
   overflow: hidden;
   background-image:
-    radial-gradient(rgba(15, 23, 42, 0.055) 1.25px, transparent 1.25px),
-    radial-gradient(circle at top left, rgba(240, 192, 0, 0.1), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(255, 92, 77, 0.08), transparent 24%),
-    linear-gradient(180deg, #eef2f6 0%, #e7ebf1 100%);
-  background-size: 22px 22px, auto, auto, auto;
+    /* Paper grain noise */
+    url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+    /* Subtle coffee stain rings */
+    radial-gradient(circle at 12% 18%, rgba(139, 105, 20, 0.06), transparent 18%),
+    radial-gradient(circle at 88% 75%, rgba(139, 105, 20, 0.04), transparent 15%),
+    /* Warm paper gradient */
+    linear-gradient(180deg, #ece4d6 0%, #e2d8c8 50%, #ddd3c3 100%);
+  background-size: 200px 200px, auto, auto, auto;
   background-repeat: repeat, no-repeat, no-repeat, no-repeat;
 }
 
@@ -49,8 +52,8 @@ textarea {
 }
 
 ::selection {
-  background: rgba(240, 192, 0, 0.28);
-  color: #0f172a;
+  background: rgba(212, 160, 23, 0.3);
+  color: #1a1410;
 }
 
 /* ─── Inputs — style cartoon avec léger bord ─── */
@@ -61,30 +64,33 @@ textarea {
   background: rgba(255, 255, 255, 0.72);
 }
 
-/* ─── Bento Card — cartoon lift shadow ─── */
+/* ─── Bento Card — Sketchbook page ─── */
 .bento-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(252, 253, 255, 0.86) 100%);
-  border-radius: 1.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+    /* Subtle paper fiber texture */
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.02'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(250, 246, 239, 0.97) 0%, rgba(240, 235, 227, 0.95) 100%);
+  background-size: 100px 100px, auto;
+  border-radius: 1.25rem;
+  border: 1.5px solid rgba(26, 20, 16, 0.08);
   box-shadow:
-    0 18px 50px rgba(15, 23, 42, 0.08),
-    0 4px 16px rgba(15, 23, 42, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
+    0 4px 0 rgba(26, 20, 16, 0.06),
+    0 12px 32px rgba(26, 20, 16, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* Backward compat alias */
 .glass-panel {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(252, 253, 255, 0.86) 100%);
-  border-radius: 1.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.02'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(250, 246, 239, 0.97) 0%, rgba(240, 235, 227, 0.95) 100%);
+  background-size: 100px 100px, auto;
+  border-radius: 1.25rem;
+  border: 1.5px solid rgba(26, 20, 16, 0.08);
   box-shadow:
-    0 18px 50px rgba(15, 23, 42, 0.08),
-    0 4px 16px rgba(15, 23, 42, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
+    0 4px 0 rgba(26, 20, 16, 0.06),
+    0 12px 32px rgba(26, 20, 16, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* ─── Ambient background orbs (Kinetic Joy) ─── */
@@ -122,9 +128,76 @@ textarea {
 
 /* ─── Glow ring for vote/suspect selection ─── */
 @keyframes glow-ring {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(240, 192, 0, 0.3); }
-  50% { box-shadow: 0 0 0 6px rgba(240, 192, 0, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(212, 160, 23, 0); }
 }
 .animate-glow-ring {
   animation: glow-ring 1.8s ease-in-out infinite;
+}
+
+/* ─── Shimmer for premium surfaces ─── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+/* ─── Vote pulse ring ─── */
+@keyframes vote-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(212, 160, 23, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0); }
+}
+.animate-vote-pulse {
+  animation: vote-pulse 1.5s ease-out infinite;
+}
+
+/* ─── Gradient text ─── */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #D4A017, #C49000, #8B6914);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Ink drip text effect ─── */
+.text-ink-drip {
+  background: linear-gradient(180deg, #1a1410 60%, #4a3c2e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(26, 20, 16, 0.2));
+}
+
+/* ─── Ink splatter spot ─── */
+.ink-spot {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.06;
+  filter: blur(1px);
+}
+
+/* ─── Paper fold line (decorative) ─── */
+.paper-fold {
+  background: linear-gradient(90deg, transparent 0%, rgba(26, 20, 16, 0.04) 49%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+}
+
+/* ─── Confetti burst (for resolution) ─── */
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ─── Bobble float for idle elements ─── */
+@keyframes bobble {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-4px) rotate(1deg); }
+  75% { transform: translateY(2px) rotate(-1deg); }
+}
+.animate-bobble {
+  animation: bobble 3s ease-in-out infinite;
 }

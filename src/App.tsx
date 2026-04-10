@@ -121,7 +121,6 @@ export default function App() {
           onClear={clearDrawing}
           onReadyForNextPhase={readyForNextPhase}
           onReaction={sendReaction}
-          onPointFinger={pointFinger}
           onSendChat={sendChatMessage}
           onVote={castVote}
           onSubmitGuess={submitMrWhiteGuess}

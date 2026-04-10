@@ -28,7 +28,7 @@ export function Button({
         "inline-flex min-h-11 items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40",
         // Primary — sun-drenched gold gradient + cartoon bottom shadow
         tone === "primary" &&
-          "bg-gradient-to-br from-primary to-[#FFD700] text-ink-950 shadow-primary border border-[rgba(140,90,0,0.15)] active:translate-y-[2px] active:shadow-none",
+          "bg-gradient-to-br from-primary to-[#C49000] text-paper shadow-primary border border-[rgba(139,105,20,0.2)] active:translate-y-[2px] active:shadow-none",
         // Secondary — surface tinted + cartoon shadow
         tone === "secondary" &&
           "bg-surface-low text-ink-950 hover:bg-surface-high border border-[rgba(15,23,42,0.08)] shadow-[0_3px_0_rgba(15,23,42,0.09)] active:translate-y-[2px] active:shadow-none",

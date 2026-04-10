@@ -5,32 +5,38 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Surfaces — warm off-white (plus blanc cassé, style cartoon)
+        // Surfaces — warm cream/paper tones
         surface: {
-          DEFAULT: "#e9edf2",
-          card: "#fffdf9",
-          low: "#f4f7fb",
-          high: "#e4e9f0"
+          DEFAULT: "#e8e0d4",
+          card: "#f0ebe3",
+          low: "#ece5db",
+          high: "#ddd5c9"
         },
-        // Primary — electric gold/yellow
+        // Paper — sketchbook whites
+        paper: {
+          DEFAULT: "#faf6ef",
+          warm: "#f5efe5",
+          aged: "#ede6da"
+        },
+        // Primary — ink gold / sepia accent
         primary: {
-          DEFAULT: "#F0C000",
-          light: "#FFF1AE",
-          dark: "#A07A00"
+          DEFAULT: "#D4A017",
+          light: "#FBF0C8",
+          dark: "#8B6914"
         },
-        // Tertiary — coral red
+        // Tertiary — ink red / vermillion
         tertiary: {
-          DEFAULT: "#FF5C4D",
-          light: "#FFE8E3"
+          DEFAULT: "#C43E2E",
+          light: "#FADED8"
         },
-        // Ink — text scale (light mode)
+        // Ink — text scale (true ink feel)
         ink: {
-          950: "#0F172A",
-          900: "#1E293B",
-          700: "#334155",
-          500: "#64748B",
-          300: "#94A3B8",
-          100: "#E2EAF0"
+          950: "#1a1410",
+          900: "#2c2318",
+          700: "#4a3c2e",
+          500: "#7a6b5a",
+          300: "#a89884",
+          100: "#e0d6c8"
         },
         // Accent helpers
         accent: {
@@ -47,11 +53,11 @@ const config: Config = {
         }
       },
       boxShadow: {
-        card: "0 4px 0 rgba(15,23,42,0.09), 0 8px 28px rgba(15,23,42,0.05)",
-        "card-hover": "0 6px 0 rgba(15,23,42,0.09), 0 12px 32px rgba(15,23,42,0.07)",
-        primary: "0 3px 0 rgba(140,90,0,0.30), 0 6px 20px rgba(240,192,0,0.35)",
-        tertiary: "0 4px 20px rgba(255,92,77,0.3)",
-        glow: "0 4px 24px rgba(124,58,237,0.2)",
+        card: "0 3px 0 rgba(26,20,16,0.08), 0 8px 24px rgba(26,20,16,0.06)",
+        "card-hover": "0 5px 0 rgba(26,20,16,0.08), 0 12px 28px rgba(26,20,16,0.08)",
+        primary: "0 3px 0 rgba(139,105,20,0.35), 0 6px 18px rgba(212,160,23,0.3)",
+        tertiary: "0 4px 20px rgba(196,62,46,0.25)",
+        glow: "0 4px 24px rgba(26,20,16,0.12)",
         cyan: "0 4px 20px rgba(14,165,233,0.2)",
         rose: "0 4px 20px rgba(255,45,120,0.2)"
       },
@@ -61,6 +67,7 @@ const config: Config = {
       },
       fontFamily: {
         display: ["Plus Jakarta Sans", "sans-serif"],
+        sketch: ["Caveat", "cursive"],
         sans: ["Be Vietnam Pro", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"]
       },

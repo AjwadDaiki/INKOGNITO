@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { PlayerRole, PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
+import { InkSplatter } from "@/components/ui/InkSplatter";
 
 function roleLabel(role: PlayerRole) {
   if (role === "undercover") return "UNDERCOVER";
@@ -10,9 +11,9 @@ function roleLabel(role: PlayerRole) {
 }
 
 function roleBg(role: PlayerRole) {
-  if (role === "mr_white") return "bg-[#FEF3C7] text-[#92400e]";
+  if (role === "mr_white") return "bg-[#f5e8c0] text-[#8B6914]";
   if (role === "undercover") return "bg-tertiary-light text-tertiary";
-  return "bg-[#dcfce7] text-[#15803d]";
+  return "bg-[#e0eddb] text-[#3d6b30]";
 }
 
 export function FinalScreen({
@@ -48,7 +49,12 @@ export function FinalScreen({
     : [];
 
   return (
-    <div className="flex h-[100dvh] flex-col gap-3 overflow-hidden p-3 md:p-4">
+    <div className="relative flex h-[100dvh] flex-col gap-3 overflow-hidden p-3 md:p-4">
+
+      {/* Ink splatters */}
+      <InkSplatter variant={0} className="left-[8%] top-[15%]" size={190} opacity={0.04} />
+      <InkSplatter variant={2} className="bottom-[10%] right-[6%]" size={160} opacity={0.05} />
+      <InkSplatter variant={1} className="left-[60%] top-[8%]" size={100} opacity={0.03} />
 
       {/* ── Header ── */}
       <motion.div
@@ -93,7 +99,7 @@ export function FinalScreen({
                   whileHover={{ scale: 1.02, x: 4 }}
                   className={`flex items-center justify-between rounded-[20px] px-4 py-3 ${
                     index === 0
-                      ? "bg-gradient-to-r from-primary-light to-[#fff4cc] shadow-[0_4px_16px_rgba(240,192,0,0.2)]"
+                      ? "bg-gradient-to-r from-primary-light to-[#f5e8c0] shadow-[0_4px_16px_rgba(212,160,23,0.2)]"
                       : isSelf
                         ? "bg-primary-light"
                         : "bg-surface-low"
@@ -202,10 +208,10 @@ export function FinalScreen({
                               src={snapshot}
                               alt={`Dessin de ${player.profile.name}`}
                               referrerPolicy="no-referrer"
-                              className="aspect-square w-full rounded-2xl bg-white object-cover"
+                              className="aspect-square w-full rounded-2xl bg-paper-warm object-cover"
                             />
                           ) : (
-                            <div className="flex aspect-square items-center justify-center rounded-2xl bg-white text-sm text-ink-300">
+                            <div className="flex aspect-square items-center justify-center rounded-2xl bg-paper-warm text-sm text-ink-300">
                               Vide
                             </div>
                           )}

@@ -107,7 +107,7 @@ function MiniDrawingCanvasComponent({
     <canvas
       ref={ref}
       className={clsx(
-        "aspect-square rounded-[20px] border border-white/10 bg-white shadow-inner",
+        "aspect-square rounded-[20px] border border-ink-100/40 bg-paper shadow-inner",
         className
       )}
       aria-label="Apercu du dessin"

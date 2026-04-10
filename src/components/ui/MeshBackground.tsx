@@ -1,21 +1,15 @@
+import { InkSplatter } from "./InkSplatter";
+
 /**
- * Ambient background with softer color separation.
+ * Ambient ink-stained background — replaces gradient orbs with organic ink splatters.
  */
 export function MeshBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-      <div
-        className="bg-orb left-[18%] top-[12%] h-[22rem] w-[22rem]"
-        style={{ background: "#7C3AED", opacity: 0.05, filter: "blur(88px)" }}
-      />
-      <div
-        className="bg-orb -left-48 -top-48 h-[38rem] w-[38rem]"
-        style={{ background: "#F0C000", opacity: 0.1, filter: "blur(82px)" }}
-      />
-      <div
-        className="bg-orb -bottom-48 -right-32 h-[34rem] w-[34rem]"
-        style={{ background: "#FF5C4D", opacity: 0.08, filter: "blur(82px)" }}
-      />
+      <InkSplatter variant={0} className="left-[8%] top-[5%]" size={320} opacity={0.035} animate />
+      <InkSplatter variant={1} className="-bottom-12 -right-8" size={280} opacity={0.04} animate />
+      <InkSplatter variant={2} className="left-[50%] top-[40%]" size={200} opacity={0.025} animate />
+      <InkSplatter variant={3} className="-left-10 bottom-[20%]" size={240} opacity={0.03} animate />
     </div>
   );
 }

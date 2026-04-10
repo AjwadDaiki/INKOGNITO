@@ -238,7 +238,7 @@ export function DrawingCanvas({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden rounded-[28px] bg-[#f8f6f2] p-2 shadow-card">
+      <div className="min-h-0 flex-1 overflow-hidden rounded-[28px] bg-paper-warm p-2 shadow-card">
         <canvas
           ref={canvasRef}
           className="aspect-square h-full max-h-full w-full touch-none rounded-[22px] bg-white"

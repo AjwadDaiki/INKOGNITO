@@ -45,24 +45,11 @@ function MiniDrawingCanvasComponent({
     }
     bufferRef.current = buffer;
     currentSize.current = size;
-    if (ref.current) {
-      ref.current.width = size;
-      ref.current.height = size;
-    }
-  }, [size]);
-
-  useEffect(() => {
-    if (currentSize.current === size) return;
-    currentSize.current = size;
-    if (bufferRef.current) {
-      bufferRef.current.width = size;
-      bufferRef.current.height = size;
-    }
-    if (ref.current) {
-      ref.current.width = size;
-      ref.current.height = size;
-    }
     renderedCount.current = 0;
+    if (ref.current) {
+      ref.current.width = size;
+      ref.current.height = size;
+    }
   }, [size]);
 
   useEffect(() => {

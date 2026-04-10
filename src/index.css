@@ -137,6 +137,7 @@ textarea {
   bottom: 1.4rem;
   left: 0.95rem;
   width: 26px;
+  pointer-events: none;
   background:
     linear-gradient(90deg, transparent 0 9px, rgba(196, 62, 46, 0.55) 9px 11px, transparent 11px 100%),
     radial-gradient(circle, rgba(118, 100, 82, 0.72) 0 2.5px, transparent 3px) 0 5px / 14px 34px repeat-y;

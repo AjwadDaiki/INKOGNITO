@@ -125,7 +125,7 @@ export function LobbyScreen({
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="relative z-10 flex flex-wrap items-center gap-2">
               <span className="ink-chip text-xs font-semibold text-ink-700">
                 {readyCount}/{connectedPlayers.length} prets
               </span>

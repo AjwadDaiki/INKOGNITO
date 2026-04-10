@@ -165,38 +165,34 @@ export function GameScreen({
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-3 py-2 md:px-4 md:py-2.5"
+        className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-3 py-2.5 md:px-4 md:py-3"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
             <span className="ink-chip text-xs font-semibold text-ink-700">
-              {voteCount}/{roundPlayers.length}
-            </span>
-            <span className="font-sketch text-lg font-semibold text-ink-950 md:text-xl">
-              {hasVoted
-                ? `Vote : ${castVoteLabel}`
-                : selectedPlayer
-                  ? `${selectedPlayer.profile.emoji} ${selectedPlayer.profile.name} ?`
-                  : "Choisis un dessin"}
+              {voteCount}/{roundPlayers.length} votes
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             {hasVoted ? (
-              <span className="ink-chip text-xs font-semibold text-ink-700">Vote validé</span>
+              <span className="font-sketch text-base font-semibold text-ink-700">
+                Tu as voté {castVoteLabel === "blanc" ? "blanc" : `pour ${castVoteLabel}`} ✓
+              </span>
             ) : selectedPlayer ? (
               <>
-                <Button onClick={() => onVote(pendingVote)} className="min-h-9 px-3 text-xs">Confirmer</Button>
-                <Button tone="ghost" onClick={() => setPendingVote(null)} className="min-h-9 px-2 text-xs">Annuler</Button>
+                <span className="font-sketch text-base font-semibold text-ink-950">
+                  {selectedPlayer.profile.emoji} {selectedPlayer.profile.name} ?
+                </span>
+                <Button onClick={() => onVote(pendingVote)} className="min-h-9 px-4 text-xs">Voter</Button>
+                <Button tone="ghost" onClick={() => setPendingVote(null)} className="min-h-9 px-2 text-xs">✕</Button>
               </>
-            ) : null}
-
-            {!hasVoted ? (
+            ) : (
               <Button tone="secondary" onClick={() => onVote(null)} className="min-h-9 px-3 text-xs">
-                Blanc
+                Vote blanc
               </Button>
-            ) : null}
+            )}
           </div>
         </div>
       </motion.div>
@@ -236,6 +232,15 @@ export function GameScreen({
             />
           ) : (
             <>
+              {/* Vote header */}
+              <div className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-4 py-2 text-center">
+                <div className="font-sketch text-2xl font-bold text-ink-950 md:text-3xl">
+                  Qui est l'Undercover ?
+                </div>
+                {!selfHasSubmittedVote ? (
+                  <div className="text-xs text-ink-500">Touche le dessin du suspect pour voter</div>
+                ) : null}
+              </div>
               {/* Vote grid — measured to fit without scroll */}
               <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-hidden rounded-[1.6rem] p-2 md:p-3">
                 <VoteGrid

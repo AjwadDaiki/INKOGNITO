@@ -41,6 +41,7 @@ export interface RoomSettings {
   gallerySeconds: number;
   resolutionSeconds: number;
   difficulty: Difficulty;
+  selectedCategories: string[];
   customWordPairs: WordPair[];
 }
 

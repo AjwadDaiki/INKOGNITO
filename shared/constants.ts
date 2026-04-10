@@ -79,7 +79,8 @@ export const DEFAULT_SETTINGS = {
   gallerySeconds: 12,
   resolutionSeconds: 10,
   rounds: 3,
-  difficulty: "random"
+  difficulty: "random",
+  selectedCategories: ["Tout"]
 } as const;
 
 export const MIN_PLAYERS = 3;

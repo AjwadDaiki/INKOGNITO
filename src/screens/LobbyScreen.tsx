@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { MIN_PLAYERS } from "@shared/constants";
 import type { PlayerView, RoomView } from "@shared/protocol";
+import { WORD_CATEGORIES } from "@shared/words";
 import { Button } from "@/components/ui/Button";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { InkSplatter } from "@/components/ui/InkSplatter";
@@ -73,6 +74,9 @@ export function LobbyScreen({
   );
   const canLaunch =
     isHost && connectedPlayers.length >= MIN_PLAYERS && readyCount >= MIN_PLAYERS;
+  const selectedCategories = room.settings.selectedCategories?.length
+    ? room.settings.selectedCategories
+    : ["Tout"];
 
   async function copyRoomCode() {
     await navigator.clipboard.writeText(room.roomCode);
@@ -80,6 +84,24 @@ export function LobbyScreen({
 
   async function copyRoomLink() {
     await navigator.clipboard.writeText(roomLink(room.roomCode));
+  }
+
+  function toggleCategory(category: string) {
+    if (!isHost) return;
+
+    if (category === "Tout") {
+      onUpdateSettings({ selectedCategories: ["Tout"] });
+      return;
+    }
+
+    const current = selectedCategories.includes("Tout") ? [] : selectedCategories;
+    const next = current.includes(category)
+      ? current.filter((entry) => entry !== category)
+      : [...current, category];
+
+    onUpdateSettings({
+      selectedCategories: next.length > 0 ? next : ["Tout"]
+    });
   }
 
   return (
@@ -209,6 +231,48 @@ export function LobbyScreen({
                       disabled={!isHost}
                       format={(v) => (v === "easy" ? "Facile" : v === "normal" ? "Normal" : "Difficile")}
                     />
+                  </div>
+                </div>
+
+                <div className="paper-divider my-4" />
+
+                <div>
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <div className="text-xs uppercase tracking-[0.18em] text-ink-500">
+                      Modes de mots
+                    </div>
+                    <span className="ink-chip text-xs font-semibold text-ink-700">
+                      {selectedCategories.includes("Tout")
+                        ? "Tout"
+                        : `${selectedCategories.length} catégorie${selectedCategories.length > 1 ? "s" : ""}`}
+                    </span>
+                  </div>
+                  <div className="mb-3 text-sm text-ink-600">
+                    Coche une ou plusieurs catégories. Par défaut, tout le carnet est mélangé.
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {["Tout", ...WORD_CATEGORIES].map((category) => {
+                      const active =
+                        category === "Tout"
+                          ? selectedCategories.includes("Tout")
+                          : !selectedCategories.includes("Tout") && selectedCategories.includes(category);
+
+                      return (
+                        <button
+                          key={category}
+                          type="button"
+                          disabled={!isHost}
+                          onClick={() => toggleCategory(category)}
+                          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                            active
+                              ? "border-ink-950 bg-ink-950 text-paper"
+                              : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
+                          } disabled:opacity-45`}
+                        >
+                          {category}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

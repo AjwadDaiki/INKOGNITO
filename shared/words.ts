@@ -293,5 +293,69 @@ export const BASE_WORD_PAIRS: WordPair[] = [
   { id: "tale-prince-roi", civilWord: "Prince", undercoverWord: "Roi", difficulty: "normal", category: "Contes" },
   { id: "tale-tresor-coffre", civilWord: "Trésor", undercoverWord: "Coffre", difficulty: "normal", category: "Contes" },
   { id: "tale-chateau-tour", civilWord: "Château fort", undercoverWord: "Tour de garde", difficulty: "hard", category: "Contes" },
-  { id: "tale-baguette-magique-baton", civilWord: "Baguette magique", undercoverWord: "Bâton de sorcier", difficulty: "hard", category: "Contes" }
+  { id: "tale-baguette-magique-baton", civilWord: "Baguette magique", undercoverWord: "Bâton de sorcier", difficulty: "hard", category: "Contes" },
+
+  // ─── Manga / Anime (18) ───
+  { id: "anime-naruto-luffy", civilWord: "Naruto", undercoverWord: "Luffy", difficulty: "easy", category: "Manga / Anime" },
+  { id: "anime-goku-vegeta", civilWord: "Goku", undercoverWord: "Vegeta", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-sasuke-itachi", civilWord: "Sasuke", undercoverWord: "Itachi", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-totoro-noiraude", civilWord: "Totoro", undercoverWord: "Noiraude", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-pikachu-evoli", civilWord: "Pikachu", undercoverWord: "Évoli", difficulty: "easy", category: "Manga / Anime" },
+  { id: "anime-sailor-moon-cardcaptor", civilWord: "Sailor Moon", undercoverWord: "Cardcaptor Sakura", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-onepiece-bateau", civilWord: "One Piece", undercoverWord: "Bateau pirate", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-spirited-away-howl", civilWord: "Chihiro", undercoverWord: "Howl", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-akatsuki-anbu", civilWord: "Akatsuki", undercoverWord: "ANBU", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-shinigami-hollow", civilWord: "Shinigami", undercoverWord: "Hollow", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-titan-colossal", civilWord: "Titan", undercoverWord: "Titan colossal", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-deku-bakugo", civilWord: "Deku", undercoverWord: "Bakugo", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-gojo-sukuna", civilWord: "Gojo", undercoverWord: "Sukuna", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-tanjiro-zenitsu", civilWord: "Tanjiro", undercoverWord: "Zenitsu", difficulty: "normal", category: "Manga / Anime" },
+  { id: "anime-nezuko-shinobu", civilWord: "Nezuko", undercoverWord: "Shinobu", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-pokemon-pokeball", civilWord: "Pokémon", undercoverWord: "Poké Ball", difficulty: "easy", category: "Manga / Anime" },
+  { id: "anime-mecha-gundam", civilWord: "Mecha", undercoverWord: "Gundam", difficulty: "hard", category: "Manga / Anime" },
+  { id: "anime-ramen-bento", civilWord: "Ramen", undercoverWord: "Bento", difficulty: "normal", category: "Manga / Anime" },
+
+  // ─── Jeux vidéo (18) ───
+  { id: "game-mario-luigi", civilWord: "Mario", undercoverWord: "Luigi", difficulty: "easy", category: "Jeux vidéo" },
+  { id: "game-zelda-link", civilWord: "Zelda", undercoverWord: "Link", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-creeper-zombie", civilWord: "Creeper", undercoverWord: "Zombie", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-fortnite-apex", civilWord: "Fortnite", undercoverWord: "Apex Legends", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-pacman-ghost", civilWord: "Pac-Man", undercoverWord: "Fantôme", difficulty: "easy", category: "Jeux vidéo" },
+  { id: "game-sonic-shadow", civilWord: "Sonic", undercoverWord: "Shadow", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-masterchief-doomguy", civilWord: "Master Chief", undercoverWord: "Doom Slayer", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-tetris-puyo", civilWord: "Tetris", undercoverWord: "Puyo Puyo", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-roblox-minecraft", civilWord: "Roblox", undercoverWord: "Minecraft", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-pokeball-masterball", civilWord: "Poké Ball", undercoverWord: "Master Ball", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-kirby-yoshi", civilWord: "Kirby", undercoverWord: "Yoshi", difficulty: "easy", category: "Jeux vidéo" },
+  { id: "game-bowser-wario", civilWord: "Bowser", undercoverWord: "Wario", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-kratos-thor", civilWord: "Kratos", undercoverWord: "Thor", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-overcooked-plateup", civilWord: "Overcooked", undercoverWord: "PlateUp!", difficulty: "hard", category: "Jeux vidéo" },
+  { id: "game-amongus-impostor", civilWord: "Among Us", undercoverWord: "Imposteur", difficulty: "easy", category: "Jeux vidéo" },
+  { id: "game-potion-elixir", civilWord: "Potion", undercoverWord: "Élixir", difficulty: "normal", category: "Jeux vidéo" },
+  { id: "game-joystick-console", civilWord: "Joystick", undercoverWord: "Console", difficulty: "easy", category: "Jeux vidéo" },
+  { id: "game-speedrun-checkpoint", civilWord: "Speedrun", undercoverWord: "Checkpoint", difficulty: "hard", category: "Jeux vidéo" },
+
+  // ─── Cinéma / Séries (18) ───
+  { id: "screen-harry-hermione", civilWord: "Harry Potter", undercoverWord: "Hermione", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-batman-joker", civilWord: "Batman", undercoverWord: "Joker", difficulty: "easy", category: "Cinéma / Séries" },
+  { id: "screen-vador-yoda", civilWord: "Dark Vador", undercoverWord: "Yoda", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-spiderman-venom", civilWord: "Spider-Man", undercoverWord: "Venom", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-sherlock-watson", civilWord: "Sherlock", undercoverWord: "Watson", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-hobbit-elf", civilWord: "Hobbit", undercoverWord: "Elfe", difficulty: "hard", category: "Cinéma / Séries" },
+  { id: "screen-minion-groot", civilWord: "Minion", undercoverWord: "Groot", difficulty: "easy", category: "Cinéma / Séries" },
+  { id: "screen-thor-loki", civilWord: "Thor", undercoverWord: "Loki", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-elsa-anna", civilWord: "Elsa", undercoverWord: "Anna", difficulty: "easy", category: "Cinéma / Séries" },
+  { id: "screen-simba-mufasa", civilWord: "Simba", undercoverWord: "Mufasa", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-r2d2-c3po", civilWord: "R2-D2", undercoverWord: "C-3PO", difficulty: "hard", category: "Cinéma / Séries" },
+  { id: "screen-wednesday-enid", civilWord: "Wednesday", undercoverWord: "Enid", difficulty: "hard", category: "Cinéma / Séries" },
+  { id: "screen-stranger-demogorgon", civilWord: "Stranger Things", undercoverWord: "Demogorgon", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-marvel-avengers", civilWord: "Marvel", undercoverWord: "Avengers", difficulty: "easy", category: "Cinéma / Séries" },
+  { id: "screen-kungfu-panda-shifu", civilWord: "Po", undercoverWord: "Shifu", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-spongebob-patrick-series", civilWord: "SpongeBob", undercoverWord: "Patrick", difficulty: "easy", category: "Cinéma / Séries" },
+  { id: "screen-rick-morty", civilWord: "Rick", undercoverWord: "Morty", difficulty: "normal", category: "Cinéma / Séries" },
+  { id: "screen-gandalf-saruman", civilWord: "Gandalf", undercoverWord: "Saroumane", difficulty: "hard", category: "Cinéma / Séries" }
 ];
+
+export const WORD_CATEGORIES = [...new Set(BASE_WORD_PAIRS.map((pair) => pair.category))].sort(
+  (left, right) => left.localeCompare(right, "fr")
+);

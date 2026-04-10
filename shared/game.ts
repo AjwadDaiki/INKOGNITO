@@ -65,6 +65,7 @@ export function clampSettings(settings?: Partial<RoomSettings>): RoomSettings {
       20
     ),
     difficulty: normalizeDifficulty(settings?.difficulty),
+    selectedCategories: sanitizeSelectedCategories(settings?.selectedCategories),
     customWordPairs: (settings?.customWordPairs ?? [])
       .map((pair, index) => sanitizeWordPair(pair, index))
       .filter((pair): pair is WordPair => pair !== null)
@@ -80,6 +81,18 @@ function normalizeDifficulty(value?: Difficulty): Difficulty {
     return value;
   }
   return "random";
+}
+
+function sanitizeSelectedCategories(categories?: string[]) {
+  const cleaned = [...new Set((categories ?? DEFAULT_SETTINGS.selectedCategories)
+    .map((category) => category?.trim())
+    .filter((category): category is string => Boolean(category)))];
+
+  if (cleaned.length === 0 || cleaned.includes("Tout")) {
+    return ["Tout"];
+  }
+
+  return cleaned;
 }
 
 function sanitizeWordPair(pair: WordPair, index: number): WordPair | null {
@@ -153,16 +166,22 @@ export function assignRoles(playerIds: string[], mode: RoomSettings["mode"]) {
 
 export function pickWordPair(settings: RoomSettings, usedIds: string[]) {
   const pool = [...BASE_WORD_PAIRS, ...settings.customWordPairs];
-  const filtered = pool.filter((pair) => {
+  const categoryPool = pool.filter((pair) => {
     if (usedIds.includes(pair.id)) {
       return false;
     }
+    if (!settings.selectedCategories.includes("Tout")) {
+      return settings.selectedCategories.includes(pair.category);
+    }
+    return true;
+  });
+  const filtered = categoryPool.filter((pair) => {
     if (settings.difficulty === "random") {
       return true;
     }
     return pair.difficulty === settings.difficulty;
   });
-  const source = filtered.length > 0 ? filtered : pool;
+  const source = filtered.length > 0 ? filtered : categoryPool.length > 0 ? categoryPool : pool;
   return source[Math.floor(Math.random() * source.length)];
 }
 

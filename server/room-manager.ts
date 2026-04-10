@@ -114,6 +114,7 @@ export class RoomManager {
       phaseEndsAt: null,
       settings: clampSettings({
         ...DEFAULT_SETTINGS,
+        selectedCategories: [...DEFAULT_SETTINGS.selectedCategories],
         customWordPairs: []
       }),
       hostId: playerId,

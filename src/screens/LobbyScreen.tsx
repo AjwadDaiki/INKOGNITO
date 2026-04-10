@@ -68,11 +68,7 @@ export function LobbyScreen({
     () => connectedPlayers.filter((player) => player.ready).length,
     [connectedPlayers]
   );
-  const othersReady = connectedPlayers
-    .filter((player) => !player.isHost)
-    .every((player) => player.ready);
-  const canLaunch =
-    connectedPlayers.length >= MIN_PLAYERS && othersReady;
+  const canLaunch = connectedPlayers.length >= MIN_PLAYERS;
   const selectedCategories = room.settings.selectedCategories?.length
     ? room.settings.selectedCategories
     : ["Tout"];

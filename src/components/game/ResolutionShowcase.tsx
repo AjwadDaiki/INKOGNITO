@@ -81,11 +81,10 @@ export function ResolutionShowcase({
           />
 
           <div className="relative">
-            <div className="text-xs uppercase tracking-[0.18em] text-ink-500">Verdict</div>
             <div className="mt-1 font-sketch text-5xl font-bold text-ink-950 md:text-6xl">
               {isCaught ? "Pris dans l'encre" : "Fausse piste"}
             </div>
-            <p className="mt-2 text-sm text-ink-700">
+            <p className="mt-1 text-sm text-ink-700">
               {suspectPlayer
                 ? `${suspectPlayer.profile.name} etait au centre des soupcons.`
                 : "Le tour est termine."}
@@ -179,9 +178,8 @@ export function ResolutionShowcase({
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <div className="font-sketch text-4xl font-semibold leading-none text-ink-950">
-                Qui a vote pour qui
+                Votes
               </div>
-              <div className="mt-1 text-sm text-ink-500">Le seul moment ou toute l&apos;histoire se lit d&apos;un coup.</div>
             </div>
             {blankVoters.length ? (
               <div className="ink-chip text-xs text-ink-700">
@@ -235,7 +233,6 @@ export function ResolutionShowcase({
                   </div>
 
                   <div className="mt-3 rounded-[1.2rem] border border-[rgba(74,60,46,0.1)] bg-paper/70 px-3 py-2">
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-ink-500">Votes recus</div>
                     {voters.length ? (
                       <div className="mt-2 flex flex-col gap-1.5">
                         {voters.map((voter) => (

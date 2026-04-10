@@ -32,6 +32,7 @@ function PlayerBoardCardComponent({
   previewSize,
   isSelf = false,
   selectedVoteTargetId,
+  voteMarkers = [],
   onVote
 }: {
   phase: RoomView["phase"];
@@ -47,6 +48,7 @@ function PlayerBoardCardComponent({
   voters?: PlayerView[];
   revealedRole?: PlayerRole | null;
   pointsAwarded?: number;
+  voteMarkers?: PlayerView[];
   onVote: (targetPlayerId: string | null) => void;
 }) {
   const isVoteSelected = selectedVoteTargetId === player.id;
@@ -72,11 +74,30 @@ function PlayerBoardCardComponent({
         strokes={strokes}
         previewStroke={phase === "drawing" ? previewStroke : null}
         size={previewSize}
-        className="rounded-[1rem] bg-[#fbf7f0]"
+        className="rounded-[1rem]"
+        frameClassName={phase === "vote" ? "aspect-[4/3]" : "aspect-[5/4]"}
       />
 
+      {phase === "vote" ? (
+        <div className="min-h-[2.25rem] px-1">
+          {voteMarkers.length > 0 ? (
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              {voteMarkers.map((voter) => (
+                <div
+                  key={voter.id}
+                  className="inline-flex items-center gap-1 rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-2 py-1 text-[11px] text-ink-700"
+                >
+                  <span>{voter.profile.emoji}</span>
+                  <span className="max-w-[70px] truncate">{voter.profile.name}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="px-1 pb-0.5 text-center">
-        <div className="truncate font-sketch text-2xl font-semibold leading-none text-ink-950">
+        <div className="truncate font-sketch text-[1.9rem] font-semibold leading-none text-ink-950">
           {player.profile.name}
         </div>
       </div>

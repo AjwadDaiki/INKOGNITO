@@ -50,8 +50,8 @@ export function fullCols(n: number, mobile = false) {
 }
 
 export function previewSize(n: number) {
-  if (n <= 2) return 240;
-  if (n <= 4) return 200;
-  if (n <= 6) return 170;
-  return 150;
+  if (n <= 2) return 340;
+  if (n <= 4) return 300;
+  if (n <= 6) return 250;
+  return 210;
 }

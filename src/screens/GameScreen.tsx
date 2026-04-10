@@ -3,14 +3,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useGameStore } from "@/store/useGameStore";
 import type { DrawingStroke, PlayerView, ReactionEmoji, RoomView } from "@shared/protocol";
 import { PlayerBoardCard } from "@/components/game/PlayerBoardCard";
-import { GameTopBar } from "@/components/game/GameTopBar";
 import { DrawingPhase } from "@/components/game/DrawingPhase";
 import { ResolutionShowcase } from "@/components/game/ResolutionShowcase";
 import { PhaseSplash } from "@/components/game/PhaseSplash";
 import { fullCols, previewSize } from "@/components/game/gameHelpers";
 import { useIsMobile } from "@/lib/useIsMobile";
 import { Button } from "@/components/ui/Button";
-import { ChatPanel } from "@/components/ui/ChatPanel";
 import { CountdownPill } from "@/components/ui/CountdownPill";
 
 export function GameScreen({
@@ -38,8 +36,6 @@ export function GameScreen({
   onVote: (targetPlayerId: string | null) => void;
   onSubmitGuess: (guess: string) => void;
 }) {
-  const [chatOpen, setChatOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [pendingVote, setPendingVote] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const isMobile = useIsMobile();
@@ -65,9 +61,35 @@ export function GameScreen({
 
   const suspectPlayer =
     round.resolution?.suspectPlayerId ? playersById[round.resolution.suspectPlayerId] : null;
-  const cols = Math.max(1, fullCols(allConnected.length, isMobile));
+  const cols = room.phase === "vote"
+    ? isMobile
+      ? 1
+      : allConnected.length >= 8
+        ? 4
+        : allConnected.length >= 5
+          ? 3
+          : 2
+    : Math.max(1, fullCols(allConnected.length, isMobile));
   const smallSize = previewSize(otherPlayers.length);
   const fullSize = previewSize(allConnected.length);
+
+  const voteMarkersByTarget = useMemo(() => {
+    const map: Record<string, PlayerView[]> = {};
+    for (const [voterId, targetId] of Object.entries(round.liveVotes)) {
+      if (!targetId) continue;
+      const voter = playersById[voterId];
+      if (!voter) continue;
+      if (!map[targetId]) map[targetId] = [];
+      map[targetId].push(voter);
+    }
+    if (room.phase === "vote" && round.selfVote === null && pendingVote) {
+      if (!map[pendingVote]) map[pendingVote] = [];
+      if (!map[pendingVote].some((entry) => entry.id === selfPlayer.id)) {
+        map[pendingVote] = [...map[pendingVote], selfPlayer];
+      }
+    }
+    return map;
+  }, [pendingVote, playersById, room.phase, round.liveVotes, round.selfVote, selfPlayer]);
 
   useEffect(() => {
     setShowSplash(true);
@@ -75,12 +97,6 @@ export function GameScreen({
     const t = window.setTimeout(() => setShowSplash(false), 900);
     return () => window.clearTimeout(t);
   }, [room.phase]);
-
-  async function copyLink() {
-    await navigator.clipboard.writeText(`${window.location.origin}?room=${room.roomCode}`);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1400);
-  }
 
   function makeCard(player: PlayerView, size: number) {
     const isSelf = player.id === selfPlayer.id;
@@ -101,6 +117,7 @@ export function GameScreen({
         voters={[]}
         revealedRole={round.resolution?.revealedRoles[player.id]}
         pointsAwarded={round.resolution?.pointsAwarded[player.id]}
+        voteMarkers={room.phase === "vote" ? voteMarkersByTarget[player.id] ?? [] : []}
         onVote={
           isSelf
             ? () => {}
@@ -171,18 +188,6 @@ export function GameScreen({
 
   return (
     <div className="relative mx-auto flex h-[100svh] max-h-[100svh] w-full max-w-[1720px] flex-col gap-3 overflow-hidden p-3 md:p-4">
-      {room.phase === "drawing" ? (
-        <GameTopBar
-          room={room}
-          round={round}
-          selfPlayer={selfPlayer}
-          chatOpen={chatOpen}
-          copied={copied}
-          onToggleChat={() => setChatOpen((v) => !v)}
-          onCopyLink={copyLink}
-        />
-      ) : null}
-
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={room.phase}
@@ -227,22 +232,6 @@ export function GameScreen({
             </>
           )}
         </motion.div>
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {chatOpen ? (
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 18 }}
-            transition={{ duration: 0.18 }}
-            className="pointer-events-none fixed bottom-3 left-3 right-3 z-40 md:bottom-4 md:left-auto md:right-4 md:w-[360px]"
-          >
-            <div className="pointer-events-auto paper-sheet h-[340px] rounded-[1.7rem] p-4">
-              <ChatPanel title="Notes" players={room.players} messages={round.chat} onSend={onSendChat} />
-            </div>
-          </motion.div>
-        ) : null}
       </AnimatePresence>
 
       <PhaseSplash show={showSplash} phase={room.phase} />

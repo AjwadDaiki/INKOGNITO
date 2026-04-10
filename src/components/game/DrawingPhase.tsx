@@ -4,8 +4,6 @@ import type { DrawingStroke, PlayerView, RoomView, RoundView } from "@shared/pro
 import { DrawingCanvas } from "@/components/game/DrawingCanvas";
 import { CountdownPill } from "@/components/ui/CountdownPill";
 import { GlassPanel } from "@/components/ui/GlassPanel";
-import { drawingCols } from "./gameHelpers";
-
 export function DrawingPhase({
   room,
   round,
@@ -29,7 +27,7 @@ export function DrawingPhase({
 }) {
   const [showOthers, setShowOthers] = useState(false);
   const selfDrawing = round.drawings[selfPlayer.id];
-  const rCols = drawingCols(otherPlayers.length);
+  const cols = otherPlayers.length >= 8 ? 4 : otherPlayers.length >= 5 ? 3 : 2;
 
   const othersPanel = (
     <GlassPanel className="flex h-full min-h-0 flex-col gap-3 overflow-hidden rounded-[1.7rem] bg-paper/84 p-3">
@@ -42,7 +40,7 @@ export function DrawingPhase({
       <div className="scrollbar-thin flex-1 overflow-y-auto pr-1">
         <div
           className="grid gap-3 place-items-center"
-          style={{ gridTemplateColumns: `repeat(${rCols}, minmax(0, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(${Math.max(1, cols)}, minmax(0, 1fr))` }}
         >
           {otherPlayers.map((p) => renderCard(p))}
         </div>
@@ -52,7 +50,7 @@ export function DrawingPhase({
 
   return (
     <>
-      <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,1.18fr)_minmax(300px,0.82fr)]">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
         <GlassPanel className="flex h-full min-h-0 flex-col gap-3 rounded-[1.8rem] bg-paper/86 p-3 md:p-4">
           <div className="flex flex-wrap items-start justify-between gap-3 rounded-[1.5rem] border border-[rgba(74,60,46,0.1)] bg-paper px-4 py-3">
             <div>
@@ -84,8 +82,6 @@ export function DrawingPhase({
             />
           </div>
         </GlassPanel>
-
-        <div className="hidden min-h-0 lg:block">{othersPanel}</div>
       </div>
 
       <AnimatePresence>
@@ -94,7 +90,7 @@ export function DrawingPhase({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 flex bg-[rgba(26,20,16,0.28)] p-3 lg:hidden"
+            className="fixed inset-0 z-40 flex bg-[rgba(26,20,16,0.3)] p-3"
             onClick={() => setShowOthers(false)}
           >
             <motion.div
@@ -102,7 +98,7 @@ export function DrawingPhase({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 18 }}
               transition={{ type: "spring", stiffness: 260, damping: 24 }}
-              className="flex min-h-0 flex-1 flex-col"
+              className="ml-auto flex min-h-0 h-full w-full max-w-[980px] flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mb-2 flex items-center justify-between">

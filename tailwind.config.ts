@@ -5,31 +5,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Surfaces — warm cream/paper tones
         surface: {
-          DEFAULT: "#e8e0d4",
-          card: "#f0ebe3",
-          low: "#ece5db",
-          high: "#ddd5c9"
+          DEFAULT: "#d8cfc3",
+          card: "#ebe2d6",
+          low: "#e2d8ca",
+          high: "#cbbfae"
         },
-        // Paper — sketchbook whites
         paper: {
-          DEFAULT: "#faf6ef",
-          warm: "#f5efe5",
-          aged: "#ede6da"
+          DEFAULT: "#f5efe5",
+          warm: "#f1e8da",
+          aged: "#e6dbc8"
         },
-        // Primary — ink gold / sepia accent
         primary: {
           DEFAULT: "#D4A017",
-          light: "#FBF0C8",
+          light: "#f0dd9e",
           dark: "#8B6914"
         },
-        // Tertiary — ink red / vermillion
         tertiary: {
           DEFAULT: "#C43E2E",
-          light: "#FADED8"
+          light: "#f3d4cc"
         },
-        // Ink — text scale (true ink feel)
         ink: {
           950: "#1a1410",
           900: "#2c2318",
@@ -37,36 +32,21 @@ const config: Config = {
           500: "#7a6b5a",
           300: "#a89884",
           100: "#e0d6c8"
-        },
-        // Accent helpers
-        accent: {
-          sky: "#0EA5E9",
-          violet: "#7C3AED",
-          green: "#22C55E"
-        },
-        // Keep neon for game-state indicators
-        neon: {
-          violet: "#7B2FFF",
-          cyan: "#00B4D8",
-          rose: "#FF2D78",
-          green: "#00CC66"
         }
       },
       boxShadow: {
-        card: "0 3px 0 rgba(26,20,16,0.08), 0 8px 24px rgba(26,20,16,0.06)",
-        "card-hover": "0 5px 0 rgba(26,20,16,0.08), 0 12px 28px rgba(26,20,16,0.08)",
-        primary: "0 3px 0 rgba(139,105,20,0.35), 0 6px 18px rgba(212,160,23,0.3)",
-        tertiary: "0 4px 20px rgba(196,62,46,0.25)",
-        glow: "0 4px 24px rgba(26,20,16,0.12)",
-        cyan: "0 4px 20px rgba(14,165,233,0.2)",
-        rose: "0 4px 20px rgba(255,45,120,0.2)"
+        card: "0 2px 0 rgba(90,68,47,0.18), 0 10px 22px rgba(90,68,47,0.12)",
+        "card-hover": "0 3px 0 rgba(90,68,47,0.2), 0 16px 30px rgba(90,68,47,0.14)",
+        primary: "0 2px 0 rgba(139,105,20,0.32), 0 10px 18px rgba(139,105,20,0.16)",
+        tertiary: "0 2px 0 rgba(120,42,33,0.28), 0 12px 20px rgba(196,62,46,0.14)",
+        glow: "0 14px 30px rgba(90,68,47,0.14)"
       },
       borderRadius: {
         "4xl": "2rem",
         "5xl": "3rem"
       },
       fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
+        display: ["Caveat", "cursive"],
         sketch: ["Caveat", "cursive"],
         sans: ["Be Vietnam Pro", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"]

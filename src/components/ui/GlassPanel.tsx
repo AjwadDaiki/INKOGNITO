@@ -6,6 +6,6 @@ export function GlassPanel({
   className
 }: PropsWithChildren<{ className?: string }>) {
   return (
-    <section className={clsx("bento-card p-4 md:p-5", className)}>{children}</section>
+    <section className={clsx("paper-sheet p-4 md:p-5", className)}>{children}</section>
   );
 }

@@ -12,7 +12,6 @@ import { useIsMobile } from "@/lib/useIsMobile";
 import { Button } from "@/components/ui/Button";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { CountdownPill } from "@/components/ui/CountdownPill";
-import { GlassPanel } from "@/components/ui/GlassPanel";
 
 export function GameScreen({
   room,
@@ -49,6 +48,7 @@ export function GameScreen({
   const round = room.round;
   if (!round) return null;
   void onReaction;
+  void onReadyForNextPhase;
 
   const playersById = useMemo(
     () => Object.fromEntries(room.players.map((p) => [p.id, p])),
@@ -63,15 +63,11 @@ export function GameScreen({
     [room.players]
   );
 
-  const connectedCount = allConnected.length;
-  const votedPlayerIds = useMemo(() => new Set(round.votedPlayerIds), [round.votedPlayerIds]);
   const suspectPlayer =
     round.resolution?.suspectPlayerId ? playersById[round.resolution.suspectPlayerId] : null;
-
-  const fCols = Math.max(1, fullCols(allConnected.length, isMobile));
-  const fRows = Math.max(1, Math.ceil(allConnected.length / fCols));
-  const sSize = previewSize(otherPlayers.length);
-  const bSize = previewSize(allConnected.length);
+  const cols = Math.max(1, fullCols(allConnected.length, isMobile));
+  const smallSize = previewSize(otherPlayers.length);
+  const fullSize = previewSize(allConnected.length);
 
   useEffect(() => {
     setShowSplash(true);
@@ -86,23 +82,10 @@ export function GameScreen({
     window.setTimeout(() => setCopied(false), 1400);
   }
 
-  /* ── Compute voters per target from liveVotes ── */
-  const votersByTarget = useMemo(() => {
-    const map: Record<string, PlayerView[]> = {};
-    for (const [voterId, targetId] of Object.entries(round.liveVotes)) {
-      if (targetId) {
-        if (!map[targetId]) map[targetId] = [];
-        const voter = playersById[voterId];
-        if (voter) map[targetId].push(voter);
-      }
-    }
-    return map;
-  }, [round.liveVotes, playersById]);
-
-  /* ── Card factory ── */
   function makeCard(player: PlayerView, size: number) {
     const isSelf = player.id === selfPlayer.id;
     const displayVote = round.selfVote ?? pendingVote;
+
     return (
       <PlayerBoardCard
         key={player.id}
@@ -112,11 +95,10 @@ export function GameScreen({
         drawingUpdatedAt={round.drawings[player.id]?.lastUpdatedAt ?? null}
         previewStroke={livePreviews[player.id]}
         previewSize={size}
-        dense={room.players.length >= 7}
         isSelf={isSelf}
         selectedVoteTargetId={displayVote}
-        hasVoted={votedPlayerIds.has(player.id)}
-        voters={votersByTarget[player.id] ?? []}
+        hasVoted={round.votedPlayerIds.includes(player.id)}
+        voters={[]}
         revealedRole={round.resolution?.revealedRoles[player.id]}
         pointsAwarded={round.resolution?.pointsAwarded[player.id]}
         onVote={
@@ -130,102 +112,66 @@ export function GameScreen({
     );
   }
 
-  /* ── Vote bar (bottom) — includes timer + round info ── */
   function renderVoteBar() {
     if (room.phase !== "vote") return null;
+
     const hasVoted = round.selfVote !== null;
     const voteCount = round.votedPlayerIds.length;
+    const selectedPlayer = pendingVote ? playersById[pendingVote] : null;
+    const castPlayer = round.selfVote ? playersById[round.selfVote] : null;
 
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 400, damping: 24 }}
-        className="shrink-0 rounded-[18px] bg-surface-card/90 px-3 py-2 shadow-[0_-4px_20px_rgba(26,20,16,0.08)] backdrop-blur-md"
+        className="paper-sheet desk-shadow shrink-0 rounded-[1.6rem] px-4 py-3"
       >
-        <div className="flex items-center gap-2">
-          {/* Round + Timer */}
-          <span className="shrink-0 text-[10px] font-bold text-ink-400">R{round.roundNumber}/{room.totalRounds}</span>
-          {room.phaseEndsAt && <CountdownPill endsAt={room.phaseEndsAt} />}
-
-          {/* Vote progress */}
-          <motion.div
-            key={voteCount}
-            initial={{ scale: 1.2 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 16 }}
-            className="shrink-0 rounded-full bg-surface-low px-2.5 py-1 text-xs font-extrabold text-ink-950"
-          >
-            {voteCount}/{connectedCount}
-          </motion.div>
-
-          {/* Vote status */}
-          <div className="flex flex-1 items-center justify-center">
-            <AnimatePresence mode="wait">
-              {hasVoted ? (
-                <motion.div
-                  key="voted"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-1.5"
-                >
-                  <span className="text-xs font-bold text-ink-950">
-                    {playersById[round.selfVote!]?.profile.emoji}{" "}
-                    {playersById[round.selfVote!]?.profile.name ?? "Blanc"} ✓
-                  </span>
-                </motion.div>
-              ) : pendingVote ? (
-                <motion.div
-                  key="confirm"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  className="flex items-center gap-2"
-                >
-                  <span className="text-xs text-ink-700">
-                    <strong className="text-ink-950">
-                      {playersById[pendingVote]?.profile.emoji} {playersById[pendingVote]?.profile.name}
-                    </strong>{" "}?
-                  </span>
-                  <Button onClick={() => onVote(pendingVote)} className="min-h-7 px-3 text-[11px]">
-                    OK
-                  </Button>
-                  <Button tone="ghost" onClick={() => setPendingVote(null)} className="min-h-7 px-2 text-[11px]">
-                    ✕
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.span
-                  key="prompt"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-xs text-ink-500"
-                >
-                  Clique sur un joueur
-                </motion.span>
-              )}
-            </AnimatePresence>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-sketch text-3xl font-semibold leading-none text-ink-950">
+              Vote
+            </span>
+            {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
+            <span className="ink-chip text-xs font-semibold text-ink-700">
+              {voteCount}/{allConnected.length}
+            </span>
           </div>
 
-          {/* Blank vote */}
-          {!hasVoted && (
-            <Button tone="ghost" onClick={() => onVote(null)} className="shrink-0 min-h-7 px-2 text-[10px] text-ink-400">
-              Blanc
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {hasVoted ? (
+              <span className="font-sketch text-2xl text-ink-700">
+                Vote pose sur {castPlayer?.profile.name ?? "blanc"}
+              </span>
+            ) : selectedPlayer ? (
+              <>
+                <span className="font-sketch text-2xl text-ink-700">
+                  Voter pour {selectedPlayer.profile.name} ?
+                </span>
+                <Button onClick={() => onVote(pendingVote)}>Confirmer</Button>
+                <Button tone="ghost" onClick={() => setPendingVote(null)}>
+                  Annuler
+                </Button>
+              </>
+            ) : (
+              <span className="font-sketch text-2xl text-ink-700">
+                Choisis un dessin
+              </span>
+            )}
+
+            {!hasVoted ? (
+              <Button tone="secondary" onClick={() => onVote(null)}>
+                Vote blanc
+              </Button>
+            ) : null}
+          </div>
         </div>
       </motion.div>
     );
   }
 
-
   return (
-    <div className="relative mx-auto flex h-[100svh] max-h-[100svh] w-full max-w-[1720px] flex-col gap-2 overflow-hidden p-2.5 md:p-3">
-
-      {/* Top bar — only during drawing phase (vote has its own bar, resolution has its own layout) */}
-      {room.phase === "drawing" && (
+    <div className="relative mx-auto flex h-[100svh] max-h-[100svh] w-full max-w-[1720px] flex-col gap-3 overflow-hidden p-3 md:p-4">
+      {room.phase === "drawing" ? (
         <GameTopBar
           room={room}
           round={round}
@@ -235,9 +181,8 @@ export function GameScreen({
           onToggleChat={() => setChatOpen((v) => !v)}
           onCopyLink={copyLink}
         />
-      )}
+      ) : null}
 
-      {/* Main content */}
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={room.phase}
@@ -245,7 +190,7 @@ export function GameScreen({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="flex min-h-0 flex-1 flex-col gap-2"
+          className="flex min-h-0 flex-1 flex-col gap-3"
         >
           {room.phase === "drawing" ? (
             <DrawingPhase
@@ -257,7 +202,7 @@ export function GameScreen({
               onCommit={onCommit}
               onUndo={onUndo}
               onClear={onClear}
-              renderCard={(p) => makeCard(p, sSize)}
+              renderCard={(p) => makeCard(p, smallSize)}
             />
           ) : room.phase === "resolution" ? (
             <ResolutionShowcase
@@ -270,40 +215,34 @@ export function GameScreen({
             />
           ) : (
             <>
-              {/* Player grid — vote phase */}
-              <GlassPanel className="min-h-0 flex-1 overflow-auto p-2">
+              <div className="paper-sheet min-h-0 flex-1 overflow-auto rounded-[1.9rem] px-3 py-4 md:px-4">
                 <div
-                  className="grid gap-2 place-items-center"
-                  style={{
-                    gridTemplateColumns: `repeat(${fCols}, minmax(0, 1fr))`
-                  }}
+                  className="grid gap-4 place-items-center"
+                  style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
                 >
-                  {allConnected.map((p) => makeCard(p, bSize))}
+                  {allConnected.map((player) => makeCard(player, fullSize))}
                 </div>
-              </GlassPanel>
-
-              {/* Vote bar */}
+              </div>
               {renderVoteBar()}
             </>
           )}
         </motion.div>
       </AnimatePresence>
 
-      {/* Chat overlay */}
       <AnimatePresence>
-        {chatOpen && (
+        {chatOpen ? (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="pointer-events-none fixed bottom-3 left-3 right-3 z-40 md:bottom-4 md:left-auto md:right-4 md:w-[340px]"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 18 }}
+            transition={{ duration: 0.18 }}
+            className="pointer-events-none fixed bottom-3 left-3 right-3 z-40 md:bottom-4 md:left-auto md:right-4 md:w-[360px]"
           >
-            <div className="pointer-events-auto bento-card h-[320px] p-3 md:h-[360px] md:p-4">
-              <ChatPanel title="Chat" players={room.players} messages={round.chat} onSend={onSendChat} />
+            <div className="pointer-events-auto paper-sheet h-[340px] rounded-[1.7rem] p-4">
+              <ChatPanel title="Notes" players={room.players} messages={round.chat} onSend={onSendChat} />
             </div>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
 
       <PhaseSplash show={showSplash} phase={room.phase} />

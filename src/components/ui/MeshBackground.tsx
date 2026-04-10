@@ -6,10 +6,10 @@ import { InkSplatter } from "./InkSplatter";
 export function MeshBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-      <InkSplatter variant={0} className="left-[8%] top-[5%]" size={320} opacity={0.035} animate />
-      <InkSplatter variant={1} className="-bottom-12 -right-8" size={280} opacity={0.04} animate />
-      <InkSplatter variant={2} className="left-[50%] top-[40%]" size={200} opacity={0.025} animate />
-      <InkSplatter variant={3} className="-left-10 bottom-[20%]" size={240} opacity={0.03} animate />
+      <InkSplatter variant={0} className="-left-8 top-0" size={360} opacity={0.09} animate />
+      <InkSplatter variant={1} className="-right-10 bottom-0" size={320} opacity={0.1} animate />
+      <InkSplatter variant={2} className="right-[18%] top-[8%]" size={150} opacity={0.05} animate />
+      <InkSplatter variant={3} className="left-[18%] bottom-[10%]" size={170} opacity={0.045} animate />
     </div>
   );
 }

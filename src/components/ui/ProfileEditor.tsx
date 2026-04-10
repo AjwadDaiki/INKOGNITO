@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AVATAR_COLORS, AVATAR_EMOJIS } from "@shared/constants";
 import type { PlayerProfile } from "@shared/protocol";
 
-/* ── Emoji Carousel ── */
 function EmojiCarousel({
   value,
   onChange
@@ -18,63 +17,47 @@ function EmojiCarousel({
     onChange(list[next]);
   }
 
-  // 5 visible: [-2, -1, 0, +1, +2]
-  const slots = [-2, -1, 0, 1, 2].map((offset) => ({
+  const slots = [-1, 0, 1].map((offset) => ({
     emoji: list[(idx + offset + list.length) % list.length],
     offset
   }));
 
-  const sizeMap: Record<number, string> = {
-    [-2]: "text-xl opacity-25 scale-75",
-    [-1]: "text-2xl opacity-55 scale-90",
-    [0]: "text-4xl opacity-100 scale-100",
-    [1]: "text-2xl opacity-55 scale-90",
-    [2]: "text-xl opacity-25 scale-75"
-  };
-
   return (
     <div className="flex items-center gap-2">
-      {/* Arrow gauche */}
       <button
         type="button"
         onClick={() => move(-1)}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-low text-lg font-bold text-ink-700 transition hover:bg-surface-high active:scale-90"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(74,60,46,0.16)] bg-paper text-lg text-ink-700 transition hover:bg-paper-warm"
       >
         ‹
       </button>
-
-      {/* Track */}
-      <div className="relative flex h-14 flex-1 items-center justify-center overflow-hidden rounded-2xl">
-        <div className="flex items-center justify-center gap-1">
-          <AnimatePresence mode="popLayout" initial={false}>
-            {slots.map(({ emoji, offset }) => (
-              <motion.button
-                key={`${offset}-${emoji}`}
-                type="button"
-                layout
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.7 }}
-                transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                onClick={() => onChange(emoji)}
-                className={`flex items-center justify-center rounded-2xl transition ${sizeMap[offset]} ${
-                  offset === 0
-                    ? "h-12 w-12 bg-primary-light shadow-primary"
-                    : "h-9 w-9"
-                }`}
-              >
-                {emoji}
-              </motion.button>
-            ))}
-          </AnimatePresence>
-        </div>
+      <div className="flex flex-1 items-center justify-center gap-2">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {slots.map(({ emoji, offset }) => (
+            <motion.button
+              key={`${offset}-${emoji}`}
+              type="button"
+              layout
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: offset === 0 ? 1 : 0.5, scale: offset === 0 ? 1 : 0.82 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              transition={{ type: "spring", stiffness: 360, damping: 22 }}
+              onClick={() => onChange(emoji)}
+              className={`flex items-center justify-center rounded-full ${
+                offset === 0
+                  ? "h-12 w-12 border border-[rgba(74,60,46,0.16)] bg-paper shadow-card"
+                  : "h-10 w-10"
+              } text-2xl`}
+            >
+              {emoji}
+            </motion.button>
+          ))}
+        </AnimatePresence>
       </div>
-
-      {/* Arrow droite */}
       <button
         type="button"
         onClick={() => move(1)}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-low text-lg font-bold text-ink-700 transition hover:bg-surface-high active:scale-90"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(74,60,46,0.16)] bg-paper text-lg text-ink-700 transition hover:bg-paper-warm"
       >
         ›
       </button>
@@ -82,7 +65,6 @@ function EmojiCarousel({
   );
 }
 
-/* ── Color Dots ── */
 function ColorDots({
   value,
   onChange
@@ -91,24 +73,20 @@ function ColorDots({
   onChange: (color: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2.5">
+    <div className="flex flex-wrap gap-2">
       {AVATAR_COLORS.map((color) => {
         const active = value === color;
         return (
           <motion.button
             key={color}
             type="button"
-            whileTap={{ scale: 0.85 }}
-            whileHover={{ scale: 1.15 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => onChange(color)}
-            className="h-9 w-9 rounded-full border-[3px] transition-all"
+            className="h-8 w-8 rounded-full border-2 transition-all"
             style={{
               backgroundColor: color,
-              borderColor: active ? "#1a1410" : "transparent",
-              boxShadow: active
-                ? `0 0 0 2px white, 0 0 0 4px ${color}`
-                : "none"
+              borderColor: active ? "#1a1410" : "rgba(255,255,255,0.55)",
+              boxShadow: active ? "0 0 0 2px rgba(26,20,16,0.12)" : "none"
             }}
             aria-label={`Couleur ${color}`}
           />
@@ -118,7 +96,6 @@ function ColorDots({
   );
 }
 
-/* ── ProfileEditor ── */
 export function ProfileEditor({
   profile,
   onChange,
@@ -132,54 +109,41 @@ export function ProfileEditor({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      {/* Nom + preview avatar */}
       <div className="flex items-center gap-3">
-        {/* Avatar preview */}
         <motion.div
           layout
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          transition={{ type: "spring", stiffness: 400, damping: 18 }}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-3xl"
-          style={{
-            background: `linear-gradient(160deg,${profile.color}44,${profile.color}18)`,
-            boxShadow: `0 3px 10px ${profile.color}35`
-          }}
+          transition={{ type: "spring", stiffness: 340, damping: 20 }}
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[rgba(74,60,46,0.14)] bg-paper text-3xl shadow-card"
+          style={{ boxShadow: `0 2px 0 rgba(90,68,47,0.18), 0 10px 22px ${profile.color}18` }}
         >
           {profile.emoji}
         </motion.div>
-        {/* Nom */}
         <input
           value={profile.name}
           onChange={(e) => onChange({ name: e.target.value })}
           placeholder="Ton pseudo..."
-          className="min-h-11 flex-1 rounded-2xl bg-surface-low px-4 text-sm font-semibold text-ink-950 outline-none transition placeholder:font-normal placeholder:text-ink-300 focus:bg-surface-high"
+          className="min-h-11 flex-1 rounded-[1.15rem] px-4 text-sm font-medium text-ink-950 outline-none placeholder:text-ink-300"
         />
       </div>
 
-      {/* Emoji carousel */}
       <div>
-        {!compact && (
-          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-ink-500">
-            Emoji
-          </div>
-        )}
+        {!compact ? (
+          <div className="mb-2 font-sketch text-lg font-semibold text-ink-700">Avatar</div>
+        ) : null}
         <EmojiCarousel
           value={profile.emoji}
           onChange={(emoji) => onChange({ emoji: emoji as typeof profile.emoji })}
         />
       </div>
 
-      {/* Color dots */}
-      {!hideColor && (
+      {!hideColor ? (
         <div>
-          {!compact && (
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-ink-500">
-              Couleur
-            </div>
-          )}
+          {!compact ? (
+            <div className="mb-2 font-sketch text-lg font-semibold text-ink-700">Encre</div>
+          ) : null}
           <ColorDots value={profile.color} onChange={(color) => onChange({ color })} />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

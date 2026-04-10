@@ -31,7 +31,7 @@ export function CodeInput({
               .slice(0, 6);
             onChange(pasted);
           }}
-          className="h-14 rounded-2xl border border-white/10 bg-white/5 text-center font-mono text-xl uppercase text-white outline-none transition focus:border-neon-cyan/50 focus:bg-white/10"
+          className="h-14 rounded-[1.2rem] border border-[rgba(74,60,46,0.14)] bg-paper text-center font-mono text-xl uppercase text-ink-950 outline-none transition focus:bg-paper-warm"
         />
       ))}
     </div>

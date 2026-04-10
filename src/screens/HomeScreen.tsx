@@ -36,135 +36,83 @@ export function HomeScreen({
   const normalizedRoomCode = extractRoomCode(accessValue);
 
   return (
-    <div className="relative flex h-[100svh] flex-col items-center justify-center overflow-hidden p-4">
-      {/* Ink splatters instead of gradient orbs */}
-      <InkSplatter variant={0} className="left-[5%] top-[10%]" size={200} opacity={0.04} />
-      <InkSplatter variant={1} className="bottom-[8%] right-[6%]" size={180} opacity={0.05} />
-      <InkSplatter variant={2} className="left-[55%] top-[65%]" size={120} opacity={0.03} />
-      <InkSplatter variant={3} className="right-[40%] top-[5%]" size={90} opacity={0.04} />
+    <div className="relative flex h-[100svh] items-center justify-center overflow-hidden p-4 md:p-6">
+      <InkSplatter variant={0} className="left-[4%] top-[4%]" size={220} opacity={0.08} />
+      <InkSplatter variant={1} className="bottom-[4%] right-[4%]" size={210} opacity={0.09} />
 
-      {/* Title — Ink identity */}
       <motion.div
-        initial={{ opacity: 0, y: -30, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="relative mb-5 text-center"
+        initial={{ opacity: 0, y: 28, rotate: -1.4 }}
+        animate={{ opacity: 1, y: 0, rotate: -0.8 }}
+        transition={{ type: "spring", stiffness: 180, damping: 20 }}
+        className="paper-sheet notebook-page desk-shadow relative w-full max-w-2xl overflow-hidden px-6 py-7 md:px-10 md:py-9"
       >
-        <motion.h1
-          className="font-display text-6xl font-extrabold tracking-[-0.04em] md:text-8xl"
-        >
-          <span className="text-ink-drip">INK</span>
-          <span className="text-gradient-gold">OGNITO</span>
-        </motion.h1>
-        <motion.span
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.25, type: "spring", stiffness: 400, damping: 20 }}
-          className="ml-2 inline-block rounded-full bg-primary/20 px-2 py-0.5 align-top font-sketch text-xs font-bold text-primary-dark"
-        >
-          v2
-        </motion.span>
-        {/* Ink drip under the title */}
-        <motion.div
-          initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-1 h-[3px] w-32 origin-left rounded-full bg-gradient-to-r from-ink-950 via-ink-700 to-transparent"
-        />
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 22 }}
-          className="mt-2 font-sketch text-lg font-medium text-ink-500"
-        >
-          Dessine. Bluffe. Demasque.
-        </motion.p>
-      </motion.div>
+        <div className="absolute inset-x-0 top-0 h-10 bg-[linear-gradient(180deg,rgba(90,68,47,0.08),transparent)]" />
 
-      {/* Main card — sketchbook page */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.15, type: "spring", stiffness: 250, damping: 22 }}
-        className="bento-card relative w-full max-w-lg p-5"
-      >
-        {/* Decorative corner ink spots */}
-        <div className="ink-spot -left-2 -top-2 h-6 w-6 rounded-full bg-ink-950" />
-        <div className="ink-spot -bottom-1 -right-2 h-4 w-4 rounded-full bg-ink-700" />
-
-        <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
-
-        <div className="mt-4 flex flex-col gap-3">
-          <motion.input
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 350, damping: 24 }}
-            value={accessValue}
-            onChange={(e) => setAccessValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
-                onJoin(normalizedRoomCode);
-              }
-            }}
-            placeholder="Code ou lien d'invitation..."
-            className="min-h-11 w-full rounded-2xl bg-surface-low px-4 text-sm text-ink-950 outline-none transition placeholder:text-ink-300 focus:bg-surface-high focus:ring-2 focus:ring-primary/30"
-          />
-
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, type: "spring", stiffness: 300, damping: 22 }}
-            className="grid grid-cols-2 gap-2"
-          >
-            <Button fullWidth onClick={onCreate} disabled={loading}>
-              {loading ? "..." : "Creer une salle"}
-            </Button>
-            <Button
-              fullWidth
-              tone="secondary"
-              onClick={() => onJoin(normalizedRoomCode)}
-              disabled={normalizedRoomCode.length < 6 || loading}
+        <div className="pl-7 md:pl-10">
+          <div className="text-center">
+            <motion.h1
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08, duration: 0.35 }}
+              className="font-sketch text-6xl font-bold leading-none text-ink-950 md:text-8xl"
             >
-              Rejoindre
-            </Button>
-          </motion.div>
+              Inkognito
+            </motion.h1>
+            <p className="mt-2 font-sketch text-2xl text-ink-700 md:text-3xl">
+              Carnet de croquis tache d&apos;encre
+            </p>
+          </div>
 
-          {error ? (
-            <motion.div
-              initial={{ opacity: 0, y: 6, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="rounded-2xl bg-tertiary-light px-4 py-3 text-sm font-medium text-tertiary"
-            >
-              {error}
-            </motion.div>
-          ) : null}
+          <div className="paper-divider my-6" />
+
+          <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-4">
+              <div>
+                <div className="mb-2 font-sketch text-2xl font-semibold text-ink-900">
+                  Entrer dans la partie
+                </div>
+                <input
+                  value={accessValue}
+                  onChange={(e) => setAccessValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
+                      onJoin(normalizedRoomCode);
+                    }
+                  }}
+                  placeholder="Code ou lien d'invitation"
+                  className="min-h-12 w-full rounded-[1.2rem] px-4 text-sm text-ink-950 outline-none placeholder:text-ink-300"
+                />
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button onClick={onCreate} disabled={loading} fullWidth>
+                  {loading ? "..." : "Creer une salle"}
+                </Button>
+                <Button
+                  tone="secondary"
+                  onClick={() => onJoin(normalizedRoomCode)}
+                  disabled={normalizedRoomCode.length < 6 || loading}
+                  fullWidth
+                >
+                  Rejoindre
+                </Button>
+              </div>
+
+              {error ? (
+                <div className="rounded-[1.2rem] border border-[rgba(120,42,33,0.16)] bg-tertiary-light px-4 py-3 text-sm font-medium text-tertiary">
+                  {error}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="rounded-[1.6rem] border border-[rgba(74,60,46,0.12)] bg-paper/80 px-4 py-4">
+              <div className="mb-3 font-sketch text-2xl font-semibold text-ink-900">
+                Ta page
+              </div>
+              <ProfileEditor profile={profile} onChange={onProfileChange} compact />
+            </div>
+          </div>
         </div>
-
-        {/* Rules — sketchbook style with handwritten font */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, type: "spring", stiffness: 280, damping: 22 }}
-          className="mt-4 grid grid-cols-3 gap-2 text-center"
-        >
-          {[
-            { emoji: "🎨", label: "Dessine" },
-            { emoji: "🕵️", label: "Trouve l'intrus" },
-            { emoji: "🗳️", label: "Vote" }
-          ].map((item, i) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, scale: 0.8, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 0.55 + i * 0.08, type: "spring", stiffness: 350, damping: 20 }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              className="overflow-hidden rounded-xl border border-ink-100/60 bg-paper-warm px-2 py-2.5"
-            >
-              <div className="text-base leading-none">{item.emoji}</div>
-              <div className="mt-1.5 font-sketch text-sm font-semibold text-ink-700">{item.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
       </motion.div>
     </div>
   );

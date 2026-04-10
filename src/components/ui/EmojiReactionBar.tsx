@@ -13,7 +13,7 @@ export function EmojiReactionBar({
           key={emoji}
           type="button"
           onClick={() => onReact(emoji)}
-          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-lg transition hover:border-neon-cyan/40 hover:bg-white/10"
+          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper text-lg transition hover:bg-paper-warm"
         >
           {emoji}
         </button>

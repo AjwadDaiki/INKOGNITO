@@ -19,24 +19,20 @@ export function Button({
 }: ButtonProps) {
   return (
     <motion.button
-      whileTap={disabled ? {} : { scale: 0.95 }}
-      whileHover={disabled ? {} : { scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      whileTap={disabled ? {} : { scale: 0.97, y: 1 }}
+      whileHover={disabled ? {} : { y: -1 }}
+      transition={{ type: "spring", stiffness: 420, damping: 24 }}
       disabled={disabled}
       className={clsx(
-        // Base: min 44 px height (touch target A11y), extreme rounding
-        "inline-flex min-h-11 items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40",
-        // Primary — sun-drenched gold gradient + cartoon bottom shadow
+        "inline-flex min-h-11 items-center justify-center rounded-[1.15rem] border px-5 py-2.5 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45",
         tone === "primary" &&
-          "bg-gradient-to-br from-primary to-[#C49000] text-paper shadow-primary border border-[rgba(139,105,20,0.2)] active:translate-y-[2px] active:shadow-none",
-        // Secondary — surface tinted + cartoon shadow
+          "border-ink-950 bg-ink-950 text-paper shadow-card hover:bg-ink-900",
         tone === "secondary" &&
-          "bg-surface-low text-ink-950 hover:bg-surface-high border border-[rgba(15,23,42,0.08)] shadow-[0_3px_0_rgba(15,23,42,0.09)] active:translate-y-[2px] active:shadow-none",
-        // Ghost
-        tone === "ghost" && "text-ink-700 hover:bg-surface-low",
-        // Danger — coral light + cartoon shadow
+          "border-[rgba(74,60,46,0.16)] bg-paper text-ink-950 shadow-card hover:bg-paper-warm",
+        tone === "ghost" &&
+          "border-transparent bg-transparent text-ink-700 hover:bg-[rgba(74,60,46,0.08)]",
         tone === "danger" &&
-          "bg-tertiary-light text-tertiary hover:bg-[#ffd4d0] border border-[rgba(255,92,77,0.18)] shadow-[0_3px_0_rgba(255,92,77,0.18)] active:translate-y-[2px] active:shadow-none",
+          "border-[rgba(120,42,33,0.24)] bg-tertiary text-paper shadow-tertiary hover:bg-[#aa3628]",
         fullWidth && "w-full",
         className
       )}

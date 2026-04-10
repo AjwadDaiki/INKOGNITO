@@ -233,7 +233,7 @@ export class RoomManager {
     const located = this.findPlayer(payload.roomCode, payload.clientId);
     if (!located) return;
     const { room, player } = located;
-    if (room.phase !== "lobby") {
+    if (room.phase !== "lobby" || room.hostId !== player.id) {
       return;
     }
     room.settings = clampSettings({
@@ -259,10 +259,12 @@ export class RoomManager {
     const located = this.findPlayer(payload.roomCode, payload.clientId);
     if (!located) return;
     const { room, player } = located;
-    if (room.phase !== "lobby") {
+    if (room.phase !== "lobby" || room.hostId !== player.id) {
       return;
     }
 
+    // Host clicking "Lancer" counts as ready
+    player.ready = true;
     const connectedPlayers = room.players.filter((entry) => entry.connected);
     const readyCount = connectedPlayers.filter((entry) => entry.ready).length;
     if (connectedPlayers.length < MIN_PLAYERS) {

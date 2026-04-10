@@ -75,25 +75,8 @@ export function LobbyScreen({
     ? room.settings.selectedCategories
     : ["Tout"];
   const visibleCategories = useMemo(() => {
-    const preferredOrder = [
-      "Animaux",
-      "Objets",
-      "Nourriture",
-      "Lieux",
-      "Sports",
-      "Métiers",
-      "Jeux vidéo",
-      "Manga / Anime",
-      "Cinéma / Séries",
-      "Dessins animés"
-    ];
-    const selectedVisible = selectedCategories.filter(
-      (category) => category !== "Tout" && WORD_CATEGORIES.includes(category)
-    );
-    return [...new Set([...selectedVisible, ...preferredOrder, ...WORD_CATEGORIES])]
-      .filter((category) => category !== "Tout")
-      .slice(0, 10);
-  }, [selectedCategories]);
+    return WORD_CATEGORIES.filter((category) => category !== "Tout").slice(0, 10);
+  }, []);
 
   async function copyRoomCode() {
     await navigator.clipboard.writeText(room.roomCode);
@@ -160,9 +143,11 @@ export function LobbyScreen({
               <Button tone={selfPlayer.ready ? "secondary" : "primary"} onClick={onToggleReady}>
                 {selfPlayer.ready ? "Annuler" : "Je suis pret"}
               </Button>
-              <Button onClick={onStartGame} disabled={!canLaunch}>
-                Lancer
-              </Button>
+              {selfPlayer.isHost ? (
+                <Button onClick={onStartGame} disabled={!everyoneReady}>
+                  Lancer
+                </Button>
+              ) : null}
             </div>
           </div>
 
@@ -212,7 +197,7 @@ export function LobbyScreen({
                 <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">
                   Regles de la manche
                 </div>
-                <div className="grid gap-3 md:grid-cols-2">
+                <div className={`grid gap-3 md:grid-cols-2${selfPlayer.isHost ? "" : " pointer-events-none opacity-50"}`}>
                   <div>
                     <div className="mb-2 text-xs uppercase tracking-[0.18em] text-ink-500">Mode</div>
                     <PillGroup
@@ -253,6 +238,9 @@ export function LobbyScreen({
                     />
                   </div>
                 </div>
+                {!selfPlayer.isHost ? (
+                  <div className="mt-2 text-[10px] text-ink-400">Seul l'hôte peut modifier les règles</div>
+                ) : null}
               </div>
 
               <div className="rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/84 px-4 py-4 md:px-5">
@@ -267,7 +255,7 @@ export function LobbyScreen({
                 <div className="mb-3 text-xs uppercase tracking-[0.18em] text-ink-500">
                   Selection rapide
                 </div>
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className={`grid gap-2 sm:grid-cols-2${selfPlayer.isHost ? "" : " pointer-events-none opacity-50"}`}>
                   <button
                     type="button"
                     aria-pressed={selectedCategories.includes("Tout")}

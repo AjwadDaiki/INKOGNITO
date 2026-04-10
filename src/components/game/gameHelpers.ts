@@ -10,8 +10,8 @@ export function phaseBg(phase: RoomView["phase"]) {
 export function phaseLabel(phase: RoomView["phase"]) {
   if (phase === "drawing") return "Croquis";
   if (phase === "gallery") return "Pages";
-  if (phase === "vote") return "Soupcon";
-  if (phase === "resolution") return "Reveal";
+  if (phase === "vote") return "Vote";
+  if (phase === "resolution") return "Revelation";
   return phase;
 }
 
@@ -30,14 +30,12 @@ export function roleBadge(role: PlayerRole | null | undefined) {
   return null;
 }
 
-/** Grid cols for right panel (drawing phase — others only) */
 export function drawingCols(n: number) {
   if (n <= 1) return 1;
   if (n <= 4) return 2;
   return 3;
 }
 
-/** Grid cols for full-width (non-drawing — all players) */
 export function fullCols(n: number, mobile = false) {
   if (mobile) {
     if (n <= 2) return n;

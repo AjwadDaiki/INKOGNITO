@@ -45,31 +45,34 @@ export function GameScreen({
   if (!round) return null;
   void onReaction;
   void onReadyForNextPhase;
+  void onSendChat;
 
   const playersById = useMemo(
-    () => Object.fromEntries(room.players.map((p) => [p.id, p])),
+    () => Object.fromEntries(room.players.map((player) => [player.id, player])),
     [room.players]
   );
   const otherPlayers = useMemo(
-    () => room.players.filter((p) => p.id !== selfPlayer.id),
+    () => room.players.filter((player) => player.id !== selfPlayer.id),
     [room.players, selfPlayer.id]
   );
   const allConnected = useMemo(
-    () => room.players.filter((p) => p.connected),
+    () => room.players.filter((player) => player.connected),
     [room.players]
   );
 
   const suspectPlayer =
     round.resolution?.suspectPlayerId ? playersById[round.resolution.suspectPlayerId] : null;
-  const cols = room.phase === "vote"
-    ? isMobile
-      ? 1
-      : allConnected.length >= 8
-        ? 4
-        : allConnected.length >= 5
-          ? 3
-          : 2
-    : Math.max(1, fullCols(allConnected.length, isMobile));
+
+  const cols =
+    room.phase === "vote"
+      ? isMobile
+        ? 1
+        : allConnected.length >= 8
+          ? 4
+          : allConnected.length >= 5
+            ? 3
+            : 2
+      : Math.max(1, fullCols(allConnected.length, isMobile));
   const smallSize = previewSize(otherPlayers.length);
   const fullSize = previewSize(allConnected.length);
 
@@ -94,8 +97,8 @@ export function GameScreen({
   useEffect(() => {
     setShowSplash(true);
     setPendingVote(null);
-    const t = window.setTimeout(() => setShowSplash(false), 900);
-    return () => window.clearTimeout(t);
+    const timeoutId = window.setTimeout(() => setShowSplash(false), 900);
+    return () => window.clearTimeout(timeoutId);
   }, [room.phase]);
 
   function makeCard(player: PlayerView, size: number) {
@@ -122,7 +125,7 @@ export function GameScreen({
           isSelf
             ? () => {}
             : room.phase === "vote" && round.selfVote === null
-              ? (id) => setPendingVote(id)
+              ? (targetId) => setPendingVote(targetId)
               : onVote
         }
       />
@@ -141,39 +144,47 @@ export function GameScreen({
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        className="paper-sheet desk-shadow shrink-0 rounded-[1.6rem] px-4 py-3"
+        className="paper-sheet notebook-page desk-shadow shrink-0 rounded-[1.8rem] px-4 py-3 md:px-5"
       >
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="pl-7 md:pl-8">
+            <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
+              Vote en cours
+            </div>
+            <div className="mt-1 font-sketch text-4xl font-semibold leading-none text-ink-950 md:text-5xl">
+              {hasVoted
+                ? `Vote pose sur ${castPlayer?.profile.name ?? "blanc"}`
+                : selectedPlayer
+                  ? `${selfPlayer.profile.emoji} ${selectedPlayer.profile.name}`
+                  : "Choisis une page"}
+            </div>
+            <div className="mt-1 text-sm text-ink-600">
+              {hasVoted
+                ? "Ton marqueur reste visible jusqu'a la revelation."
+                : selectedPlayer
+                  ? "Confirme pour verrouiller ton vote."
+                  : "Tape un dessin pour y poser ton marqueur."}
+            </div>
+          </div>
+
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-sketch text-3xl font-semibold leading-none text-ink-950">
-              Vote
-            </span>
             {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
             <span className="ink-chip text-xs font-semibold text-ink-700">
               {voteCount}/{allConnected.length}
             </span>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-2">
             {hasVoted ? (
-              <span className="font-sketch text-2xl text-ink-700">
-                Vote pose sur {castPlayer?.profile.name ?? "blanc"}
+              <span className="inline-flex items-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-4 py-2 text-sm font-semibold text-ink-700">
+                Vote valide
               </span>
             ) : selectedPlayer ? (
               <>
-                <span className="font-sketch text-2xl text-ink-700">
-                  Voter pour {selectedPlayer.profile.name} ?
-                </span>
                 <Button onClick={() => onVote(pendingVote)}>Confirmer</Button>
                 <Button tone="ghost" onClick={() => setPendingVote(null)}>
                   Annuler
                 </Button>
               </>
-            ) : (
-              <span className="font-sketch text-2xl text-ink-700">
-                Choisis un dessin
-              </span>
-            )}
+            ) : null}
 
             {!hasVoted ? (
               <Button tone="secondary" onClick={() => onVote(null)}>
@@ -207,7 +218,7 @@ export function GameScreen({
               onCommit={onCommit}
               onUndo={onUndo}
               onClear={onClear}
-              renderCard={(p) => makeCard(p, smallSize)}
+              renderCard={(player) => makeCard(player, smallSize)}
             />
           ) : room.phase === "resolution" ? (
             <ResolutionShowcase
@@ -220,9 +231,9 @@ export function GameScreen({
             />
           ) : (
             <>
-              <div className="paper-sheet min-h-0 flex-1 overflow-auto rounded-[1.9rem] px-3 py-4 md:px-4">
+              <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-auto rounded-[2rem] px-3 py-4 md:px-4">
                 <div
-                  className="grid gap-4 place-items-center"
+                  className="grid items-start gap-4"
                   style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
                 >
                   {allConnected.map((player) => makeCard(player, fullSize))}

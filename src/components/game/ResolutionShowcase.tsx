@@ -59,7 +59,20 @@ export function ResolutionShowcase({
     return { votesByTarget: nextVotesByTarget, blankVoters: nextBlankVoters };
   }, [playersById, round.resolution]);
 
-  const allPlayers = useMemo(() => room.players.filter((player) => player.connected), [room.players]);
+  const allPlayers = useMemo(
+    () => room.players.filter((player) => player.connected),
+    [room.players]
+  );
+  const scoreEntries = useMemo(
+    () =>
+      [...allPlayers]
+        .map((player) => ({
+          player,
+          points: round.resolution!.pointsAwarded[player.id] ?? 0
+        }))
+        .sort((left, right) => right.points - left.points),
+    [allPlayers, round.resolution]
+  );
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
@@ -82,7 +95,7 @@ export function ResolutionShowcase({
 
           <div className="relative">
             <div className="mt-1 font-sketch text-5xl font-bold text-ink-950 md:text-6xl">
-              {isCaught ? "Pris dans l'encre" : "Fausse piste"}
+              {isCaught ? "Pris dans l'encre" : "Mauvaise page"}
             </div>
             <p className="mt-1 text-sm text-ink-700">
               {suspectPlayer
@@ -131,12 +144,16 @@ export function ResolutionShowcase({
                   <div className="font-sketch text-4xl font-semibold leading-none text-ink-950">
                     {suspectPlayer.profile.name}
                   </div>
-                  <div className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${roleTone(suspectRole)}`}>
+                  <div
+                    className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${roleTone(suspectRole)}`}
+                  >
                     {roleLabel(suspectRole)}
                   </div>
-                  <div className="mt-3 flex justify-center gap-2 text-xs">
-                    <span className="ink-chip text-ink-700">{round.resolution.civilWord}</span>
-                    <span className="ink-chip text-ink-700">{round.resolution.undercoverWord}</span>
+                  <div className="mt-3 flex flex-wrap justify-center gap-2 text-xs text-ink-700">
+                    <span className="ink-chip">Civil : {round.resolution.civilWord}</span>
+                    <span className="ink-chip">
+                      Undercover : {round.resolution.undercoverWord}
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -146,8 +163,8 @@ export function ResolutionShowcase({
             round.resolution.mrWhiteGuess.playerId === selfPlayer.id ? (
               <form
                 className="mt-5 rounded-[1.5rem] border border-[rgba(139,105,20,0.22)] bg-primary-light/55 px-4 py-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
+                onSubmit={(event) => {
+                  event.preventDefault();
                   if (!guess.trim()) return;
                   onSubmitGuess(guess.trim());
                   setGuess("");
@@ -162,7 +179,7 @@ export function ResolutionShowcase({
                 <div className="mt-3 flex gap-2">
                   <input
                     value={guess}
-                    onChange={(e) => setGuess(e.target.value)}
+                    onChange={(event) => setGuess(event.target.value)}
                     className="min-h-11 flex-1 rounded-[1.15rem] px-4 text-sm text-ink-950 outline-none"
                     placeholder="Mot civil"
                     autoFocus
@@ -174,11 +191,11 @@ export function ResolutionShowcase({
           </div>
         </motion.div>
 
-        <div className="paper-sheet min-h-0 overflow-hidden px-4 py-4 md:px-5">
+        <div className="paper-sheet notebook-page min-h-0 overflow-hidden px-4 py-4 md:px-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div>
+            <div className="pl-7 md:pl-8">
               <div className="font-sketch text-4xl font-semibold leading-none text-ink-950">
-                Votes
+                Qui a vote pour qui
               </div>
             </div>
             {blankVoters.length ? (
@@ -188,11 +205,10 @@ export function ResolutionShowcase({
             ) : null}
           </div>
 
-          <div className="scrollbar-thin grid max-h-[58vh] gap-3 overflow-y-auto pr-1 md:grid-cols-2 2xl:grid-cols-3">
+          <div className="scrollbar-thin grid max-h-[46vh] gap-3 overflow-y-auto pr-1 md:grid-cols-2 2xl:grid-cols-3">
             {allPlayers.map((player, index) => {
               const revealedRole = round.resolution!.revealedRoles[player.id];
               const voters = votesByTarget[player.id] ?? [];
-              const pts = round.resolution!.pointsAwarded[player.id] ?? 0;
               const tilt = pageAngle(player.id);
               const isSuspect = player.id === suspectPlayer?.id;
 
@@ -201,7 +217,12 @@ export function ResolutionShowcase({
                   key={player.id}
                   initial={{ opacity: 0, y: 18, rotate: tilt - 2 }}
                   animate={{ opacity: 1, y: 0, rotate: tilt }}
-                  transition={{ delay: index * 0.04, type: "spring", stiffness: 250, damping: 22 }}
+                  transition={{
+                    delay: index * 0.04,
+                    type: "spring",
+                    stiffness: 250,
+                    damping: 22
+                  }}
                   className={`paper-sheet overflow-hidden px-3 py-3 ${isSuspect ? "ring-2 ring-tertiary/25" : ""}`}
                 >
                   {isSuspect ? (
@@ -212,43 +233,66 @@ export function ResolutionShowcase({
                       className="pointer-events-none absolute inset-[-10%] rounded-full bg-[radial-gradient(circle_at_center,rgba(196,62,46,0.65),rgba(196,62,46,0.14)_30%,transparent_58%)]"
                     />
                   ) : null}
+
                   <MiniDrawingCanvas
                     strokes={round.drawings[player.id]?.strokes ?? []}
                     size={180}
                     className="rounded-[1rem] bg-[#fbf7f0]"
                   />
 
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="truncate font-sketch text-3xl font-semibold leading-none text-ink-950">
-                        {player.profile.name}
-                      </div>
-                      <div className="mt-1 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-700">
-                        {roleLabel(revealedRole)}
-                      </div>
+                  <div className="mt-3 min-w-0">
+                    <div className="truncate font-sketch text-3xl font-semibold leading-none text-ink-950">
+                      {player.profile.name}
                     </div>
-                    <div className={`rounded-full px-2.5 py-1 text-xs font-semibold ${pts > 0 ? "bg-primary-light text-primary-dark" : "bg-paper text-ink-500"}`}>
-                      {pts > 0 ? `+${pts}` : pts} pts
+                    <div className="mt-1 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-700">
+                      {roleLabel(revealedRole)}
                     </div>
                   </div>
 
                   <div className="mt-3 rounded-[1.2rem] border border-[rgba(74,60,46,0.1)] bg-paper/70 px-3 py-2">
                     {voters.length ? (
-                      <div className="mt-2 flex flex-col gap-1.5">
+                      <div className="mt-1 flex flex-wrap gap-1.5">
                         {voters.map((voter) => (
-                          <div key={voter.id} className="flex items-center gap-2 text-sm text-ink-900">
+                          <div
+                            key={voter.id}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-2 py-1 text-sm text-ink-900"
+                          >
                             <span className="text-base">{voter.profile.emoji}</span>
                             <span>{voter.profile.name}</span>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="mt-2 text-sm text-ink-500">Aucun vote</div>
+                      <div className="mt-1 text-sm text-ink-500">Aucun vote</div>
                     )}
                   </div>
                 </motion.article>
               );
             })}
+          </div>
+
+          <div className="paper-divider my-4" />
+
+          <div className="pl-7 md:pl-8">
+            <div className="font-sketch text-3xl font-semibold leading-none text-ink-950">
+              Points du tour
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {scoreEntries.map(({ player, points }) => (
+              <div
+                key={player.id}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${
+                  points > 0
+                    ? "border-[rgba(139,105,20,0.22)] bg-primary-light text-primary-dark"
+                    : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
+                }`}
+              >
+                <span>{player.profile.emoji}</span>
+                <span>{player.profile.name}</span>
+                <span className="font-semibold">{points > 0 ? `+${points}` : points}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

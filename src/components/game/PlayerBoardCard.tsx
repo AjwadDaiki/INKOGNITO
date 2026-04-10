@@ -119,6 +119,7 @@ export const PlayerBoardCard = memo(PlayerBoardCardComponent, (prev, next) => {
     prev.previewSize === next.previewSize &&
     prev.isSelf === next.isSelf &&
     prev.selectedVoteTargetId === next.selectedVoteTargetId &&
+    sameVoters(prev.voteMarkers ?? [], next.voteMarkers ?? []) &&
     previewSignature(prev.previewStroke) === previewSignature(next.previewStroke) &&
     sameVoters(prev.voters ?? [], next.voters ?? []) &&
     prev.revealedRole === next.revealedRole &&

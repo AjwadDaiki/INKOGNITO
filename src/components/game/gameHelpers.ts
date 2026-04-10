@@ -8,18 +8,18 @@ export function phaseBg(phase: RoomView["phase"]) {
 }
 
 export function phaseLabel(phase: RoomView["phase"]) {
-  if (phase === "drawing") return "Dessin";
-  if (phase === "gallery") return "Galerie";
-  if (phase === "vote") return "Vote";
-  if (phase === "resolution") return "Verdict";
+  if (phase === "drawing") return "Croquis";
+  if (phase === "gallery") return "Pages";
+  if (phase === "vote") return "Soupcon";
+  if (phase === "resolution") return "Reveal";
   return phase;
 }
 
 export function phaseSubtitle(phase: RoomView["phase"]) {
-  if (phase === "drawing") return "Dessine ton mot";
-  if (phase === "gallery") return "Observe les dessins";
-  if (phase === "vote") return "Vote pour le suspect";
-  if (phase === "resolution") return "Qui etait l'imposteur ?";
+  if (phase === "drawing") return "Une page pour laisser parler l'encre";
+  if (phase === "gallery") return "Les pages se repondent";
+  if (phase === "vote") return "Pose ton vote sur une page";
+  if (phase === "resolution") return "L'encre dit enfin la verite";
   return "";
 }
 

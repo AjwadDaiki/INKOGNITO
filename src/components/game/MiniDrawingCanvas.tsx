@@ -41,7 +41,7 @@ function MiniDrawingCanvasComponent({
     buffer.height = size;
     const ctx = buffer.getContext("2d");
     if (ctx) {
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "#fbf7f0";
       ctx.fillRect(0, 0, size, size);
     }
     bufferRef.current = buffer;
@@ -102,17 +102,20 @@ function MiniDrawingCanvasComponent({
   }, [previewStroke, strokes, size]);
 
   return (
-    <div
-      className={clsx("relative flex items-center justify-center", className)}
-      style={{ width: "100%", maxWidth: size }}
-    >
-      <div className={clsx("relative w-full", frameClassName ?? "aspect-square")}>
-      <canvas
-        ref={ref}
-        className="absolute inset-0 h-full w-full rounded-[12px] border border-ink-100/40 bg-[#fbf7f0] shadow-inner"
-        style={{ objectFit: "contain" }}
-        aria-label="Apercu du dessin"
-      />
+    <div className={clsx("relative w-full", className)}>
+      <div
+        className={clsx(
+          "relative flex w-full items-center justify-center overflow-hidden rounded-[1rem] border border-[rgba(74,60,46,0.12)] bg-[#f1e7d8]",
+          frameClassName ?? "aspect-[4/3]"
+        )}
+      >
+        <div className="absolute inset-y-[8%] left-[9%] right-[9%] flex items-center justify-center rounded-[0.8rem] border border-[rgba(74,60,46,0.08)] bg-[#fbf7f0] shadow-inner">
+          <canvas
+            ref={ref}
+            className="aspect-square h-full max-h-full w-auto max-w-full"
+            aria-label="Apercu du dessin"
+          />
+        </div>
       </div>
     </div>
   );

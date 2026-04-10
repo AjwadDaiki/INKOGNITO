@@ -73,7 +73,7 @@ export function LobbyScreen({
     ? room.settings.selectedCategories
     : ["Tout"];
   const visibleCategories = useMemo(() => {
-    return WORD_CATEGORIES.filter((category) => category !== "Tout").slice(0, 10);
+    return WORD_CATEGORIES.filter((category) => category !== "Tout").slice(0, 9);
   }, []);
 
   async function copyRoomCode() {
@@ -111,8 +111,8 @@ export function LobbyScreen({
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
         className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full max-w-[1480px] flex-col overflow-hidden px-5 py-5 md:px-8"
       >
-        <div className="absolute right-8 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
-        <div className="absolute bottom-8 left-10 h-16 w-16 rounded-full bg-ink-950/6" />
+        <div className="pointer-events-none absolute right-8 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
+        <div className="pointer-events-none absolute bottom-8 left-10 h-16 w-16 rounded-full bg-ink-950/6" />
 
         <div className="flex min-h-0 flex-1 flex-col pl-7 md:pl-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">

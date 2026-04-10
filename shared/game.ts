@@ -51,8 +51,8 @@ export function clampSettings(settings?: Partial<RoomSettings>): RoomSettings {
     voteSeconds: clampNumber(settings?.voteSeconds ?? DEFAULT_SETTINGS.voteSeconds, 20, 45),
     resolutionSeconds: clampNumber(
       settings?.resolutionSeconds ?? DEFAULT_SETTINGS.resolutionSeconds,
-      8,
-      20
+      10,
+      30
     ),
     difficulty: normalizeDifficulty(settings?.difficulty),
     selectedCategories: sanitizeSelectedCategories(settings?.selectedCategories),

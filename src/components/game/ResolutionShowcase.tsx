@@ -3,22 +3,23 @@ import { motion } from "framer-motion";
 import type { PlayerRole, PlayerView, RoomView, RoundView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
 import { MiniDrawingCanvas } from "./MiniDrawingCanvas";
+import { CountdownPill } from "@/components/ui/CountdownPill";
 
 function roleLabel(role: PlayerRole | null | undefined) {
-  if (role === "undercover") return "Undercover";
-  if (role === "mr_white") return "Mr White";
-  return "Civil";
+  if (role === "undercover") return "UNDERCOVER";
+  if (role === "mr_white") return "MR WHITE";
+  return "CIVIL";
 }
 
-function roleTone(role: PlayerRole | null | undefined) {
-  if (role === "undercover") return "border-[rgba(196,62,46,0.26)] bg-tertiary-light text-tertiary";
-  if (role === "mr_white") return "border-[rgba(139,105,20,0.26)] bg-primary-light text-primary-dark";
+function roleBadgeClass(role: PlayerRole | null | undefined) {
+  if (role === "undercover") return "border-[rgba(196,62,46,0.3)] bg-tertiary-light text-tertiary";
+  if (role === "mr_white") return "border-[rgba(139,105,20,0.3)] bg-primary-light text-primary-dark";
   return "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700";
 }
 
 function pageAngle(seed: string) {
   const sum = seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return ((sum % 7) - 3) * 0.7;
+  return ((sum % 7) - 3) * 0.6;
 }
 
 export function ResolutionShowcase({
@@ -40,357 +41,139 @@ export function ResolutionShowcase({
 
   if (!round.resolution) return null;
 
-  const suspectRole = suspectPlayer ? round.resolution.revealedRoles[suspectPlayer.id] : null;
+  const resolution = round.resolution;
+  const suspectRole = suspectPlayer ? resolution.revealedRoles[suspectPlayer.id] : null;
   const isCaught = suspectRole === "undercover" || suspectRole === "mr_white";
-
-  const { votesByTarget, blankVoters } = useMemo(() => {
-    const nextVotesByTarget: Record<string, PlayerView[]> = {};
-    const nextBlankVoters: PlayerView[] = [];
-    for (const [fromId, toId] of Object.entries(round.resolution!.votes)) {
-      const voter = playersById[fromId];
-      if (!voter) continue;
-      if (toId) {
-        if (!nextVotesByTarget[toId]) nextVotesByTarget[toId] = [];
-        nextVotesByTarget[toId].push(voter);
-      } else {
-        nextBlankVoters.push(voter);
-      }
-    }
-    return { votesByTarget: nextVotesByTarget, blankVoters: nextBlankVoters };
-  }, [playersById, round.resolution]);
 
   const allPlayers = useMemo(
     () =>
-      Object.keys(round.resolution.revealedRoles)
-        .map((playerId) => playersById[playerId])
-        .filter((player): player is PlayerView => Boolean(player)),
-    [playersById, round.resolution.revealedRoles]
+      Object.keys(resolution.revealedRoles)
+        .map((id) => playersById[id])
+        .filter((p): p is PlayerView => Boolean(p)),
+    [playersById, resolution.revealedRoles]
   );
-  const scoreEntries = useMemo(
-    () =>
-      [...allPlayers]
-        .map((player) => ({
-          player,
-          points: round.resolution!.pointsAwarded[player.id] ?? 0
-        }))
-        .sort((left, right) => right.points - left.points),
-    [allPlayers, round.resolution]
-  );
-  const suspectVoters = suspectPlayer ? votesByTarget[suspectPlayer.id] ?? [] : [];
-  const suspectVoteCount = suspectVoters.length;
-  const denseReveal = allPlayers.length >= 7;
-  const compactReveal = allPlayers.length >= 5;
-  const revealPreviewSize = denseReveal ? 144 : compactReveal ? 164 : 180;
+
+  const dense = allPlayers.length >= 7;
+  const previewSize = dense ? 120 : allPlayers.length >= 5 ? 140 : 160;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
-      <div className={`grid gap-4 ${denseReveal ? "xl:grid-cols-[0.72fr_1.28fr]" : "xl:grid-cols-[0.78fr_1.22fr]"}`}>
-        <motion.div
-          initial={{ opacity: 0, y: 16, rotate: -1.2 }}
-          animate={{ opacity: 1, y: 0, rotate: -0.6 }}
-          className="paper-sheet notebook-page desk-shadow relative overflow-hidden px-5 py-5"
+    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden md:gap-3">
+      {/* Header — verdict + words */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-4 py-3 text-center"
+      >
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
+          <div className="font-sketch text-2xl font-bold text-ink-950 md:text-3xl">
+            {isCaught ? "Pris dans l'encre !" : suspectPlayer ? "Innocent..." : "Pas de suspect"}
+          </div>
+        </div>
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-3 text-sm">
+          <span className="rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-3 py-1 font-semibold text-ink-800">
+            Civil : {resolution.civilWord}
+          </span>
+          <span className="rounded-full border border-[rgba(196,62,46,0.2)] bg-tertiary-light px-3 py-1 font-semibold text-tertiary">
+            Undercover : {resolution.undercoverWord}
+          </span>
+        </div>
+      </motion.div>
+
+      {/* Mr White guess form */}
+      {resolution.mrWhiteGuess.pending &&
+      resolution.mrWhiteGuess.playerId === selfPlayer.id ? (
+        <motion.form
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-4 py-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!guess.trim()) return;
+            onSubmitGuess(guess.trim());
+            setGuess("");
+          }}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.2 }}
-            animate={{ opacity: 1, scale: 1.2 }}
-            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            className={`pointer-events-none absolute inset-0 ${
-              isCaught
-                ? "bg-[radial-gradient(circle_at_center,rgba(196,62,46,0.26),transparent_58%)]"
-                : "bg-[radial-gradient(circle_at_center,rgba(212,160,23,0.2),transparent_58%)]"
-            }`}
-          />
-
-          <div className="relative">
-            <div className="pl-7 md:pl-8">
-              <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
-                Verdict du tour
-              </div>
-            </div>
-            <div className="mt-1 pl-7 font-sketch text-5xl font-bold text-ink-950 md:pl-8 md:text-6xl">
-              {isCaught ? "Pris dans l'encre" : "Mauvaise page"}
-            </div>
-            <p className="mt-1 pl-7 text-sm text-ink-700 md:pl-8">
-              {suspectPlayer
-                ? `${suspectPlayer.profile.name} était au centre des soupçons.`
-                : "Le tour est terminé."}
-            </p>
-
-            {suspectPlayer ? (
-              <motion.div
-                initial={{ opacity: 0, y: 14, rotate: 4 }}
-                animate={{ opacity: 1, y: 0, rotate: 1.6 }}
-                transition={{ delay: 0.12, type: "spring", stiffness: 260, damping: 24 }}
-                className="paper-sheet relative mt-5 overflow-hidden px-4 py-4 md:px-5"
-              >
-                <motion.div
-                  initial={{ scale: 0.1, opacity: 0 }}
-                  animate={{ scale: 1, opacity: isCaught ? 0.32 : 0.2 }}
-                  transition={{ delay: 0.06, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-                  className={`pointer-events-none absolute inset-[-18%] rounded-full ${
-                    isCaught
-                      ? "bg-[radial-gradient(circle_at_center,rgba(196,62,46,0.7),rgba(196,62,46,0.16)_34%,transparent_64%)]"
-                      : "bg-[radial-gradient(circle_at_center,rgba(212,160,23,0.58),rgba(212,160,23,0.14)_34%,transparent_64%)]"
-                  }`}
-                  style={{ filter: "blur(1px)" }}
-                />
-                <motion.div
-                  initial={{ scale: 0.12, opacity: 0, rotate: -25 }}
-                  animate={{ scale: 1, opacity: 0.18, rotate: 0 }}
-                  transition={{ delay: 0.12, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                  className="pointer-events-none absolute -left-12 -top-10 h-28 w-28 rounded-full bg-ink-950"
-                  style={{ filter: "blur(2px)" }}
-                />
-                <motion.div
-                  initial={{ scale: 0.12, opacity: 0, rotate: 25 }}
-                  animate={{ scale: 1, opacity: 0.12, rotate: 0 }}
-                  transition={{ delay: 0.16, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                  className="pointer-events-none absolute -bottom-10 -right-6 h-20 w-20 rounded-full bg-ink-950"
-                />
-                <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-ink-950/8" />
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
-                      Page accusée
-                    </div>
-                    <div className="mt-1 font-sketch text-5xl font-semibold leading-none text-ink-950">
-                      {suspectPlayer.profile.name}
-                    </div>
-                  </div>
-                  <div
-                    className={`mt-1 inline-flex -rotate-3 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] shadow-[0_6px_14px_rgba(90,68,47,0.14)] ${
-                      isCaught
-                        ? "border-[rgba(196,62,46,0.24)] bg-tertiary-light text-tertiary"
-                        : "border-[rgba(139,105,20,0.24)] bg-primary-light text-primary-dark"
-                    }`}
-                  >
-                    {isCaught ? "Démasqué" : "Innocent"}
-                  </div>
-                </div>
-                <MiniDrawingCanvas
-                  strokes={round.drawings[suspectPlayer.id]?.strokes ?? []}
-                  size={220}
-                  className="rounded-[1rem] bg-[#fbf7f0]"
-                />
-                <div className="mt-4 text-center">
-                  <div
-                    className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${roleTone(suspectRole)}`}
-                  >
-                    {roleLabel(suspectRole)}
-                  </div>
-                  <div className="mt-3 flex flex-wrap justify-center gap-2 text-xs text-ink-700">
-                    <span className="ink-chip">Civil : {round.resolution.civilWord}</span>
-                    <span className="ink-chip">
-                      Undercover : {round.resolution.undercoverWord}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="paper-divider my-4" />
-
-                <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
-                  <div>
-                    <div className="text-[10px] uppercase tracking-[0.28em] text-ink-500">
-                      Pression du groupe
-                    </div>
-                    <div className="mt-1 font-sketch text-3xl leading-none text-ink-950">
-                      {suspectVoteCount} voix posées sur cette page
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {suspectVoters.length ? (
-                        suspectVoters.map((voter) => (
-                          <div
-                            key={voter.id}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-2 py-1 text-sm text-ink-900"
-                          >
-                            <span>{voter.profile.emoji}</span>
-                            <span>{voter.profile.name}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="text-sm text-ink-500">Aucune accusation posée.</div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    className={`rounded-[1.4rem] border px-4 py-3 text-center ${
-                      isCaught
-                        ? "border-[rgba(196,62,46,0.18)] bg-tertiary-light/80 text-tertiary"
-                        : "border-[rgba(139,105,20,0.2)] bg-primary-light/80 text-primary-dark"
-                    }`}
-                  >
-                    <div className="text-[10px] uppercase tracking-[0.22em]">
-                      Rôle révélé
-                    </div>
-                    <div className="mt-1 font-sketch text-3xl leading-none">
-                      {roleLabel(suspectRole)}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ) : null}
-
-            {round.resolution.mrWhiteGuess.pending &&
-            round.resolution.mrWhiteGuess.playerId === selfPlayer.id ? (
-              <form
-                className="mt-5 rounded-[1.5rem] border border-[rgba(139,105,20,0.22)] bg-primary-light/55 px-4 py-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (!guess.trim()) return;
-                  onSubmitGuess(guess.trim());
-                  setGuess("");
-                }}
-              >
-                <div className="font-sketch text-3xl font-semibold text-primary-dark">
-                  Dernière chance
-                </div>
-                <div className="mt-1 text-sm text-ink-700">
-                  Devine le mot civil pour revenir dans la partie.
-                </div>
-                <div className="mt-3 flex gap-2">
-                  <input
-                    value={guess}
-                    onChange={(event) => setGuess(event.target.value)}
-                    className="min-h-11 flex-1 rounded-[1.15rem] px-4 text-sm text-ink-950 outline-none"
-                    placeholder="Mot civil"
-                    autoFocus
-                  />
-                  <Button type="submit">Deviner</Button>
-                </div>
-              </form>
-            ) : null}
+          <div className="font-sketch text-xl font-semibold text-primary-dark">
+            Derniere chance — Devine le mot civil
           </div>
-        </motion.div>
-
-        <div className="paper-sheet notebook-page min-h-0 overflow-hidden px-4 py-4 md:px-5">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <div className="pl-7 md:pl-8">
-              <div className="font-sketch text-4xl font-semibold leading-none text-ink-950">
-                Qui a vote pour qui
-              </div>
-            </div>
-            {blankVoters.length ? (
-              <div className="ink-chip text-xs text-ink-700">
-                Blanc : {blankVoters.map((voter) => voter.profile.name).join(", ")}
-              </div>
-            ) : null}
+          <div className="mt-2 flex gap-2">
+            <input
+              value={guess}
+              onChange={(event) => setGuess(event.target.value)}
+              className="min-h-11 flex-1 rounded-[1.15rem] border border-[rgba(74,60,46,0.12)] px-4 text-sm text-ink-950 outline-none"
+              placeholder="Mot civil"
+              autoFocus
+            />
+            <Button type="submit">Deviner</Button>
           </div>
+        </motion.form>
+      ) : null}
 
+      {/* All players grid */}
+      <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-hidden rounded-[1.6rem] p-2 md:p-3">
+        <div className="scrollbar-thin flex h-full items-start justify-center overflow-y-auto">
           <div
-            className={`scrollbar-thin grid overflow-y-auto pr-1 ${
-              denseReveal
-                ? "max-h-[50vh] gap-2.5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-                : "max-h-[46vh] gap-3 md:grid-cols-2 2xl:grid-cols-3"
+            className={`grid place-items-center gap-2 ${
+              dense
+                ? "sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
+                : allPlayers.length <= 4
+                  ? "sm:grid-cols-2 md:grid-cols-4"
+                  : "sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
             }`}
           >
             {allPlayers.map((player, index) => {
-              const revealedRole = round.resolution!.revealedRoles[player.id];
-              const voters = votesByTarget[player.id] ?? [];
-              const tilt = pageAngle(player.id);
+              const role = resolution.revealedRoles[player.id];
+              const isUndercover = role === "undercover" || role === "mr_white";
               const isSuspect = player.id === suspectPlayer?.id;
+              const points = resolution.pointsAwarded[player.id] ?? 0;
+              const word = role === "civil"
+                ? resolution.civilWord
+                : role === "undercover"
+                  ? resolution.undercoverWord
+                  : "???";
+              const tilt = pageAngle(player.id);
 
               return (
-                <motion.article
+                <motion.div
                   key={player.id}
-                  initial={{ opacity: 0, y: 18, rotate: tilt - 2 }}
+                  initial={{ opacity: 0, y: 16, rotate: tilt - 1.5 }}
                   animate={{ opacity: 1, y: 0, rotate: tilt }}
-                  transition={{
-                    delay: index * 0.04,
-                    type: "spring",
-                    stiffness: 250,
-                    damping: 22
-                  }}
-                  className={`paper-sheet overflow-hidden ${
-                    denseReveal ? "px-2.5 py-2.5" : "px-3 py-3"
-                  } ${isSuspect ? "ring-2 ring-tertiary/25" : ""}`}
+                  transition={{ delay: index * 0.04, type: "spring", stiffness: 260, damping: 22 }}
+                  className={`paper-sheet flex w-full flex-col items-center gap-1 overflow-hidden px-2 py-2 shadow-card ${
+                    isUndercover ? "ring-2 ring-tertiary/30" : ""
+                  } ${isSuspect ? "border-[rgba(196,62,46,0.2)]" : ""}`}
                 >
-                  {isSuspect ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.15 }}
-                      animate={{ opacity: 0.2, scale: 1 }}
-                      transition={{ delay: 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                      className="pointer-events-none absolute inset-[-10%] rounded-full bg-[radial-gradient(circle_at_center,rgba(196,62,46,0.65),rgba(196,62,46,0.14)_30%,transparent_58%)]"
-                    />
-                  ) : null}
-
                   <MiniDrawingCanvas
                     strokes={round.drawings[player.id]?.strokes ?? []}
-                    size={revealPreviewSize}
-                    className="rounded-[1rem] bg-[#fbf7f0]"
+                    size={previewSize}
+                    className="rounded-[0.6rem]"
                   />
 
-                  <div className="mt-3 min-w-0">
-                    <div
-                      className={`truncate font-sketch font-semibold leading-none text-ink-950 ${
-                        denseReveal ? "text-[2rem]" : "text-3xl"
-                      }`}
-                    >
-                      {player.profile.name}
-                    </div>
-                    <div className="mt-1 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-700">
-                      {roleLabel(revealedRole)}
-                    </div>
+                  {/* Name */}
+                  <div className="w-full truncate text-center font-sketch text-sm font-semibold leading-tight text-ink-950">
+                    {player.profile.emoji} {player.profile.name}
                   </div>
 
-                  <div
-                    className={`mt-3 rounded-[1.2rem] border border-[rgba(74,60,46,0.1)] bg-paper/70 ${
-                      denseReveal ? "px-2.5 py-2" : "px-3 py-2"
-                    }`}
-                  >
-                    {voters.length ? (
-                      <div className="mt-1 flex flex-wrap gap-1.5">
-                        {voters.map((voter) => (
-                          <div
-                            key={voter.id}
-                            className={`inline-flex items-center rounded-full border border-[rgba(74,60,46,0.12)] bg-paper text-ink-900 ${
-                              denseReveal ? "gap-1 px-1.5 py-1 text-xs" : "gap-1.5 px-2 py-1 text-sm"
-                            }`}
-                          >
-                            <span className={denseReveal ? "text-sm" : "text-base"}>
-                              {voter.profile.emoji}
-                            </span>
-                            <span className={denseReveal ? "max-w-[62px] truncate" : ""}>
-                              {voter.profile.name}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="mt-1 text-sm text-ink-500">Aucun vote</div>
-                    )}
+                  {/* Role badge */}
+                  <div className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${roleBadgeClass(role)}`}>
+                    {roleLabel(role)}
                   </div>
-                </motion.article>
+
+                  {/* Word */}
+                  <div className="text-[10px] font-medium text-ink-500">
+                    {word}
+                  </div>
+
+                  {/* Points */}
+                  {points !== 0 ? (
+                    <div className={`text-xs font-bold ${points > 0 ? "text-[#6a8a20]" : "text-tertiary"}`}>
+                      {points > 0 ? `+${points}` : points} pt{Math.abs(points) > 1 ? "s" : ""}
+                    </div>
+                  ) : null}
+                </motion.div>
               );
             })}
-          </div>
-
-          <div className="paper-divider my-4" />
-
-          <div className="pl-7 md:pl-8">
-            <div className="font-sketch text-3xl font-semibold leading-none text-ink-950">
-              Points du tour
-            </div>
-          </div>
-          <div className={`mt-3 flex flex-wrap ${denseReveal ? "gap-1.5" : "gap-2"}`}>
-            {scoreEntries.map(({ player, points }) => (
-              <div
-                key={player.id}
-                className={`inline-flex items-center rounded-full border ${
-                  denseReveal ? "gap-1.5 px-2.5 py-1.5 text-xs" : "gap-2 px-3 py-2 text-sm"
-                } ${
-                  points > 0
-                    ? "border-[rgba(139,105,20,0.22)] bg-primary-light text-primary-dark"
-                    : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
-                }`}
-              >
-                <span>{player.profile.emoji}</span>
-                <span className={denseReveal ? "max-w-[92px] truncate" : ""}>
-                  {player.profile.name}
-                </span>
-                <span className="font-semibold">{points > 0 ? `+${points}` : points}</span>
-              </div>
-            ))}
           </div>
         </div>
       </div>

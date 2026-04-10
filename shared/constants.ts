@@ -95,7 +95,7 @@ export const DEFAULT_SETTINGS = {
   mode: "classic",
   drawingSeconds: 45,
   voteSeconds: 20,
-  resolutionSeconds: 10,
+  resolutionSeconds: 18,
   rounds: 3,
   difficulty: "random",
   selectedCategories: ["Tout"]

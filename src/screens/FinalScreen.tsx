@@ -3,6 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { PlayerRole, PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
 import { InkSplatter } from "@/components/ui/InkSplatter";
+import { CoffeeStain } from "@/components/ui/CoffeeStain";
+import { StackedPages } from "@/components/ui/StackedPages";
+import { WashiTape } from "@/components/ui/WashiTape";
+import { SpiralBinding } from "@/components/ui/SpiralBinding";
+import { InkBleed } from "@/components/ui/InkBleed";
 
 function roleLabel(role: PlayerRole) {
   if (role === "undercover") return "Undercover";
@@ -52,10 +57,15 @@ export function FinalScreen({
     <div className="relative flex h-[100dvh] items-center justify-center overflow-hidden p-3 md:p-5">
       <InkSplatter variant={0} className="left-[7%] top-[12%]" size={220} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[8%] right-[7%]" size={230} opacity={0.09} />
+      <CoffeeStain className="right-[10%] top-[6%] rotate-[30deg]" size={130} opacity={0.06} />
 
-      <div className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full max-w-[1580px] flex-col overflow-hidden px-5 py-5 md:px-8">
+      <StackedPages className="h-full w-full max-w-[1580px]">
+      <div className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full flex-col overflow-hidden px-5 py-5 md:px-8">
+        <SpiralBinding />
         <div className="absolute right-10 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
         <div className="absolute bottom-12 left-8 h-16 w-16 rounded-full bg-ink-950/6" />
+        <WashiTape className="-right-2 top-4" variant={1} rotate={-10} width={110} />
+        <WashiTape className="bottom-6 -left-1" variant={2} rotate={5} width={95} />
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -145,8 +155,8 @@ export function FinalScreen({
                           Mots du round
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
-                          <span className="ink-chip text-sm text-ink-700">{selectedRound.civilWord}</span>
-                          <span className="ink-chip text-sm text-ink-700">{selectedRound.undercoverWord}</span>
+                          <span className="ink-chip text-sm text-ink-700"><InkBleed>{selectedRound.civilWord}</InkBleed></span>
+                          <span className="ink-chip text-sm text-ink-700"><InkBleed intensity={1.3}>{selectedRound.undercoverWord}</InkBleed></span>
                         </div>
                       </div>
 
@@ -207,6 +217,7 @@ export function FinalScreen({
           </div>
         </div>
       </div>
+      </StackedPages>
     </div>
   );
 }

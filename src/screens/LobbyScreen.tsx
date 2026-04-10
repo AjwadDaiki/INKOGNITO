@@ -6,6 +6,10 @@ import { WORD_CATEGORIES } from "@shared/words";
 import { Button } from "@/components/ui/Button";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { InkSplatter } from "@/components/ui/InkSplatter";
+import { CoffeeStain } from "@/components/ui/CoffeeStain";
+import { StackedPages } from "@/components/ui/StackedPages";
+import { WashiTape } from "@/components/ui/WashiTape";
+import { SpiralBinding } from "@/components/ui/SpiralBinding";
 
 function roomLink(roomCode: string) {
   return `${window.location.origin}?room=${roomCode}`;
@@ -104,15 +108,20 @@ export function LobbyScreen({
     <div className="relative flex h-[100svh] items-center justify-center overflow-hidden p-3 md:p-5">
       <InkSplatter variant={0} className="left-[3%] top-[9%]" size={210} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[5%] right-[4%]" size={230} opacity={0.08} />
+      <CoffeeStain className="bottom-[14%] left-[6%] -rotate-12" size={110} opacity={0.055} />
 
+      <StackedPages className="h-full w-full max-w-[1480px]">
       <motion.section
         initial={{ opacity: 0, y: 24, rotate: -1 }}
         animate={{ opacity: 1, y: 0, rotate: -0.4 }}
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full max-w-[1480px] flex-col overflow-hidden px-5 py-5 md:px-8"
+        className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full flex-col overflow-hidden px-5 py-5 md:px-8"
       >
+        <SpiralBinding />
         <div className="pointer-events-none absolute right-8 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
         <div className="pointer-events-none absolute bottom-8 left-10 h-16 w-16 rounded-full bg-ink-950/6" />
+        <WashiTape className="-right-2 top-6" variant={2} rotate={-12} width={105} />
+        <WashiTape className="-left-1 bottom-4" variant={0} rotate={6} width={95} />
 
         <div className="flex min-h-0 flex-1 flex-col pl-7 md:pl-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -296,6 +305,7 @@ export function LobbyScreen({
           </div>
         </div>
       </motion.section>
+      </StackedPages>
     </div>
   );
 }

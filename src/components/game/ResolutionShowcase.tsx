@@ -4,6 +4,7 @@ import type { PlayerRole, PlayerView, RoomView, RoundView } from "@shared/protoc
 import { Button } from "@/components/ui/Button";
 import { MiniDrawingCanvas } from "./MiniDrawingCanvas";
 import { CountdownPill } from "@/components/ui/CountdownPill";
+import { InkBleed } from "@/components/ui/InkBleed";
 
 function roleLabel(role: PlayerRole | null | undefined) {
   if (role === "undercover") return "UNDERCOVER";
@@ -72,10 +73,10 @@ export function ResolutionShowcase({
         </div>
         <div className="mt-1 flex flex-wrap items-center justify-center gap-3 text-sm">
           <span className="rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-3 py-1 font-semibold text-ink-800">
-            Civil : {resolution.civilWord}
+            Civil : <InkBleed>{resolution.civilWord}</InkBleed>
           </span>
           <span className="rounded-full border border-[rgba(196,62,46,0.2)] bg-tertiary-light px-3 py-1 font-semibold text-tertiary">
-            Undercover : {resolution.undercoverWord}
+            Undercover : <InkBleed intensity={1.3}>{resolution.undercoverWord}</InkBleed>
           </span>
         </div>
       </motion.div>
@@ -162,7 +163,7 @@ export function ResolutionShowcase({
 
                   {/* Word */}
                   <div className="text-[10px] font-medium text-ink-500">
-                    {word}
+                    <InkBleed intensity={0.8}>{word}</InkBleed>
                   </div>
 
                   {/* Points */}

@@ -2,12 +2,15 @@ import { motion } from "framer-motion";
 import type { PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
 import { InkSplatter } from "@/components/ui/InkSplatter";
+import { StackedPages } from "@/components/ui/StackedPages";
+import { WashiTape } from "@/components/ui/WashiTape";
+import { SpiralBinding } from "@/components/ui/SpiralBinding";
 
 function roleTone(room: RoomView) {
   const role = room.round?.role.ownRole;
   if (role === "mr_white") {
     return {
-      chip: "border-[rgba(139,105,20,0.24)] bg-primary-light text-primary-dark",
+      stamp: "border-[rgba(139,105,20,0.5)] text-primary-dark",
       title: "Mr White",
       subtitle: "Tu n'as pas de mot. Observe les autres et improvise."
     };
@@ -15,14 +18,14 @@ function roleTone(room: RoomView) {
 
   if (role === "undercover") {
     return {
-      chip: "border-[rgba(120,42,33,0.24)] bg-tertiary-light text-tertiary",
+      stamp: "border-[rgba(196,62,46,0.5)] text-tertiary",
       title: "Undercover",
       subtitle: "Ton mot ressemble au leur. Dessine sans te trahir."
     };
   }
 
   return {
-    chip: "border-[rgba(139,105,20,0.24)] bg-primary-light text-primary-dark",
+    stamp: "border-[rgba(74,60,46,0.4)] text-ink-800",
     title: "Civil",
     subtitle: "Tu connais le vrai mot. Fais-le comprendre sans l'écrire."
   };
@@ -46,13 +49,16 @@ export function RoleRevealScreen({
       <InkSplatter variant={0} className="left-[8%] top-[10%]" size={220} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[10%] right-[8%]" size={220} opacity={0.09} />
 
+      <StackedPages className="w-full max-w-3xl">
       <motion.div
         initial={{ opacity: 0, y: 24, rotate: -1.5 }}
         animate={{ opacity: 1, y: 0, rotate: -0.8 }}
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        className="paper-sheet notebook-page desk-shadow animate-page-settle w-full max-w-3xl overflow-hidden px-6 py-7 md:px-10 md:py-8"
+        className="paper-sheet notebook-page desk-shadow animate-page-settle w-full overflow-hidden px-6 py-7 md:px-10 md:py-8"
       >
+        <SpiralBinding />
         <div className="absolute right-8 top-10 h-20 w-20 rounded-full bg-ink-950/8" />
+        <WashiTape className="-right-2 -top-1" variant={0} rotate={-7} width={100} />
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
@@ -61,9 +67,16 @@ export function RoleRevealScreen({
                 {selfPlayer.profile.name}
               </div>
             </div>
-            <div className={`rounded-full border px-4 py-2 text-sm font-semibold ${tone.chip}`}>
+            {/* Stamp effect — role arrives like a rubber stamp pressed on paper */}
+            <motion.div
+              initial={{ scale: 1.6, opacity: 0, filter: "blur(6px)", rotate: -8 }}
+              animate={{ scale: 1, opacity: 1, filter: "blur(0px)", rotate: -3 }}
+              transition={{ delay: 0.35, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className={`rounded-[0.6rem] border-[3px] border-dashed px-5 py-2.5 font-sketch text-2xl font-bold uppercase tracking-[0.22em] ${tone.stamp}`}
+              style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.5)" }}
+            >
               {tone.title}
-            </div>
+            </motion.div>
           </div>
 
           <div className="paper-divider my-5" />
@@ -109,6 +122,7 @@ export function RoleRevealScreen({
           </div>
         </div>
       </motion.div>
+      </StackedPages>
     </div>
   );
 }

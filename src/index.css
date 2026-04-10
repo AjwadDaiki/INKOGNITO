@@ -126,6 +126,10 @@ textarea {
   border-radius: inherit;
   pointer-events: none;
   background:
+    /* Dog-ear fold — bottom-right corner */
+    linear-gradient(225deg, rgba(173, 138, 102, 0.28) 0%, rgba(173, 138, 102, 0.12) 3.4%, transparent 3.5%) no-repeat bottom right / 100% 100%,
+    linear-gradient(225deg, rgba(245, 237, 224, 0.95) 0%, rgba(245, 237, 224, 0.95) 2.2%, transparent 2.3%) no-repeat bottom right / 100% 100%,
+    /* Existing vignette */
     radial-gradient(circle at 8% 10%, rgba(26, 20, 16, 0.08), transparent 10%),
     radial-gradient(circle at 94% 88%, rgba(26, 20, 16, 0.06), transparent 10%),
     linear-gradient(180deg, transparent 0 86%, rgba(122, 94, 66, 0.06) 100%);
@@ -140,9 +144,8 @@ textarea {
   left: 0.95rem;
   width: 26px;
   pointer-events: none;
-  background:
-    linear-gradient(90deg, transparent 0 9px, rgba(196, 62, 46, 0.55) 9px 11px, transparent 11px 100%),
-    radial-gradient(circle, rgba(118, 100, 82, 0.72) 0 2.5px, transparent 3px) 0 5px / 14px 34px repeat-y;
+  /* Red margin line only — spiral binding replaces the punch holes */
+  background: linear-gradient(90deg, transparent 0 9px, rgba(196, 62, 46, 0.55) 9px 11px, transparent 11px 100%);
   opacity: 0.8;
 }
 
@@ -168,6 +171,30 @@ textarea {
   box-shadow:
     0 3px 0 rgba(90, 68, 47, 0.22),
     0 24px 46px rgba(70, 49, 33, 0.24);
+}
+
+/* Loose pages peeking under the main sheet */
+.stacked-page {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 1.7rem;
+  background-color: #ece3d2;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 18%),
+    linear-gradient(180deg, #ede5d5 0%, #e6dbc8 100%);
+  border: 1px solid rgba(90, 68, 47, 0.13);
+}
+.stacked-page:first-child {
+  transform: rotate(2.1deg) translate(5px, 8px);
+  background-color: #e5d9c6;
+  box-shadow: 0 6px 18px rgba(70, 49, 33, 0.12);
+}
+.stacked-page:first-child + .stacked-page {
+  transform: rotate(-1.4deg) translate(-3px, 5px);
+  background-color: #ebe2d1;
+  box-shadow: 0 4px 12px rgba(70, 49, 33, 0.08);
 }
 
 .ink-chip {

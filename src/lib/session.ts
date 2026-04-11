@@ -27,7 +27,8 @@ function safeLocalStorage() {
 }
 
 export function ensureClientId() {
-  const storage = safeSessionStorage();
+  // Use localStorage so the ID survives tab close / refresh for reconnection
+  const storage = safeLocalStorage();
   const existing = storage?.getItem(CLIENT_ID_KEY);
   if (existing) return existing;
   const value =

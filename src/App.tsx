@@ -199,38 +199,30 @@ export default function App() {
   ]);
 
   return (
-    <div className="relative h-full min-h-screen overflow-hidden" style={{ perspective: "1800px" }}>
+    <div className="relative h-full min-h-screen overflow-hidden">
       <MeshBackground />
 
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={screen.key}
           initial={{
-            rotateY: 55,
+            x: "60%",
             opacity: 0,
-            scale: 0.97,
-            boxShadow: "0 0 0 rgba(26,20,16,0)"
+            rotate: 1.5
           }}
           animate={{
-            rotateY: 0,
+            x: "0%",
             opacity: 1,
-            scale: 1,
-            boxShadow: "0 0 0 rgba(26,20,16,0)"
+            rotate: 0
           }}
           exit={{
-            rotateY: -80,
+            x: "-40%",
             opacity: 0,
-            scale: 0.96,
-            boxShadow: "-30px 10px 60px rgba(26,20,16,0.35)"
+            rotate: -1
           }}
           transition={{
-            duration: 0.55,
-            ease: [0.32, 0.72, 0, 1]
-          }}
-          style={{
-            transformOrigin: "left center",
-            transformStyle: "preserve-3d",
-            backfaceVisibility: "hidden"
+            duration: 0.5,
+            ease: [0.22, 1, 0.36, 1]
           }}
           className="relative z-10 h-full will-change-transform"
         >

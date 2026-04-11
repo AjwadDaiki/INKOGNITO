@@ -91,6 +91,7 @@ interface ServerRoom {
 
 export class RoomManager {
   private rooms = new Map<string, ServerRoom>();
+  private removalTimers = new Map<string, NodeJS.Timeout>();
 
   constructor(
     private readonly io: Server<ClientToServerEvents, ServerToClientEvents>
@@ -165,10 +166,13 @@ export class RoomManager {
       player.connected = true;
       player.profile = normalizeProfile(payload.profile);
       player.lastActiveAt = Date.now();
+      // Cancel any pending removal — player is back
+      this.cancelPlayerRemoval(room.code, player.id);
       if (!room.players.some((entry) => entry.isHost && entry.connected)) {
         player.isHost = true;
         room.hostId = player.id;
       }
+      room.systemNotice = `${player.profile.name} s'est reconnecté.`;
     } else {
       player = this.createPlayer({
         id: createId("player"),
@@ -211,6 +215,55 @@ export class RoomManager {
       return;
     }
 
+    this.emitRoomState(room);
+
+    // Schedule auto-removal: 20s in lobby, 120s in game
+    const delay = room.status === "lobby" ? 20_000 : 120_000;
+    this.schedulePlayerRemoval(room, player.id, delay);
+  }
+
+  /** Remove a disconnected player after a grace period */
+  private schedulePlayerRemoval(room: ServerRoom, playerId: string, delayMs: number) {
+    const key = `${room.code}:${playerId}`;
+    // Clear any existing timer for this player
+    if (this.removalTimers.has(key)) {
+      clearTimeout(this.removalTimers.get(key)!);
+    }
+    const timer = setTimeout(() => {
+      this.removalTimers.delete(key);
+      this.removePlayerIfStillGone(room.code, playerId);
+    }, delayMs);
+    this.removalTimers.set(key, timer);
+  }
+
+  /** Cancel scheduled removal (e.g. when player reconnects) */
+  private cancelPlayerRemoval(roomCode: string, playerId: string) {
+    const key = `${roomCode}:${playerId}`;
+    const timer = this.removalTimers.get(key);
+    if (timer) {
+      clearTimeout(timer);
+      this.removalTimers.delete(key);
+    }
+  }
+
+  private removePlayerIfStillGone(roomCode: string, playerId: string) {
+    const room = this.rooms.get(roomCode);
+    if (!room) return;
+    const player = room.players.find((p) => p.id === playerId);
+    if (!player || player.connected) return;
+
+    // Remove the player
+    room.players = room.players.filter((p) => p.id !== playerId);
+    room.systemNotice = `${player.profile.name} a été retiré (déconnexion).`;
+
+    // If no players left, delete room
+    if (room.players.length === 0) {
+      this.clearRoomTimeout(room);
+      this.rooms.delete(roomCode);
+      return;
+    }
+
+    this.ensureHost(room);
     this.emitRoomState(room);
   }
 

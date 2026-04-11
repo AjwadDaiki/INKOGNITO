@@ -89,8 +89,8 @@ function MiniDrawingCanvasComponent({
 
   return (
     <div
-      className={clsx("relative", className)}
-      style={{ width: size, height: size, maxWidth: "100%" }}
+      className={clsx("relative aspect-square", className)}
+      style={{ width: size, maxWidth: "100%" }}
     >
       <canvas
         ref={ref}

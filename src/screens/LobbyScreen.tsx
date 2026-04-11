@@ -169,12 +169,14 @@ export function LobbyScreen({
                     <motion.div
                       key={player.id}
                       initial={{ opacity: 0, y: 12, rotate: index % 2 === 0 ? -1.1 : 1 }}
-                      animate={{ opacity: 1, y: 0, rotate: index % 2 === 0 ? -1.1 : 1 }}
+                      animate={{ opacity: player.connected ? 1 : 0.45, y: 0, rotate: index % 2 === 0 ? -1.1 : 1 }}
                       transition={{ delay: index * 0.04, type: "spring", stiffness: 240, damping: 22 }}
                       className={`rounded-[1.3rem] border px-3 py-2.5 shadow-card ${
-                        player.id === selfPlayer.id
-                          ? "border-[rgba(212,160,23,0.22)] bg-primary-light/50"
-                          : "border-[rgba(74,60,46,0.1)] bg-paper"
+                        !player.connected
+                          ? "border-[rgba(74,60,46,0.08)] bg-paper/50 grayscale"
+                          : player.id === selfPlayer.id
+                            ? "border-[rgba(212,160,23,0.22)] bg-primary-light/50"
+                            : "border-[rgba(74,60,46,0.1)] bg-paper"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -189,7 +191,7 @@ export function LobbyScreen({
                             {player.profile.name}
                           </div>
                           <div className="mt-1 text-[11px] text-ink-500">
-                            {player.isHost ? "hôte" : "joueur"} — {player.ready ? "prêt" : "attend"}
+                            {!player.connected ? "déconnecté..." : player.isHost ? "hôte" : "joueur"} — {!player.connected ? "en attente" : player.ready ? "prêt" : "attend"}
                           </div>
                         </div>
                       </div>

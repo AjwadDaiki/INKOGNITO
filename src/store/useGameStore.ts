@@ -65,7 +65,12 @@ function getSocket() {
     socket = io(socketUrl, {
       autoConnect: true,
       transports: ["websocket"],
-      closeOnBeforeunload: true
+      closeOnBeforeunload: true,
+      reconnection: true,
+      reconnectionAttempts: 50,
+      reconnectionDelay: 500,
+      reconnectionDelayMax: 5000,
+      timeout: 10000
     });
   }
   return socket;

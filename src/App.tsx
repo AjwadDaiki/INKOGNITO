@@ -228,7 +228,7 @@ export default function App() {
   ]);
 
   return (
-    <div className="relative h-full min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-x-hidden">
       <MeshBackground />
 
       <AnimatePresence mode="wait" initial={false}>
@@ -253,7 +253,7 @@ export default function App() {
             duration: 0.5,
             ease: [0.22, 1, 0.36, 1]
           }}
-          className="relative z-10 h-full will-change-transform"
+          className="relative z-10 min-h-screen will-change-transform"
         >
           {screen.node}
         </motion.div>

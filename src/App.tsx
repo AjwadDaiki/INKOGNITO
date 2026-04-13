@@ -62,6 +62,7 @@ export default function App() {
       createRoom: state.createRoom,
       createPublicRoom: state.createPublicRoom,
       fetchPublicRooms: state.fetchPublicRooms,
+      publicRooms: state.publicRooms,
       joinRoom: state.joinRoom,
       updateSettings: state.updateSettings,
       toggleReady: state.toggleReady,

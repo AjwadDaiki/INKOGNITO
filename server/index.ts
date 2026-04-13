@@ -94,6 +94,7 @@ io.on("connection", (socket) => {
     callback(rooms.quickPlay(socket.id, payload));
   });
   socket.on("cancel_quick_play", (payload) => rooms.cancelQuickPlay(payload));
+  socket.on("list_public_rooms", (callback) => callback(rooms.listPublicRooms()));
   socket.on("disconnect", () => rooms.handleDisconnect(socket.id));
 });
 

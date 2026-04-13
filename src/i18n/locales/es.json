@@ -124,6 +124,14 @@
   "matchmaking.cancel": "Cancelar",
   "matchmaking.noPlayers": "Nadie en cola — ¡crea una sala privada!",
 
+  "publicRooms.title": "Salas públicas",
+  "publicRooms.players": "{count}/{max}",
+  "publicRooms.join": "Unirse",
+  "publicRooms.empty": "No hay salas públicas — ¡crea una!",
+  "publicRooms.create": "Crear sala pública",
+  "publicRooms.refresh": "Actualizar",
+  "publicRooms.back": "Volver",
+
   "error.roomNotFound": "Sala no encontrada.",
   "error.gameStarted": "La partida ya ha empezado.",
   "error.roomFull": "La sala está llena.",

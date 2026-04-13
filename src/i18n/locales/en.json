@@ -124,6 +124,14 @@
   "matchmaking.cancel": "Cancel",
   "matchmaking.noPlayers": "Nobody in queue — create a private room!",
 
+  "publicRooms.title": "Public rooms",
+  "publicRooms.players": "{count}/{max}",
+  "publicRooms.join": "Join",
+  "publicRooms.empty": "No public rooms — create one!",
+  "publicRooms.create": "Create public room",
+  "publicRooms.refresh": "Refresh",
+  "publicRooms.back": "Back",
+
   "error.roomNotFound": "Room not found.",
   "error.gameStarted": "The game has already started.",
   "error.roomFull": "The room is full.",

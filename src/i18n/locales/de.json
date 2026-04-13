@@ -124,6 +124,14 @@
   "matchmaking.cancel": "Abbrechen",
   "matchmaking.noPlayers": "Niemand in der Warteschlange — erstelle einen privaten Raum!",
 
+  "publicRooms.title": "Öffentliche Räume",
+  "publicRooms.players": "{count}/{max}",
+  "publicRooms.join": "Beitreten",
+  "publicRooms.empty": "Keine öffentlichen Räume — erstelle einen!",
+  "publicRooms.create": "Öffentlichen Raum erstellen",
+  "publicRooms.refresh": "Aktualisieren",
+  "publicRooms.back": "Zurück",
+
   "error.roomNotFound": "Raum nicht gefunden.",
   "error.gameStarted": "Das Spiel hat bereits begonnen.",
   "error.roomFull": "Der Raum ist voll.",

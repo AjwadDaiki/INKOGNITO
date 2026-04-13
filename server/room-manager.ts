@@ -89,6 +89,7 @@ interface ServerRoom {
   finalResults: FinalResultsView | null;
   systemNotice: string | null;
   timeoutHandle: NodeJS.Timeout | null;
+  isPublic: boolean;
 }
 
 export class RoomManager {
@@ -99,7 +100,7 @@ export class RoomManager {
     private readonly io: Server<ClientToServerEvents, ServerToClientEvents>
   ) {}
 
-  createRoom(socketId: string, payload: { clientId: string; profile: PlayerProfile }) {
+  createRoom(socketId: string, payload: { clientId: string; profile: PlayerProfile; isPublic?: boolean }) {
     const code = generateRoomCode(new Set(this.rooms.keys()));
     const playerId = createId("player");
     const player = this.createPlayer({
@@ -130,7 +131,8 @@ export class RoomManager {
       usedWordPairIds: [],
       finalResults: null,
       systemNotice: "Salon créé. Invite tes suspects.",
-      timeoutHandle: null
+      timeoutHandle: null,
+      isPublic: payload.isPublic ?? false
     };
 
     this.rooms.set(code, room);
@@ -645,6 +647,29 @@ export class RoomManager {
     this.emitRoomState(room);
   }
 
+  // ─── Public Room Listing ───
+
+  listPublicRooms(): import("../shared/protocol.js").PublicRoomInfo[] {
+    const results: import("../shared/protocol.js").PublicRoomInfo[] = [];
+    for (const room of this.rooms.values()) {
+      if (!room.isPublic) continue;
+      if (room.status !== "lobby") continue;
+      if (room.settings.locked) continue;
+      if (room.players.length >= MAX_PLAYERS) continue;
+      const host = room.players.find((p) => p.id === room.hostId);
+      results.push({
+        roomCode: room.code,
+        hostName: host?.profile.name ?? "???",
+        playerCount: room.players.filter((p) => p.connected).length,
+        maxPlayers: MAX_PLAYERS,
+        mode: room.settings.mode,
+        language: room.settings.language,
+        createdAt: room.createdAt
+      });
+    }
+    return results.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
   // ─── Matchmaking Queue ───
 
   private matchmakingQueue: Array<{
@@ -749,7 +774,8 @@ export class RoomManager {
       usedWordPairIds: [],
       finalResults: null,
       systemNotice: "Matchmaking — Partie trouvée !",
-      timeoutHandle: null
+      timeoutHandle: null,
+      isPublic: true
     };
 
     this.rooms.set(code, room);

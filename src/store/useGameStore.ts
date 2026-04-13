@@ -7,6 +7,7 @@ import type {
   DrawingStroke,
   GameMode,
   PlayerProfile,
+  PublicRoomInfo,
   ReactionEmoji,
   RoomSettings,
   RoomView,
@@ -36,11 +37,14 @@ interface GameStoreState {
   initialized: boolean;
   livePreviews: Record<string, DrawingStroke | null>;
   lightboxPlayerId: string | null;
+  publicRooms: PublicRoomInfo[];
   init: () => void;
   clearError: () => void;
   setLightboxPlayerId: (playerId: string | null) => void;
   updateProfile: (profile: Partial<PlayerProfile>) => void;
   createRoom: () => void;
+  createPublicRoom: () => void;
+  fetchPublicRooms: () => void;
   joinRoom: (roomCode: string) => void;
   autoJoinFromUrl: () => void;
   updateSettings: (settings: Partial<RoomSettings>) => void;
@@ -98,6 +102,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   initialized: false,
   livePreviews: {},
   lightboxPlayerId: null,
+  publicRooms: [],
 
   init: () => {
     if (get().initialized) return;
@@ -179,6 +184,27 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         setRoomCodeInUrl(response.roomCode ?? null);
       }
     );
+  },
+
+  createPublicRoom: () => {
+    set({ loading: true, error: null });
+    getSocket().emit(
+      "create_room",
+      { clientId: get().clientId, profile: get().profile, isPublic: true },
+      (response) => {
+        if (!response.ok) {
+          set({ loading: false, error: response.error ?? "Impossible de créer la room." });
+          return;
+        }
+        setRoomCodeInUrl(response.roomCode ?? null);
+      }
+    );
+  },
+
+  fetchPublicRooms: () => {
+    getSocket().emit("list_public_rooms", (rooms) => {
+      set({ publicRooms: rooms });
+    });
   },
 
   joinRoom: (roomCode) => {

@@ -46,7 +46,10 @@ export default function App() {
     kickPlayer,
     quickPlay,
     cancelQuickPlay,
-    clearError
+    clearError,
+    publicRooms,
+    createPublicRoom,
+    fetchPublicRooms
   } = useGameStore(
     useShallow((state) => ({
       init: state.init,
@@ -57,6 +60,8 @@ export default function App() {
       socketConnected: state.socketConnected,
       updateProfile: state.updateProfile,
       createRoom: state.createRoom,
+      createPublicRoom: state.createPublicRoom,
+      fetchPublicRooms: state.fetchPublicRooms,
       joinRoom: state.joinRoom,
       updateSettings: state.updateSettings,
       toggleReady: state.toggleReady,
@@ -117,9 +122,12 @@ export default function App() {
             profile={profile}
             loading={loading}
             error={error}
+            publicRooms={publicRooms}
             onProfileChange={updateProfile}
             onCreate={createRoom}
+            onCreatePublic={createPublicRoom}
             onJoin={joinRoom}
+            onFetchPublicRooms={fetchPublicRooms}
             onQuickPlay={quickPlay}
             onCancelQuickPlay={cancelQuickPlay}
           />
@@ -193,6 +201,9 @@ export default function App() {
     error,
     updateProfile,
     createRoom,
+    createPublicRoom,
+    fetchPublicRooms,
+    publicRooms,
     joinRoom,
     updateSettings,
     toggleReady,

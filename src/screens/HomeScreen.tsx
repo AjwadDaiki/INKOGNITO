@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import type { GameMode, PlayerProfile } from "@shared/protocol";
+import type { GameMode, PlayerProfile, PublicRoomInfo } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
 import { ProfileEditor } from "@/components/ui/ProfileEditor";
 import { InkSplatter } from "@/components/ui/InkSplatter";
@@ -15,18 +15,24 @@ export function HomeScreen({
   profile,
   loading,
   error,
+  publicRooms,
   onProfileChange,
   onCreate,
+  onCreatePublic,
   onJoin,
+  onFetchPublicRooms,
   onQuickPlay,
   onCancelQuickPlay
 }: {
   profile: PlayerProfile;
   loading: boolean;
   error: string | null;
+  publicRooms: PublicRoomInfo[];
   onProfileChange: (patch: Partial<PlayerProfile>) => void;
   onCreate: () => void;
+  onCreatePublic: () => void;
   onJoin: (roomCode: string) => void;
+  onFetchPublicRooms: () => void;
   onQuickPlay: (language: string, mode: GameMode) => void;
   onCancelQuickPlay: () => void;
 }) {
@@ -35,7 +41,7 @@ export function HomeScreen({
   const locale = useI18n((s) => s.locale);
   const setLocale = useI18n((s) => s.setLocale);
   const [showLangPicker, setShowLangPicker] = useState(false);
-  const [inQueue, setInQueue] = useState(false);
+  const [showPublicRooms, setShowPublicRooms] = useState(false);
   const streamerEnabled = useStreamerMode((s) => s.enabled);
   const toggleStreamer = useStreamerMode((s) => s.toggle);
 
@@ -125,21 +131,69 @@ export function HomeScreen({
 
           <div className="paper-divider my-6" />
 
-          {inQueue ? (
-            <div className="space-y-4 text-center">
-              <div className="font-sketch text-2xl font-semibold text-ink-900">
-                {t("matchmaking.searching")}
+          {showPublicRooms ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="font-sketch text-2xl font-semibold text-ink-900">
+                  {t("publicRooms.title")}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={onFetchPublicRooms}
+                    className="rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:bg-paper-warm"
+                  >
+                    {t("publicRooms.refresh")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPublicRooms(false)}
+                    className="rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:bg-paper-warm"
+                  >
+                    {t("publicRooms.back")}
+                  </button>
+                </div>
               </div>
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-ink-200 border-t-ink-800" />
+
+              {publicRooms.length === 0 ? (
+                <div className="rounded-[1.2rem] border border-[rgba(74,60,46,0.08)] bg-paper/60 px-4 py-6 text-center text-sm text-ink-500">
+                  {t("publicRooms.empty")}
+                </div>
+              ) : (
+                <div className="max-h-[280px] space-y-2 overflow-y-auto">
+                  {publicRooms.map((room) => (
+                    <div
+                      key={room.roomCode}
+                      className="flex items-center justify-between rounded-[1.2rem] border border-[rgba(74,60,46,0.10)] bg-paper/80 px-4 py-3"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate font-sketch text-lg font-semibold text-ink-950">
+                          {room.hostName}
+                        </div>
+                        <div className="flex gap-3 text-xs text-ink-500">
+                          <span>{t("publicRooms.players", { count: room.playerCount, max: room.maxPlayers })}</span>
+                          <span>{room.mode}</span>
+                        </div>
+                      </div>
+                      <Button
+                        tone="primary"
+                        onClick={() => onJoin(room.roomCode)}
+                        disabled={loading}
+                      >
+                        {t("publicRooms.join")}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <Button
                 tone="secondary"
-                onClick={() => {
-                  setInQueue(false);
-                  onCancelQuickPlay();
-                }}
+                onClick={onCreatePublic}
+                disabled={loading}
                 fullWidth
               >
-                {t("matchmaking.cancel")}
+                {t("publicRooms.create")}
               </Button>
             </div>
           ) : (
@@ -184,12 +238,12 @@ export function HomeScreen({
                     </Button>
                   </div>
 
-                  {/* Quick Play */}
+                  {/* Public Rooms */}
                   <Button
                     tone="primary"
                     onClick={() => {
-                      setInQueue(true);
-                      onQuickPlay(locale, "classic");
+                      setShowPublicRooms(true);
+                      onFetchPublicRooms();
                     }}
                     disabled={loading}
                     fullWidth

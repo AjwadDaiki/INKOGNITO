@@ -124,6 +124,14 @@
   "matchmaking.cancel": "Annuler",
   "matchmaking.noPlayers": "Personne en file — crée une salle privée !",
 
+  "publicRooms.title": "Salons publics",
+  "publicRooms.players": "{count}/{max}",
+  "publicRooms.join": "Rejoindre",
+  "publicRooms.empty": "Aucun salon public — crée le tien !",
+  "publicRooms.create": "Créer un salon public",
+  "publicRooms.refresh": "Rafraîchir",
+  "publicRooms.back": "Retour",
+
   "error.roomNotFound": "Salon introuvable.",
   "error.gameStarted": "La partie a déjà commencé.",
   "error.roomFull": "Le salon est plein.",

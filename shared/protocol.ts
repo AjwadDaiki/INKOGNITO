@@ -198,10 +198,21 @@ export interface DrawingStreamMessage {
   stroke?: DrawingStroke;
 }
 
+export interface PublicRoomInfo {
+  roomCode: string;
+  hostName: string;
+  playerCount: number;
+  maxPlayers: number;
+  mode: GameMode;
+  language: string;
+  createdAt: number;
+}
+
 export interface CreateRoomPayload {
   profile: PlayerProfile;
   clientId: string;
   language?: string;
+  isPublic?: boolean;
 }
 
 export interface QuickPlayPayload {
@@ -292,6 +303,9 @@ export interface ClientToServerEvents {
     callback: (response: ClientRoomAck) => void
   ) => void;
   cancel_quick_play: (payload: { clientId: string }) => void;
+  list_public_rooms: (
+    callback: (rooms: PublicRoomInfo[]) => void
+  ) => void;
 }
 
 export interface ServerToClientEvents {

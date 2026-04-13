@@ -652,7 +652,6 @@ export class RoomManager {
   listPublicRooms(): import("../shared/protocol.js").PublicRoomInfo[] {
     const results: import("../shared/protocol.js").PublicRoomInfo[] = [];
     for (const room of this.rooms.values()) {
-      if (!room.isPublic) continue;
       if (room.status !== "lobby") continue;
       if (room.settings.locked) continue;
       if (room.players.length >= MAX_PLAYERS) continue;

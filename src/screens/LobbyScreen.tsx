@@ -113,7 +113,7 @@ export function LobbyScreen({
   }
 
   return (
-    <div className="relative flex h-[100svh] items-center justify-center overflow-hidden p-3 md:p-5">
+    <div className="relative flex min-h-[100svh] items-center justify-center overflow-y-auto p-3 md:p-5 lg:h-[100svh] lg:min-h-0 lg:overflow-hidden">
       <InkSplatter variant={0} className="left-[3%] top-[9%]" size={210} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[5%] right-[4%]" size={230} opacity={0.08} />
       <CoffeeStain className="bottom-[14%] left-[6%] -rotate-12" size={110} opacity={0.055} />
@@ -123,7 +123,7 @@ export function LobbyScreen({
         initial={{ opacity: 0, y: 24, rotate: -1 }}
         animate={{ opacity: 1, y: 0, rotate: -0.4 }}
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full flex-col overflow-hidden px-5 py-5 md:px-8"
+        className="paper-sheet notebook-page desk-shadow animate-page-settle flex w-full flex-col overflow-y-auto px-5 py-5 md:px-8 lg:h-full lg:overflow-hidden"
       >
         <SpiralBinding />
         <div className="pointer-events-none absolute right-8 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
@@ -180,9 +180,9 @@ export function LobbyScreen({
 
           <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[1.16fr_0.84fr]">
             <div className="min-h-0 rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/88 px-4 py-4 md:px-5">
-              <div className="flex h-full min-h-0 flex-col">
+              <div className="flex min-h-0 flex-col lg:h-full">
                 <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">{t("lobby.title")}</div>
-                <div className="grid flex-1 auto-rows-min gap-2.5 overflow-hidden sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid flex-1 auto-rows-min gap-2.5 overflow-y-auto sm:grid-cols-2 xl:grid-cols-3">
                   {room.players.map((player, index) => (
                     <motion.div
                       key={player.id}

@@ -64,7 +64,7 @@ export function ResolutionShowcase({
         : "???";
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden md:gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto md:gap-3 lg:overflow-hidden">
       {/* Verdict banner — big & dramatic */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -158,7 +158,7 @@ export function ResolutionShowcase({
       ) : null}
 
       {/* All players — scrollable grid */}
-      <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-hidden rounded-[1.6rem] p-3 md:p-4">
+      <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-y-auto rounded-[1.6rem] p-3 md:p-4 lg:overflow-hidden">
         <div className="scrollbar-thin flex h-full items-start justify-center overflow-y-auto pl-6 md:pl-8">
           <div
             className={`grid w-full place-items-center gap-3 ${

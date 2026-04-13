@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { PlayerView, RoomView } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
@@ -44,11 +45,40 @@ export function RoleRevealScreen({
 }) {
   const t = useI18n((s) => s.t);
   const ownWord = room.round?.role.ownWord ?? null;
+  const ownRole = room.round?.role.ownRole;
   const confirmedCount = room.roleConfirmedPlayerIds.length;
   const tone = roleTone(room, t);
+  const isMrWhite = ownRole === "mr_white";
+  const hasConfirmed = room.roleConfirmedPlayerIds.includes(selfPlayer.id);
+
+  // 30s countdown with auto-confirm
+  const ROLE_REVEAL_SECONDS = 30;
+  const [secondsLeft, setSecondsLeft] = useState(ROLE_REVEAL_SECONDS);
+  const confirmedRef = useRef(false);
+
+  useEffect(() => {
+    if (hasConfirmed) {
+      confirmedRef.current = true;
+      return;
+    }
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          if (!confirmedRef.current) {
+            confirmedRef.current = true;
+            onConfirm();
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [hasConfirmed, onConfirm]);
 
   return (
-    <div className="relative flex h-[100svh] items-center justify-center overflow-hidden p-4 md:p-6">
+    <div className="relative flex min-h-[100svh] items-center justify-center overflow-y-auto p-4 md:p-6 lg:h-[100svh] lg:min-h-0 lg:overflow-hidden">
       <InkSplatter variant={0} className="left-[8%] top-[10%]" size={220} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[10%] right-[8%]" size={220} opacity={0.09} />
 
@@ -70,16 +100,23 @@ export function RoleRevealScreen({
                 {selfPlayer.profile.name}
               </div>
             </div>
-            {/* Stamp effect — role arrives like a rubber stamp pressed on paper */}
-            <motion.div
-              initial={{ scale: 1.6, opacity: 0, filter: "blur(6px)", rotate: -8 }}
-              animate={{ scale: 1, opacity: 1, filter: "blur(0px)", rotate: -3 }}
-              transition={{ delay: 0.35, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className={`rounded-[0.6rem] border-[3px] border-dashed px-5 py-2.5 font-sketch text-2xl font-bold uppercase tracking-[0.22em] ${tone.stamp}`}
-              style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.5)" }}
-            >
-              {tone.title}
-            </motion.div>
+            {/* Stamp effect — only shown for Mr. White (others discover their role at the end) */}
+            {isMrWhite ? (
+              <motion.div
+                initial={{ scale: 1.6, opacity: 0, filter: "blur(6px)", rotate: -8 }}
+                animate={{ scale: 1, opacity: 1, filter: "blur(0px)", rotate: -3 }}
+                transition={{ delay: 0.35, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className={`rounded-[0.6rem] border-[3px] border-dashed px-5 py-2.5 font-sketch text-2xl font-bold uppercase tracking-[0.22em] ${tone.stamp}`}
+                style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.5)" }}
+              >
+                {tone.title}
+              </motion.div>
+            ) : (
+              /* Countdown timer for non-Mr White players */
+              <div className="flex items-center gap-2 rounded-full border border-[rgba(74,60,46,0.15)] bg-paper px-4 py-2 font-sketch text-xl font-bold text-ink-700">
+                ⏱ {secondsLeft}s
+              </div>
+            )}
           </div>
 
           <div className="paper-divider my-5" />
@@ -97,7 +134,9 @@ export function RoleRevealScreen({
               <div className="mt-3 font-sketch text-6xl font-bold leading-none text-ink-950 md:text-7xl">
                 {ownWord ?? "?"}
               </div>
-              <div className="mt-4 text-base text-ink-700 md:text-lg">{tone.subtitle}</div>
+              <div className="mt-4 text-base text-ink-700 md:text-lg">
+                {isMrWhite ? tone.subtitle : t("role.drawThisWord")}
+              </div>
             </motion.div>
           </StreamerWordGuard>
 
@@ -120,10 +159,15 @@ export function RoleRevealScreen({
             </div>
           </div>
 
-          <div className="mt-6">
-            <Button onClick={onConfirm} fullWidth>
-              {t("role.memorized")}
+          <div className="mt-6 flex items-center gap-3">
+            <Button onClick={onConfirm} fullWidth disabled={hasConfirmed}>
+              {hasConfirmed ? t("role.waiting") : t("role.memorized")}
             </Button>
+            {isMrWhite && !hasConfirmed ? (
+              <div className="shrink-0 rounded-full border border-[rgba(74,60,46,0.15)] bg-paper px-4 py-2 font-sketch text-xl font-bold text-ink-700">
+                ⏱ {secondsLeft}s
+              </div>
+            ) : null}
           </div>
         </div>
       </motion.div>

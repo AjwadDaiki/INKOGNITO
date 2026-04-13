@@ -229,7 +229,7 @@ export function GameScreen({
   }
 
   return (
-    <div className="relative mx-auto flex h-[100svh] max-h-[100svh] w-full max-w-[1720px] flex-col gap-2 overflow-hidden p-2 md:gap-3 md:p-3">
+    <div className="relative mx-auto flex h-[100svh] w-full max-w-[1720px] flex-col gap-2 overflow-y-auto p-2 md:gap-3 md:p-3 lg:max-h-[100svh] lg:overflow-hidden">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={room.phase}
@@ -270,8 +270,8 @@ export function GameScreen({
                   <div className="text-xs text-ink-500">{t("vote.tapToVote")}</div>
                 ) : null}
               </div>
-              {/* Vote grid — measured to fit without scroll */}
-              <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-hidden rounded-[1.6rem] p-2 md:p-3">
+              {/* Vote grid — scrollable on mobile, fit on desktop */}
+              <div className="paper-sheet notebook-page min-h-0 flex-1 overflow-y-auto rounded-[1.6rem] p-2 md:p-3 lg:overflow-hidden">
                 <VoteGrid
                   players={roundPlayers}
                   renderCard={makeCard}

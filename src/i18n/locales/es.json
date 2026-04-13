@@ -67,6 +67,8 @@
   "role.confirmations": "Confirmaciones",
   "role.pagesClosed": "páginas cerradas",
   "role.memorized": "Memorizado",
+  "role.waiting": "Esperando...",
+  "role.drawThisWord": "Memoriza esta palabra y dibújala sin escribirla.",
 
   "draw.secretWord": "Palabra secreta",
   "draw.drawings": "{count} dibujo{plural}",

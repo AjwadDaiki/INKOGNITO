@@ -178,13 +178,13 @@ export function DrawingPhase({
   );
 
   if (isMobile) {
-    // Mobile: vertical split — canvas 62%, others 38%
+    // Mobile: scrollable vertical layout — canvas fixed height, others below
     return (
-      <div className="flex h-full min-h-0 flex-1 flex-col gap-2">
-        <div className="flex min-h-0" style={{ flex: "0 0 62%" }}>
+      <div className="flex h-full min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+        <div className="flex shrink-0" style={{ height: "62svh" }}>
           {canvasSection}
         </div>
-        <div className="flex min-h-0 flex-1">
+        <div className="flex shrink-0" style={{ minHeight: "38svh" }}>
           {othersSection}
         </div>
       </div>

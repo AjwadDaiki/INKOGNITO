@@ -83,9 +83,14 @@ function PlayerBoardCardComponent({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 18 }}
               title={voter.profile.name}
-              className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[rgba(74,60,46,0.22)] bg-[rgba(245,239,229,0.96)] text-lg shadow-sm"
+              className="flex flex-col items-center gap-0.5"
             >
-              {voter.profile.emoji}
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[rgba(74,60,46,0.22)] bg-[rgba(245,239,229,0.96)] text-lg shadow-sm">
+                {voter.profile.emoji}
+              </div>
+              <span className="max-w-[3rem] truncate text-center text-[8px] font-semibold leading-tight text-ink-600">
+                {voter.profile.name}
+              </span>
             </motion.div>
           ))}
           {pendingMarkers.slice(0, 8 - voteMarkers.length).map((voter) => (
@@ -95,9 +100,14 @@ function PlayerBoardCardComponent({
               animate={{ scale: 1, opacity: 0.5 }}
               transition={{ type: "spring", stiffness: 400, damping: 18 }}
               title={`${voter.profile.name} (hésite)`}
-              className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-[rgba(74,60,46,0.18)] bg-[rgba(245,239,229,0.5)] text-lg grayscale"
+              className="flex flex-col items-center gap-0.5"
             >
-              {voter.profile.emoji}
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-[rgba(74,60,46,0.18)] bg-[rgba(245,239,229,0.5)] text-lg grayscale">
+                {voter.profile.emoji}
+              </div>
+              <span className="max-w-[3rem] truncate text-center text-[8px] font-semibold leading-tight text-ink-400">
+                {voter.profile.name}
+              </span>
             </motion.div>
           ))}
           {voteMarkers.length + pendingMarkers.length > 8 ? (

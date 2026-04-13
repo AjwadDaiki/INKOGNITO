@@ -57,13 +57,13 @@ export function FinalScreen({
     : [];
 
   return (
-    <div className="relative flex h-[100dvh] items-center justify-center overflow-hidden p-3 md:p-5">
+    <div className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto p-3 md:p-5 lg:h-[100dvh] lg:min-h-0 lg:overflow-hidden">
       <InkSplatter variant={0} className="left-[7%] top-[12%]" size={220} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[8%] right-[7%]" size={230} opacity={0.09} />
       <CoffeeStain className="right-[10%] top-[6%] rotate-[30deg]" size={130} opacity={0.06} />
 
       <StackedPages className="h-full w-full max-w-[1580px]">
-      <div className="paper-sheet notebook-page desk-shadow animate-page-settle flex h-full w-full flex-col overflow-hidden px-5 py-5 md:px-8">
+      <div className="paper-sheet notebook-page desk-shadow animate-page-settle flex w-full flex-col overflow-y-auto px-5 py-5 md:px-8 lg:h-full lg:overflow-hidden">
         <SpiralBinding />
         <div className="absolute right-10 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
         <div className="absolute bottom-12 left-8 h-16 w-16 rounded-full bg-ink-950/6" />

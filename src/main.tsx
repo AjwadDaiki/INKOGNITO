@@ -60,10 +60,13 @@ window.addEventListener("unhandledrejection", (event) => {
 });
 
 import("./App")
-  .then(({ default: App }) => {
+  .then(async ({ default: App }) => {
+    const { ErrorBoundary } = await import("./components/ui/ErrorBoundary");
     root.render(
       <React.StrictMode>
-        <App />
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
       </React.StrictMode>
     );
   })

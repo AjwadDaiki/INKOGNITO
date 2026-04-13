@@ -3,31 +3,150 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="description" content="INKOGNITO — un party game multijoueur de déduction sociale par le dessin." />
+
+    <!-- Primary Meta -->
+    <title>INKOGNITO — Jeu de dessin multijoueur en ligne | Drawing Party Game</title>
+    <meta name="description" content="Inkognito: jeu de dessin multijoueur en ligne gratuit. Dessine, bluffe, démasque l'imposteur ! Joue avec tes amis sur navigateur. Free online multiplayer drawing game — draw, bluff, unmask!" />
+    <meta name="keywords" content="inkognito, jeu de dessin en ligne, jeu multijoueur navigateur, party game en ligne, jeu entre amis, undercover game, drawing game online, multiplayer browser game, online party game, play with friends, jeu de déduction, social deduction game, impostor drawing game, gartic, skribbl alternative, jeu gratuit en ligne, free browser game, juego de dibujo online, jogo de desenho online, Zeichenspiel online, jeu discord, game night, soirée jeux" />
+
+    <!-- Multilingual SEO: hreflang -->
+    <link rel="alternate" hreflang="fr" href="https://inkognito.fun/?lang=fr" />
+    <link rel="alternate" hreflang="en" href="https://inkognito.fun/?lang=en" />
+    <link rel="alternate" hreflang="es" href="https://inkognito.fun/?lang=es" />
+    <link rel="alternate" hreflang="pt" href="https://inkognito.fun/?lang=pt" />
+    <link rel="alternate" hreflang="de" href="https://inkognito.fun/?lang=de" />
+    <link rel="alternate" hreflang="x-default" href="https://inkognito.fun/" />
+    <link rel="canonical" href="https://inkognito.fun/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="INKOGNITO" />
-    <meta property="og:description" content="Un party game multijoueur de déduction par le dessin. Dessine, bluff, démasque !" />
+    <meta property="og:site_name" content="Inkognito" />
+    <meta property="og:title" content="INKOGNITO — Drawing Party Game" />
+    <meta property="og:description" content="Free online multiplayer drawing game. Draw, bluff, unmask the impostor! Play with friends on any browser." />
+    <meta property="og:url" content="https://inkognito.fun/" />
+    <meta property="og:image" content="https://inkognito.fun/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+    <meta property="og:locale:alternate" content="de_DE" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="INKOGNITO" />
-    <meta name="twitter:description" content="Un party game multijoueur de déduction par le dessin." />
+    <meta name="twitter:title" content="INKOGNITO — Drawing Party Game" />
+    <meta name="twitter:description" content="Free online multiplayer drawing game. Draw, bluff, unmask the impostor!" />
+    <meta name="twitter:image" content="https://inkognito.fun/og-image.png" />
 
-    <!-- Fonts: Plus Jakarta Sans (display) + Be Vietnam Pro (body) + JetBrains Mono -->
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1a1410" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Inkognito" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7EYJSLC0EK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-7EYJSLC0EK');
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Inkognito",
+      "alternateName": ["INKOGNITO", "Inkognito Game", "Inkognito Drawing Game", "Inkognito Online"],
+      "url": "https://inkognito.fun",
+      "image": "https://inkognito.fun/og-image.png",
+      "description": "Free online multiplayer social deduction drawing game. Draw, bluff, and unmask the impostor with friends! 3-12 players, no download.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any (browser-based)",
+      "gamePlatform": ["Web Browser", "Mobile Browser"],
+      "playMode": "MultiPlayer",
+      "numberOfPlayers": {
+        "@type": "QuantitativeValue",
+        "minValue": 3,
+        "maxValue": 12
+      },
+      "genre": ["Party Game", "Social Deduction", "Drawing Game", "Casual"],
+      "inLanguage": ["fr", "en", "es", "pt", "de"],
+      "browserRequirements": "Requires a modern web browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "HiddenLab",
+        "url": "https://hiddenlab.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "HiddenLab",
+        "url": "https://hiddenlab.com"
+      }
+    }
+    </script>
+
+    <!-- Preconnect: fonts + WebSocket server -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link rel="preconnect" href="https://inkognito.fun" crossorigin="" />
+
+    <!-- Fonts: Caveat (sketch) + Be Vietnam Pro (body) — preload critical font -->
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/caveat/v18/WnznHAc5bAfYB2QRah7pcpNvOx-pjSP6SIZjQA.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin=""
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <title>INKOGNITO — Party Game de Déduction</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Noscript SEO content for crawlers -->
+    <noscript>
+      <h1>Inkognito — Free Online Multiplayer Drawing Party Game</h1>
+      <p>Inkognito is a free online multiplayer social deduction drawing game. Draw, bluff, and unmask the impostor! Play with friends on any browser — no download required.</p>
+      <h2>Play in your language</h2>
+      <ul>
+        <li><a href="/?lang=fr">Français — Jeu de dessin multijoueur en ligne gratuit</a></li>
+        <li><a href="/?lang=en">English — Free online multiplayer drawing game</a></li>
+        <li><a href="/?lang=es">Español — Juego de dibujo multijugador en línea gratis</a></li>
+        <li><a href="/?lang=pt">Português — Jogo de desenho multijogador online grátis</a></li>
+        <li><a href="/?lang=de">Deutsch — Kostenloses Online-Mehrspieler-Zeichenspiel</a></li>
+      </ul>
+      <h2>How to play</h2>
+      <p>Everyone draws the same word — except the Undercover, who has a similar but different word. Compare drawings, find the impostor, and vote them out! Mr. White has no word at all and must bluff their way through.</p>
+      <h2>Features</h2>
+      <ul>
+        <li>Real-time multiplayer drawing</li>
+        <li>Social deduction and voting</li>
+        <li>Private rooms with invite codes</li>
+        <li>Public matchmaking (Quick Play)</li>
+        <li>5 languages: French, English, Spanish, Portuguese, German</li>
+        <li>Classic mode + Mr. White mode</li>
+        <li>Works on mobile, tablet, and desktop</li>
+      </ul>
+      <p><a href="https://hiddenlab.com">hiddenlab.com</a></p>
+    </noscript>
   </body>
 </html>

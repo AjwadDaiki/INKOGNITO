@@ -8,11 +8,13 @@ import { StackedPages } from "@/components/ui/StackedPages";
 import { WashiTape } from "@/components/ui/WashiTape";
 import { SpiralBinding } from "@/components/ui/SpiralBinding";
 import { InkBleed } from "@/components/ui/InkBleed";
+import { ShareRecap } from "@/components/game/ShareRecap";
+import { useI18n } from "@/i18n";
 
-function roleLabel(role: PlayerRole) {
-  if (role === "undercover") return "Undercover";
-  if (role === "mr_white") return "Mr White";
-  return "Civil";
+function roleLabel(role: PlayerRole, t: (key: string) => string) {
+  if (role === "undercover") return t("role.undercover");
+  if (role === "mr_white") return t("role.mrWhite");
+  return t("role.civil");
 }
 
 function roleBg(role: PlayerRole) {
@@ -32,6 +34,7 @@ export function FinalScreen({
   onReplay: () => void;
   onReturnToLobby: () => void;
 }) {
+  const t = useI18n((s) => s.t);
   const finalResults = room.finalResults;
   if (!finalResults) return null;
 
@@ -69,20 +72,25 @@ export function FinalScreen({
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <div className="text-xs uppercase tracking-[0.18em] text-ink-500">Fin de partie</div>
+              <div className="text-xs uppercase tracking-[0.18em] text-ink-500">{t("final.gameOver")}</div>
               <div className="mt-1 font-sketch text-5xl font-bold leading-none text-ink-950 md:text-6xl">
-                Table des scores
+                {t("final.scoreboard")}
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <ShareRecap
+                finalResults={finalResults}
+                players={room.players}
+                roomCode={room.roomCode}
+              />
               <Button onClick={onReplay} disabled={!selfPlayer.isHost}>
-                Rejouer
+                {t("final.replay")}
               </Button>
               <Button tone="secondary" onClick={onReturnToLobby} disabled={!selfPlayer.isHost}>
-                Retour lobby
+                {t("final.backToLobby")}
               </Button>
               {!selfPlayer.isHost ? (
-                <span className="text-xs text-ink-400">L'hôte décide</span>
+                <span className="text-xs text-ink-400">{t("final.hostDecides")}</span>
               ) : null}
             </div>
           </div>
@@ -91,7 +99,7 @@ export function FinalScreen({
 
           <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[0.72fr_1.28fr]">
             <div className="min-h-0 rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/84 px-4 py-4">
-              <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">Classement final</div>
+              <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">{t("final.leaderboard")}</div>
               <div className="scrollbar-thin flex max-h-[62vh] flex-col gap-3 overflow-y-auto pr-1">
                 {finalResults.leaderboard.map((entry, index) => {
                   const player = playersById[entry.playerId];
@@ -152,7 +160,7 @@ export function FinalScreen({
                     >
                       <div className="paper-sheet px-4 py-4">
                         <div className="font-sketch text-3xl font-semibold text-ink-950">
-                          Mots du round
+                          {t("final.roundWords")}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           <span className="ink-chip text-sm text-ink-700"><InkBleed>{selectedRound.civilWord}</InkBleed></span>
@@ -166,7 +174,7 @@ export function FinalScreen({
                             const role = selectedRound.revealedRoles[player.id];
                             return (
                               <div key={player.id} className={`rounded-full border px-3 py-1.5 text-sm font-semibold ${roleBg(role)}`}>
-                                {player.profile.name} · {roleLabel(role)}
+                                {player.profile.name} · {roleLabel(role, t)}
                               </div>
                             );
                           })}
@@ -190,19 +198,19 @@ export function FinalScreen({
                                   {player.profile.name}
                                 </div>
                                 <div className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${roleBg(role)}`}>
-                                  {roleLabel(role)}
+                                  {roleLabel(role, t)}
                                 </div>
                               </div>
                               {snapshot ? (
                                 <img
                                   src={snapshot}
-                                  alt={`Dessin de ${player.profile.name}`}
+                                  alt={player.profile.name}
                                   referrerPolicy="no-referrer"
                                   className="aspect-square w-full rounded-[1rem] border border-[rgba(74,60,46,0.08)] bg-[#fbf7f0] object-cover"
                                 />
                               ) : (
                                 <div className="flex aspect-square items-center justify-center rounded-[1rem] bg-[#fbf7f0] text-sm text-ink-300">
-                                  Vide
+                                  {t("final.empty")}
                                 </div>
                               )}
                             </motion.div>

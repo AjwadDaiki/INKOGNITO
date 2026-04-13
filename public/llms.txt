@@ -1,0 +1,20 @@
+# Inkognito
+> Free online multiplayer drawing party game with hidden roles (Undercover / Mr White). Draw, bluff, unmask!
+
+## Play
+- [Play now](https://inkognito.fun): Start or join a game instantly in your browser
+- [Français](https://inkognito.fun/?lang=fr): Jouer en français
+- [English](https://inkognito.fun/?lang=en): Play in English
+- [Español](https://inkognito.fun/?lang=es): Jugar en español
+- [Português](https://inkognito.fun/?lang=pt): Jogar em português
+- [Deutsch](https://inkognito.fun/?lang=de): Auf Deutsch spielen
+
+## About
+- Inkognito is a free browser-based multiplayer party game combining drawing and social deduction.
+- Players draw a secret word simultaneously. The Undercover has a similar but different word. Mr White has no word at all.
+- Compare drawings, find the impostor, and vote them out.
+- 3-12 players, works on mobile, tablet, and desktop. No download required.
+- Available in 5 languages with 300+ word pairs per language.
+
+## Publisher
+- [HiddenLab](https://hiddenlab.com)

@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { RoomView } from "@shared/protocol";
 import { phaseLabel, phaseSubtitle } from "./gameHelpers";
+import { useI18n } from "@/i18n";
 
 /** Ink drop SVG — a teardrop that falls and splashes */
 function InkDrop() {
@@ -33,6 +34,7 @@ function InkSplashRing() {
 }
 
 export function PhaseSplash({ show, phase }: { show: boolean; phase: RoomView["phase"] }) {
+  const t = useI18n((s) => s.t);
   return (
     <AnimatePresence>
       {show ? (
@@ -92,13 +94,13 @@ export function PhaseSplash({ show, phase }: { show: boolean; phase: RoomView["p
               className="absolute -bottom-6 -right-4 h-16 w-16 rounded-full bg-ink-950"
             />
             <div className="mb-1 pl-7 text-[10px] uppercase tracking-[0.28em] text-ink-500 md:pl-8">
-              La page tourne
+              {t("phase.pageFlip")}
             </div>
             <div className="font-sketch text-5xl font-bold text-ink-950 md:text-6xl">
-              {phaseLabel(phase)}
+              {phaseLabel(phase, t)}
             </div>
             <div className="mt-2 font-sketch text-2xl text-ink-700 md:text-3xl">
-              {phaseSubtitle(phase)}
+              {phaseSubtitle(phase, t)}
             </div>
           </motion.div>
         </motion.div>

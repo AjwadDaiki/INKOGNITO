@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { AVATAR_COLORS, AVATAR_EMOJIS } from "@shared/constants";
 import type { PlayerProfile } from "@shared/protocol";
+import { useI18n } from "@/i18n";
 
 function EmojiCarousel({
   value,
@@ -107,6 +108,7 @@ export function ProfileEditor({
   compact?: boolean;
   hideColor?: boolean;
 }) {
+  const t = useI18n((s) => s.t);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
@@ -125,14 +127,14 @@ export function ProfileEditor({
         <input
           value={profile.name}
           onChange={(e) => onChange({ name: e.target.value })}
-          placeholder="Ton pseudo..."
+          placeholder={t("profile.namePlaceholder")}
           className="min-h-11 flex-1 rounded-[1.15rem] px-4 text-sm font-medium text-ink-950 outline-none placeholder:text-ink-300"
         />
       </div>
 
       <div>
         {!compact ? (
-          <div className="mb-2 font-sketch text-lg font-semibold text-ink-700">Avatar</div>
+          <div className="mb-2 font-sketch text-lg font-semibold text-ink-700">{t("profile.avatar")}</div>
         ) : null}
         <EmojiCarousel
           value={profile.emoji}
@@ -143,7 +145,7 @@ export function ProfileEditor({
       {!hideColor ? (
         <div>
           {!compact ? (
-            <div className="mb-2 font-sketch text-lg font-semibold text-ink-700">Encre</div>
+            <div className="mb-2 font-sketch text-lg font-semibold text-ink-700">{t("profile.ink")}</div>
           ) : null}
           <ColorDots value={profile.color} onChange={(color) => onChange({ color })} />
         </div>

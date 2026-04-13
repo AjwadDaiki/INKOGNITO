@@ -39,6 +39,8 @@ export interface RoomSettings {
   difficulty: Difficulty;
   selectedCategories: string[];
   customWordPairs: WordPair[];
+  language: string;
+  locked: boolean;
 }
 
 export interface WordPair {
@@ -199,6 +201,14 @@ export interface DrawingStreamMessage {
 export interface CreateRoomPayload {
   profile: PlayerProfile;
   clientId: string;
+  language?: string;
+}
+
+export interface QuickPlayPayload {
+  profile: PlayerProfile;
+  clientId: string;
+  language: string;
+  mode: GameMode;
 }
 
 export interface JoinRoomPayload {
@@ -276,6 +286,12 @@ export interface ClientToServerEvents {
   ) => void;
   replay_game: (payload: { roomCode: string; clientId: string }) => void;
   return_to_lobby: (payload: { roomCode: string; clientId: string }) => void;
+  kick_player: (payload: { roomCode: string; clientId: string; targetPlayerId: string }) => void;
+  quick_play: (
+    payload: QuickPlayPayload,
+    callback: (response: ClientRoomAck) => void
+  ) => void;
+  cancel_quick_play: (payload: { clientId: string }) => void;
 }
 
 export interface ServerToClientEvents {

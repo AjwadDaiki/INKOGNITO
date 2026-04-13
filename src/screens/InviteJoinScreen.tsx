@@ -5,6 +5,7 @@ import { ProfileEditor } from "@/components/ui/ProfileEditor";
 import { InkSplatter } from "@/components/ui/InkSplatter";
 import { StackedPages } from "@/components/ui/StackedPages";
 import { SpiralBinding } from "@/components/ui/SpiralBinding";
+import { useI18n } from "@/i18n";
 
 export function InviteJoinScreen({
   roomCode,
@@ -21,6 +22,7 @@ export function InviteJoinScreen({
   onProfileChange: (patch: Partial<PlayerProfile>) => void;
   onJoin: () => void;
 }) {
+  const t = useI18n((s) => s.t);
   return (
     <div className="relative flex h-[100svh] items-center justify-center overflow-hidden p-4 md:p-6">
       <InkSplatter variant={0} className="left-[4%] top-[4%]" size={220} opacity={0.08} />
@@ -49,7 +51,7 @@ export function InviteJoinScreen({
               Inkognito
             </motion.h1>
             <p className="mt-2 font-sketch text-2xl text-ink-700 md:text-3xl">
-              Rejoins le lobby
+              {t("invite.joinLobby")}
             </p>
           </div>
 
@@ -58,7 +60,7 @@ export function InviteJoinScreen({
           <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
             <div className="rounded-[1.6rem] border border-[rgba(74,60,46,0.12)] bg-paper/80 px-4 py-4">
               <div className="mb-3 font-sketch text-2xl font-semibold text-ink-900">
-                Ta page
+                {t("home.yourPage")}
               </div>
               <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
             </div>
@@ -66,7 +68,7 @@ export function InviteJoinScreen({
             <div className="space-y-4">
               <div>
                 <div className="mb-2 font-sketch text-2xl font-semibold text-ink-900">
-                  Code de groupe
+                  {t("home.groupCode")}
                 </div>
                 <div className="rounded-[1.2rem] border border-[rgba(74,60,46,0.16)] bg-paper px-4 py-3 text-lg font-semibold tracking-[0.24em] text-ink-950">
                   {roomCode}
@@ -74,7 +76,7 @@ export function InviteJoinScreen({
               </div>
 
               <Button onClick={onJoin} disabled={loading} fullWidth>
-                {loading ? "..." : "Rejoindre le lobby"}
+                {loading ? "..." : t("invite.joinBtn")}
               </Button>
 
               {error ? (

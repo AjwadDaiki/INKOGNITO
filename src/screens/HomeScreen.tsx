@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import type { PlayerProfile } from "@shared/protocol";
+import type { GameMode, PlayerProfile } from "@shared/protocol";
 import { Button } from "@/components/ui/Button";
 import { ProfileEditor } from "@/components/ui/ProfileEditor";
 import { InkSplatter } from "@/components/ui/InkSplatter";
@@ -8,6 +8,8 @@ import { CoffeeStain } from "@/components/ui/CoffeeStain";
 import { StackedPages } from "@/components/ui/StackedPages";
 import { WashiTape } from "@/components/ui/WashiTape";
 import { SpiralBinding } from "@/components/ui/SpiralBinding";
+import { useI18n, SUPPORTED_LOCALES, LOCALE_LABELS, type Locale } from "@/i18n";
+import { useStreamerMode } from "@/lib/useStreamerMode";
 
 export function HomeScreen({
   profile,
@@ -15,7 +17,9 @@ export function HomeScreen({
   error,
   onProfileChange,
   onCreate,
-  onJoin
+  onJoin,
+  onQuickPlay,
+  onCancelQuickPlay
 }: {
   profile: PlayerProfile;
   loading: boolean;
@@ -23,8 +27,17 @@ export function HomeScreen({
   onProfileChange: (patch: Partial<PlayerProfile>) => void;
   onCreate: () => void;
   onJoin: (roomCode: string) => void;
+  onQuickPlay: (language: string, mode: GameMode) => void;
+  onCancelQuickPlay: () => void;
 }) {
   const [accessValue, setAccessValue] = useState("");
+  const t = useI18n((s) => s.t);
+  const locale = useI18n((s) => s.locale);
+  const setLocale = useI18n((s) => s.setLocale);
+  const [showLangPicker, setShowLangPicker] = useState(false);
+  const [inQueue, setInQueue] = useState(false);
+  const streamerEnabled = useStreamerMode((s) => s.enabled);
+  const toggleStreamer = useStreamerMode((s) => s.toggle);
 
   function extractRoomCode(raw: string) {
     const trimmed = raw.trim();
@@ -60,6 +73,42 @@ export function HomeScreen({
         <WashiTape className="-bottom-1 left-12" variant={1} rotate={4} width={90} />
 
         <div className="pl-7 md:pl-10">
+          {/* Language selector - top right */}
+          <div className="absolute right-5 top-5 z-20 md:right-8 md:top-7">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowLangPicker(!showLangPicker)}
+                className="flex items-center gap-1.5 rounded-full border border-[rgba(74,60,46,0.12)] bg-paper px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:bg-paper-warm"
+              >
+                {LOCALE_LABELS[locale].flag} {LOCALE_LABELS[locale].label}
+              </button>
+              {showLangPicker ? (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute right-0 top-full z-30 mt-1 rounded-[1rem] border border-[rgba(74,60,46,0.12)] bg-paper py-1 shadow-card"
+                >
+                  {SUPPORTED_LOCALES.map((loc) => (
+                    <button
+                      key={loc}
+                      type="button"
+                      onClick={() => {
+                        setLocale(loc);
+                        setShowLangPicker(false);
+                      }}
+                      className={`flex w-full items-center gap-2 px-4 py-2 text-left text-xs font-medium transition hover:bg-paper-warm ${
+                        loc === locale ? "text-ink-950" : "text-ink-600"
+                      }`}
+                    >
+                      {LOCALE_LABELS[loc].flag} {LOCALE_LABELS[loc].label}
+                    </button>
+                  ))}
+                </motion.div>
+              ) : null}
+            </div>
+          </div>
+
           <div className="text-center">
             <motion.h1
               initial={{ opacity: 0, y: -10 }}
@@ -70,62 +119,126 @@ export function HomeScreen({
               Inkognito
             </motion.h1>
             <p className="mt-2 font-sketch text-2xl text-ink-700 md:text-3xl">
-              Imposteur version dessin
+              {t("home.subtitle")}
             </p>
           </div>
 
           <div className="paper-divider my-6" />
 
-          <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
-            <div className="rounded-[1.6rem] border border-[rgba(74,60,46,0.12)] bg-paper/80 px-4 py-4">
-              <div className="mb-3 font-sketch text-2xl font-semibold text-ink-900">
-                Ta page
+          {inQueue ? (
+            <div className="space-y-4 text-center">
+              <div className="font-sketch text-2xl font-semibold text-ink-900">
+                {t("matchmaking.searching")}
               </div>
-              <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
+              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-ink-200 border-t-ink-800" />
+              <Button
+                tone="secondary"
+                onClick={() => {
+                  setInQueue(false);
+                  onCancelQuickPlay();
+                }}
+                fullWidth
+              >
+                {t("matchmaking.cancel")}
+              </Button>
             </div>
-
-            <div className="space-y-4">
-              <div>
-                <div className="mb-2 font-sketch text-2xl font-semibold text-ink-900">
-                  Code de groupe
+          ) : (
+            <>
+              <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
+                <div className="rounded-[1.6rem] border border-[rgba(74,60,46,0.12)] bg-paper/80 px-4 py-4">
+                  <div className="mb-3 font-sketch text-2xl font-semibold text-ink-900">
+                    {t("home.yourPage")}
+                  </div>
+                  <ProfileEditor profile={profile} onChange={onProfileChange} compact hideColor />
                 </div>
-                <input
-                  value={accessValue}
-                  onChange={(e) => setAccessValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
-                      onJoin(normalizedRoomCode);
-                    }
-                  }}
-                  placeholder="Code ou lien d'invitation"
-                  className="min-h-12 w-full rounded-[1.2rem] px-4 text-sm text-ink-950 outline-none placeholder:text-ink-300"
-                />
-              </div>
 
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button onClick={onCreate} disabled={loading} fullWidth>
-                  {loading ? "..." : "Créer une salle"}
-                </Button>
-                <Button
-                  tone="secondary"
-                  onClick={() => onJoin(normalizedRoomCode)}
-                  disabled={normalizedRoomCode.length < 6 || loading}
-                  fullWidth
-                >
-                  Rejoindre
-                </Button>
-              </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="mb-2 font-sketch text-2xl font-semibold text-ink-900">
+                      {t("home.groupCode")}
+                    </div>
+                    <input
+                      value={accessValue}
+                      onChange={(e) => setAccessValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && normalizedRoomCode.length === 6 && !loading) {
+                          onJoin(normalizedRoomCode);
+                        }
+                      }}
+                      placeholder={t("home.codePlaceholder")}
+                      className="min-h-12 w-full rounded-[1.2rem] px-4 text-sm text-ink-950 outline-none placeholder:text-ink-300"
+                    />
+                  </div>
 
-              {error ? (
-                <div className="rounded-[1.2rem] border border-[rgba(120,42,33,0.16)] bg-tertiary-light px-4 py-3 text-sm font-medium text-tertiary">
-                  {error}
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <Button onClick={onCreate} disabled={loading} fullWidth>
+                      {loading ? "..." : t("home.create")}
+                    </Button>
+                    <Button
+                      tone="secondary"
+                      onClick={() => onJoin(normalizedRoomCode)}
+                      disabled={normalizedRoomCode.length < 6 || loading}
+                      fullWidth
+                    >
+                      {t("home.join")}
+                    </Button>
+                  </div>
+
+                  {/* Quick Play */}
+                  <Button
+                    tone="primary"
+                    onClick={() => {
+                      setInQueue(true);
+                      onQuickPlay(locale, "classic");
+                    }}
+                    disabled={loading}
+                    fullWidth
+                  >
+                    {t("home.quickPlay")} ⚡
+                  </Button>
+
+                  {/* Streamer mode toggle */}
+                  <button
+                    type="button"
+                    onClick={toggleStreamer}
+                    className={`flex items-center gap-2 rounded-[1.2rem] border px-4 py-2.5 text-left text-xs font-semibold transition ${
+                      streamerEnabled
+                        ? "border-ink-950 bg-ink-950 text-paper"
+                        : "border-[rgba(74,60,46,0.12)] bg-paper text-ink-700"
+                    }`}
+                  >
+                    <span>{streamerEnabled ? "📡" : "📡"}</span>
+                    {t("streamer.mode")}
+                    <span className={`ml-auto rounded-full px-2 py-0.5 text-[10px] ${
+                      streamerEnabled ? "bg-paper/20 text-paper" : "bg-ink-950/5 text-ink-400"
+                    }`}>
+                      {streamerEnabled ? "ON" : "OFF"}
+                    </span>
+                  </button>
+
+                  {error ? (
+                    <div className="rounded-[1.2rem] border border-[rgba(120,42,33,0.16)] bg-tertiary-light px-4 py-3 text-sm font-medium text-tertiary">
+                      {error}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </motion.div>
       </StackedPages>
+
+      <div className="absolute inset-x-0 bottom-3 text-center">
+        <a
+          href="https://hiddenlab.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-sketch text-sm text-ink-400 transition-colors hover:text-ink-600"
+        >
+          hiddenlab.com
+        </a>
+      </div>
     </div>
   );
 }

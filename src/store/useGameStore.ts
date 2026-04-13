@@ -5,6 +5,7 @@ import type {
   ClientToServerEvents,
   DrawingStreamMessage,
   DrawingStroke,
+  GameMode,
   PlayerProfile,
   ReactionEmoji,
   RoomSettings,
@@ -58,6 +59,9 @@ interface GameStoreState {
   submitMrWhiteGuess: (guess: string) => void;
   replayGame: () => void;
   returnToLobby: () => void;
+  kickPlayer: (targetPlayerId: string) => void;
+  quickPlay: (language: string, mode: GameMode) => void;
+  cancelQuickPlay: () => void;
 }
 
 function getSocket() {
@@ -79,7 +83,7 @@ function getSocket() {
 function withRoomContext<T extends object>(payload: T, state: GameStoreState) {
   return {
     ...payload,
-    roomCode: state.room?.roomCode,
+    roomCode: state.room?.roomCode ?? "",
     clientId: state.clientId
   };
 }
@@ -298,6 +302,34 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return;
     }
     getSocket().emit("return_to_lobby", withRoomContext({}, get()));
+  },
+
+  kickPlayer: (targetPlayerId: string) => {
+    if (!get().room) return;
+    getSocket().emit("kick_player", withRoomContext({ targetPlayerId }, get()));
+  },
+
+  quickPlay: (language: string, mode: GameMode) => {
+    set({ loading: true, error: null });
+    getSocket().emit(
+      "quick_play",
+      { clientId: get().clientId, profile: get().profile, language, mode },
+      (response) => {
+        if (!response.ok) {
+          set({ loading: false, error: response.error ?? "Matchmaking failed." });
+          return;
+        }
+        if (response.roomCode) {
+          setRoomCodeInUrl(response.roomCode);
+        }
+        set({ loading: false });
+      }
+    );
+  },
+
+  cancelQuickPlay: () => {
+    getSocket().emit("cancel_quick_play", { clientId: get().clientId });
+    set({ loading: false });
   }
 }));
 

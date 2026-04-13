@@ -8,6 +8,8 @@ import { PhaseSplash } from "@/components/game/PhaseSplash";
 import { previewSize } from "@/components/game/gameHelpers";
 import { Button } from "@/components/ui/Button";
 import { CountdownPill } from "@/components/ui/CountdownPill";
+import { useI18n } from "@/i18n";
+import { useWakeLock } from "@/lib/useWakeLock";
 
 /**
  * Compute optimal grid cols so all items fit within given pixel bounds,
@@ -64,6 +66,8 @@ export function GameScreen({
   onPointFinger: (targetPlayerId: string | null) => void;
   onSubmitGuess: (guess: string) => void;
 }) {
+  const t = useI18n((s) => s.t);
+  useWakeLock(true);
   const [pendingVote, setPendingVote] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
 
@@ -184,9 +188,6 @@ export function GameScreen({
     const voteCount = submittedVotePlayerIds.length;
     const selectedPlayer = pendingVote ? playersById[pendingVote] : null;
     const castPlayer = activeRound.selfVote ? playersById[activeRound.selfVote] : null;
-    const castVoteLabel =
-      activeRound.selfVote === null ? "blanc" : castPlayer?.profile.name ?? "inconnu";
-
     return (
       <motion.div
         initial={{ opacity: 0, y: 18 }}
@@ -197,26 +198,28 @@ export function GameScreen({
           <div className="flex items-center gap-2">
             {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
             <span className="ink-chip text-xs font-semibold text-ink-700">
-              {voteCount}/{roundPlayers.length} votes
+              {t("vote.votes", { count: voteCount, total: roundPlayers.length })}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             {hasVoted ? (
               <span className="font-sketch text-base font-semibold text-ink-700">
-                Tu as voté {castVoteLabel === "blanc" ? "blanc" : `pour ${castVoteLabel}`} ✓
+                {activeRound.selfVote === null
+                  ? t("vote.votedBlank")
+                  : t("vote.votedFor", { name: castPlayer?.profile.name ?? "?" })}
               </span>
             ) : selectedPlayer ? (
               <>
                 <span className="font-sketch text-base font-semibold text-ink-950">
                   {selectedPlayer.profile.emoji} {selectedPlayer.profile.name} ?
                 </span>
-                <Button onClick={() => onVote(pendingVote)} className="min-h-9 px-4 text-xs">Voter</Button>
+                <Button onClick={() => onVote(pendingVote)} className="min-h-9 px-4 text-xs">{t("vote.confirm")}</Button>
                 <Button tone="ghost" onClick={() => setPendingVote(null)} className="min-h-9 px-2 text-xs">✕</Button>
               </>
             ) : (
               <Button tone="secondary" onClick={() => onVote(null)} className="min-h-9 px-3 text-xs">
-                Vote blanc
+                {t("vote.blank")}
               </Button>
             )}
           </div>
@@ -261,10 +264,10 @@ export function GameScreen({
               {/* Vote header */}
               <div className="paper-sheet desk-shadow shrink-0 rounded-[1.4rem] px-4 py-2 text-center">
                 <div className="font-sketch text-2xl font-bold text-ink-950 md:text-3xl">
-                  Qui est l'Undercover ?
+                  {t("vote.whoIsUndercover")}
                 </div>
                 {!selfHasSubmittedVote ? (
-                  <div className="text-xs text-ink-500">Touche le dessin du suspect pour voter</div>
+                  <div className="text-xs text-ink-500">{t("vote.tapToVote")}</div>
                 ) : null}
               </div>
               {/* Vote grid — measured to fit without scroll */}

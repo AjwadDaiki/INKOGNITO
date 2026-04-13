@@ -5,29 +5,31 @@ import { InkSplatter } from "@/components/ui/InkSplatter";
 import { StackedPages } from "@/components/ui/StackedPages";
 import { WashiTape } from "@/components/ui/WashiTape";
 import { SpiralBinding } from "@/components/ui/SpiralBinding";
+import { useI18n } from "@/i18n";
+import { StreamerWordGuard } from "@/components/ui/StreamerWordGuard";
 
-function roleTone(room: RoomView) {
+function roleTone(room: RoomView, t: (key: string, params?: Record<string, string | number>) => string) {
   const role = room.round?.role.ownRole;
   if (role === "mr_white") {
     return {
       stamp: "border-[rgba(139,105,20,0.5)] text-primary-dark",
-      title: "Mr White",
-      subtitle: "Tu n'as pas de mot. Observe les autres et improvise."
+      title: t("role.mrWhite"),
+      subtitle: t("role.mrWhiteSub")
     };
   }
 
   if (role === "undercover") {
     return {
       stamp: "border-[rgba(196,62,46,0.5)] text-tertiary",
-      title: "Undercover",
-      subtitle: "Ton mot ressemble au leur. Dessine sans te trahir."
+      title: t("role.undercover"),
+      subtitle: t("role.undercoverSub")
     };
   }
 
   return {
     stamp: "border-[rgba(74,60,46,0.4)] text-ink-800",
-    title: "Civil",
-    subtitle: "Tu connais le vrai mot. Fais-le comprendre sans l'écrire."
+    title: t("role.civil"),
+    subtitle: t("role.civilSub")
   };
 }
 
@@ -40,9 +42,10 @@ export function RoleRevealScreen({
   selfPlayer: PlayerView;
   onConfirm: () => void;
 }) {
+  const t = useI18n((s) => s.t);
   const ownWord = room.round?.role.ownWord ?? null;
   const confirmedCount = room.roleConfirmedPlayerIds.length;
-  const tone = roleTone(room);
+  const tone = roleTone(room, t);
 
   return (
     <div className="relative flex h-[100svh] items-center justify-center overflow-hidden p-4 md:p-6">
@@ -62,7 +65,7 @@ export function RoleRevealScreen({
         <div className="pl-7 md:pl-10">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div>
-              <div className="text-xs uppercase tracking-[0.18em] text-ink-500">Carte secrète</div>
+              <div className="text-xs uppercase tracking-[0.18em] text-ink-500">{t("role.secretCard")}</div>
               <div className="mt-1 font-sketch text-5xl font-bold leading-none text-ink-950 md:text-6xl">
                 {selfPlayer.profile.name}
               </div>
@@ -81,43 +84,45 @@ export function RoleRevealScreen({
 
           <div className="paper-divider my-5" />
 
-          <motion.div
-            initial={{ opacity: 0, y: 18, rotate: 2.4 }}
-            animate={{ opacity: 1, y: 0, rotate: 1.1 }}
-            transition={{ delay: 0.1, type: "spring", stiffness: 240, damping: 24 }}
-            className="paper-sheet mx-auto max-w-2xl px-6 py-8 text-center"
-          >
-            <div className="font-sketch text-3xl font-semibold text-ink-700">
-              {ownWord ? "Ton mot" : "Aucun mot"}
-            </div>
-            <div className="mt-3 font-sketch text-6xl font-bold leading-none text-ink-950 md:text-7xl">
-              {ownWord ?? "?"}
-            </div>
-            <div className="mt-4 text-base text-ink-700 md:text-lg">{tone.subtitle}</div>
-          </motion.div>
+          <StreamerWordGuard>
+            <motion.div
+              initial={{ opacity: 0, y: 18, rotate: 2.4 }}
+              animate={{ opacity: 1, y: 0, rotate: 1.1 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 240, damping: 24 }}
+              className="paper-sheet mx-auto max-w-2xl px-6 py-8 text-center"
+            >
+              <div className="font-sketch text-3xl font-semibold text-ink-700">
+                {ownWord ? t("role.yourWord") : t("role.noWord")}
+              </div>
+              <div className="mt-3 font-sketch text-6xl font-bold leading-none text-ink-950 md:text-7xl">
+                {ownWord ?? "?"}
+              </div>
+              <div className="mt-4 text-base text-ink-700 md:text-lg">{tone.subtitle}</div>
+            </motion.div>
+          </StreamerWordGuard>
 
           <div className="mt-5 grid gap-4 md:grid-cols-[1fr_auto]">
             <div className="rounded-[1.5rem] border border-[rgba(74,60,46,0.1)] bg-paper/80 px-4 py-4">
-              <div className="font-sketch text-3xl font-semibold text-ink-900">Avant de passer</div>
+              <div className="font-sketch text-3xl font-semibold text-ink-900">{t("role.before")}</div>
               <div className="mt-2 space-y-1.5 text-sm text-ink-700">
-                <div>Mémorise ton rôle et ton mot.</div>
-                <div>Cache cet écran aux autres.</div>
-                <div>Clique seulement quand tu es prêt.</div>
+                <div>{t("role.memorize")}</div>
+                <div>{t("role.hide")}</div>
+                <div>{t("role.clickReady")}</div>
               </div>
             </div>
 
             <div className="rounded-[1.5rem] border border-[rgba(74,60,46,0.1)] bg-ink-950 px-5 py-4 text-paper md:min-w-[220px]">
-              <div className="text-xs uppercase tracking-[0.18em] text-paper/60">Confirmations</div>
+              <div className="text-xs uppercase tracking-[0.18em] text-paper/60">{t("role.confirmations")}</div>
               <div className="mt-2 font-sketch text-5xl font-bold leading-none">
                 {confirmedCount}/{room.players.length}
               </div>
-              <div className="mt-2 text-sm text-paper/70">pages déjà refermées</div>
+              <div className="mt-2 text-sm text-paper/70">{t("role.pagesClosed")}</div>
             </div>
           </div>
 
           <div className="mt-6">
             <Button onClick={onConfirm} fullWidth>
-              J'ai mémorisé
+              {t("role.memorized")}
             </Button>
           </div>
         </div>

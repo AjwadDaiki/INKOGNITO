@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useShallow } from "zustand/react/shallow";
 import { MeshBackground } from "@/components/ui/MeshBackground";
 import { useGameStore } from "@/store/useGameStore";
+import { useI18n } from "@/i18n";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { InviteJoinScreen } from "@/screens/InviteJoinScreen";
 import { LobbyScreen } from "@/screens/LobbyScreen";
@@ -13,6 +14,9 @@ import { Button } from "@/components/ui/Button";
 import { getRoomCodeFromUrl } from "@/lib/session";
 
 export default function App() {
+  const initI18n = useI18n((s) => s.init);
+  const t = useI18n((s) => s.t);
+
   const {
     init,
     room,
@@ -39,6 +43,9 @@ export default function App() {
     submitMrWhiteGuess,
     replayGame,
     returnToLobby,
+    kickPlayer,
+    quickPlay,
+    cancelQuickPlay,
     clearError
   } = useGameStore(
     useShallow((state) => ({
@@ -67,13 +74,17 @@ export default function App() {
       submitMrWhiteGuess: state.submitMrWhiteGuess,
       replayGame: state.replayGame,
       returnToLobby: state.returnToLobby,
+      kickPlayer: state.kickPlayer,
+      quickPlay: state.quickPlay,
+      cancelQuickPlay: state.cancelQuickPlay,
       clearError: state.clearError
     }))
   );
 
   useEffect(() => {
+    initI18n();
     init();
-  }, [init]);
+  }, [init, initI18n]);
 
   const selfPlayer = useMemo(
     () => room?.players.find((player) => player.id === room.selfId) ?? null,
@@ -109,6 +120,8 @@ export default function App() {
             onProfileChange={updateProfile}
             onCreate={createRoom}
             onJoin={joinRoom}
+            onQuickPlay={quickPlay}
+            onCancelQuickPlay={cancelQuickPlay}
           />
         )
       };
@@ -125,6 +138,7 @@ export default function App() {
             onToggleReady={toggleReady}
             onStartGame={startGame}
             onSendChat={sendChatMessage}
+            onKickPlayer={kickPlayer}
           />
         )
       };
@@ -187,6 +201,9 @@ export default function App() {
     confirmRole,
     replayGame,
     returnToLobby,
+    kickPlayer,
+    quickPlay,
+    cancelQuickPlay,
     sendDrawingPreview,
     commitStroke,
     undoStroke,
@@ -243,7 +260,7 @@ export default function App() {
                   transition={{ duration: 0.2 }}
                   className="rounded-full bg-surface-low px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink-700 shadow-card"
                 >
-                  Reconnexion...
+                  {t("reconnecting")}
                 </motion.div>
               ) : null
             ) : null}

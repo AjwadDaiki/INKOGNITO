@@ -98,7 +98,9 @@ export const DEFAULT_SETTINGS = {
   resolutionSeconds: 18,
   rounds: 3,
   difficulty: "random",
-  selectedCategories: ["Tout"]
+  selectedCategories: ["Tout"],
+  language: "fr",
+  locked: false
 } as const;
 
 export const MIN_PLAYERS = 3;

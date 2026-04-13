@@ -4,12 +4,13 @@ import { createId } from "@shared/game";
 import type { DrawingStroke, DrawingTool } from "@shared/protocol";
 import { drawStroke, getCanvasSnapshot, normalizePointerPosition, renderStrokeCanvas } from "@/lib/canvas";
 import { Button } from "@/components/ui/Button";
+import { useI18n } from "@/i18n";
 
 const TOOL_OPTIONS: Array<{ tool: DrawingTool; label: string; title: string }> = [
-  { tool: "pen", label: "Plume", title: "Crayon" },
-  { tool: "brush", label: "Pinceau", title: "Pinceau" },
-  { tool: "fill", label: "Encre", title: "Remplir" },
-  { tool: "eraser", label: "Gomme", title: "Gomme" }
+  { tool: "pen", label: "✏️", title: "Crayon" },
+  { tool: "brush", label: "🖌️", title: "Pinceau" },
+  { tool: "fill", label: "🪣", title: "Remplir" },
+  { tool: "eraser", label: "🧹", title: "Gomme" }
 ];
 
 const SIZE_PRESETS = [
@@ -45,6 +46,7 @@ export function DrawingCanvas({
   onUndo,
   onClear
 }: DrawingCanvasProps) {
+  const t = useI18n((s) => s.t);
   const [activeTool, setActiveTool] = useState<DrawingTool>("pen");
   const [activeColor, setActiveColor] = useState<string>(DRAWING_COLORS[0]);
   const [brushSize, setBrushSize] = useState<number>(8);
@@ -311,18 +313,18 @@ export function DrawingCanvas({
         <Button
           tone="secondary"
           onClick={onUndo}
-          title="Annuler"
+          title={t("draw.undo")}
           className="min-h-9 px-3 text-xs"
         >
-          Annuler
+          {t("draw.undo")}
         </Button>
         <Button
           tone="danger"
           onClick={onClear}
-          title="Tout effacer"
+          title={t("draw.clear")}
           className="min-h-9 px-3 text-xs"
         >
-          Effacer
+          {t("draw.clear")}
         </Button>
       </div>
     </div>

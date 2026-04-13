@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/Button";
 import { MiniDrawingCanvas } from "./MiniDrawingCanvas";
 import { CountdownPill } from "@/components/ui/CountdownPill";
 import { InkBleed } from "@/components/ui/InkBleed";
+import { useI18n } from "@/i18n";
 
-function roleLabel(role: PlayerRole | null | undefined) {
-  if (role === "undercover") return "Undercover";
-  if (role === "mr_white") return "Mr White";
-  return "Civil";
+function roleLabel(role: PlayerRole | null | undefined, t: (key: string) => string) {
+  if (role === "undercover") return t("role.undercover");
+  if (role === "mr_white") return t("role.mrWhite");
+  return t("role.civil");
 }
 
 function roleBadgeClass(role: PlayerRole | null | undefined) {
@@ -38,6 +39,7 @@ export function ResolutionShowcase({
   selfPlayer: PlayerView;
   onSubmitGuess: (guess: string) => void;
 }) {
+  const t = useI18n((s) => s.t);
   const [guess, setGuess] = useState("");
 
   if (!round.resolution) return null;
@@ -81,7 +83,7 @@ export function ResolutionShowcase({
                 transition={{ delay: 0.15 }}
                 className="font-sketch text-3xl font-bold text-ink-950 md:text-4xl"
               >
-                {isCaught ? "Pris dans l'encre !" : suspectPlayer ? "Innocent..." : "Pas de suspect"}
+                {isCaught ? t("resolution.caught") : suspectPlayer ? t("resolution.innocent") : t("resolution.noSuspect")}
               </motion.div>
             </div>
             {suspectPlayer ? (
@@ -96,7 +98,7 @@ export function ResolutionShowcase({
                   {suspectPlayer.profile.name}
                 </span>
                 <span className={`rounded-full border-2 border-dashed px-3 py-1 font-sketch text-sm font-bold uppercase tracking-wider ${roleBadgeClass(suspectRole)}`}>
-                  {roleLabel(suspectRole)}
+                  {roleLabel(suspectRole, t)}
                 </span>
               </motion.div>
             ) : null}
@@ -110,13 +112,13 @@ export function ResolutionShowcase({
             className="flex flex-col gap-2"
           >
             <div className="rounded-[1.1rem] border border-[rgba(74,60,46,0.15)] bg-paper px-4 py-2.5">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-ink-400">Mot civil</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-ink-400">{t("resolution.civilWord")}</div>
               <div className="font-sketch text-2xl font-bold text-ink-950">
                 <InkBleed>{resolution.civilWord}</InkBleed>
               </div>
             </div>
             <div className="rounded-[1.1rem] border border-[rgba(196,62,46,0.2)] bg-tertiary-light/50 px-4 py-2.5">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-tertiary/60">Mot undercover</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-tertiary/60">{t("resolution.undercoverWord")}</div>
               <div className="font-sketch text-2xl font-bold text-tertiary">
                 <InkBleed intensity={1.3}>{resolution.undercoverWord}</InkBleed>
               </div>
@@ -140,17 +142,17 @@ export function ResolutionShowcase({
           }}
         >
           <div className="font-sketch text-xl font-semibold text-primary-dark">
-            Dernière chance — Devine le mot civil
+            {t("resolution.lastChance")}
           </div>
           <div className="mt-2 flex gap-2">
             <input
               value={guess}
               onChange={(event) => setGuess(event.target.value)}
               className="min-h-11 flex-1 rounded-[1.15rem] border border-[rgba(74,60,46,0.12)] px-4 text-sm text-ink-950 outline-none"
-              placeholder="Mot civil"
+              placeholder={t("resolution.civilWordPlaceholder")}
               autoFocus
             />
-            <Button type="submit">Deviner</Button>
+            <Button type="submit">{t("resolution.guess")}</Button>
           </div>
         </motion.form>
       ) : null}
@@ -207,7 +209,7 @@ export function ResolutionShowcase({
 
                   {/* Role stamp */}
                   <div className={`rounded-full border-2 border-dashed px-3 py-1 text-xs font-bold uppercase tracking-wider ${roleBadgeClass(role)}`}>
-                    {roleLabel(role)}
+                    {roleLabel(role, t)}
                   </div>
 
                   {/* Word */}

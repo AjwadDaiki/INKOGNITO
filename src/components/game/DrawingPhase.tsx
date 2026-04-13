@@ -5,6 +5,8 @@ import { CountdownPill } from "@/components/ui/CountdownPill";
 import { MiniDrawingCanvas } from "./MiniDrawingCanvas";
 import { useGameStore } from "@/store/useGameStore";
 import { useIsMobile } from "@/lib/useIsMobile";
+import { useI18n } from "@/i18n";
+import { StreamerWordGuard } from "@/components/ui/StreamerWordGuard";
 
 const EMPTY_STROKES: DrawingStroke[] = [];
 
@@ -130,6 +132,7 @@ export function DrawingPhase({
   onUndo: () => void;
   onClear: () => void;
 }) {
+  const t = useI18n((s) => s.t);
   const selfDrawing = round.drawings[selfPlayer.id];
   const n = otherPlayers.length;
   const isMobile = useIsMobile();
@@ -137,12 +140,14 @@ export function DrawingPhase({
   const canvasSection = (
     <section className="paper-sheet notebook-page desk-shadow flex min-h-0 flex-col gap-2 overflow-hidden rounded-[1.9rem] px-3 py-3 lg:px-4 lg:py-4">
       <div className="flex flex-wrap items-center justify-between gap-2 pl-7 md:pl-8">
-        <div className="min-w-0">
-          <span className="text-[9px] uppercase tracking-[0.28em] text-ink-500">Mot secret</span>
-          <div className="truncate font-sketch text-3xl font-bold leading-none text-ink-950 md:text-4xl lg:text-5xl">
-            {round.role.ownWord ?? "???"}
+        <StreamerWordGuard>
+          <div className="min-w-0">
+            <span className="text-[9px] uppercase tracking-[0.28em] text-ink-500">{t("draw.secretWord")}</span>
+            <div className="truncate font-sketch text-3xl font-bold leading-none text-ink-950 md:text-4xl lg:text-5xl">
+              {round.role.ownWord ?? "???"}
+            </div>
           </div>
-        </div>
+        </StreamerWordGuard>
         {room.phaseEndsAt ? <CountdownPill endsAt={room.phaseEndsAt} /> : null}
       </div>
       <div className="min-h-0 flex-1">
@@ -162,9 +167,9 @@ export function DrawingPhase({
     <section className="paper-sheet notebook-page desk-shadow flex min-h-0 flex-col gap-1 overflow-hidden rounded-[1.9rem] px-3 py-2 lg:px-4 lg:py-3">
       <div className="flex shrink-0 items-center justify-between pl-7 md:pl-8">
         <span className="text-[9px] font-bold uppercase tracking-[0.28em] text-ink-500">
-          {n} dessin{n > 1 ? "s" : ""}
+          {t("draw.drawings", { count: n, plural: n > 1 ? "s" : "" })}
         </span>
-        <span className="text-[9px] text-ink-300 animate-pulse-soft">live</span>
+        <span className="text-[9px] text-ink-300 animate-pulse-soft">{t("draw.live")}</span>
       </div>
       <div className="min-h-0 flex-1">
         <MeasuredGrid players={otherPlayers} />

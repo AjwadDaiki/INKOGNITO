@@ -7,17 +7,17 @@ export function phaseBg(phase: RoomView["phase"]) {
   return "bg-surface-low text-ink-700";
 }
 
-export function phaseLabel(phase: RoomView["phase"]) {
-  if (phase === "drawing") return "Croquis";
-  if (phase === "vote") return "Vote";
-  if (phase === "resolution") return "Révélation";
+export function phaseLabel(phase: RoomView["phase"], t: (key: string) => string) {
+  if (phase === "drawing") return t("phase.drawing");
+  if (phase === "vote") return t("phase.vote");
+  if (phase === "resolution") return t("phase.resolution");
   return phase;
 }
 
-export function phaseSubtitle(phase: RoomView["phase"]) {
-  if (phase === "drawing") return "Une page pour laisser parler l'encre";
-  if (phase === "vote") return "Pose ton vote sur une page";
-  if (phase === "resolution") return "L'encre dit enfin la vérité";
+export function phaseSubtitle(phase: RoomView["phase"], t: (key: string) => string) {
+  if (phase === "drawing") return t("phase.drawingSub");
+  if (phase === "vote") return t("phase.voteSub");
+  if (phase === "resolution") return t("phase.resolutionSub");
   return "";
 }
 

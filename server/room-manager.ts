@@ -27,10 +27,12 @@ import type {
   DrawingStroke,
   FinalResultsView,
   GamePhase,
+  GameMode,
   GameStatus,
   PlayerProfile,
   PlayerRole,
   PlayerStatsView,
+  QuickPlayPayload,
   ReactionEvent,
   RoundResolutionView,
   RoomSettings,
@@ -155,6 +157,10 @@ export class RoomManager {
     const inGameJoin = room.status === "in_game" && !player;
     if (inGameJoin) {
       return { ok: false, error: "La partie a déjà commencé." };
+    }
+
+    if (!player && room.settings.locked) {
+      return { ok: false, error: "La salle est verrouillée." };
     }
 
     if (!player && room.players.length >= MAX_PLAYERS) {
@@ -613,6 +619,162 @@ export class RoomManager {
     const { room, player } = located;
     if (room.hostId !== player.id) return;
     this.resetRoomToLobby(room, "Retour au lobby.");
+  }
+
+  kickPlayer(payload: { roomCode: string; clientId: string; targetPlayerId: string }) {
+    const located = this.findPlayer(payload.roomCode, payload.clientId);
+    if (!located) return;
+    const { room, player } = located;
+    if (room.hostId !== player.id) return;
+    if (room.phase !== "lobby") return;
+
+    const target = room.players.find((p) => p.id === payload.targetPlayerId);
+    if (!target || target.id === player.id) return;
+
+    // Disconnect target socket from room
+    if (target.socketId) {
+      const targetSocket = this.io.sockets.sockets.get(target.socketId);
+      targetSocket?.leave(room.code);
+      this.io.to(target.socketId).emit("server_error", "Tu as été expulsé de la salle.");
+    }
+
+    room.players = room.players.filter((p) => p.id !== target.id);
+    this.cancelPlayerRemoval(room.code, target.id);
+    room.systemNotice = `${target.profile.name} a été expulsé.`;
+    this.emitRoomState(room);
+  }
+
+  // ─── Matchmaking Queue ───
+
+  private matchmakingQueue: Array<{
+    clientId: string;
+    socketId: string;
+    profile: PlayerProfile;
+    language: string;
+    mode: GameMode;
+    joinedAt: number;
+  }> = [];
+
+  private matchmakingTimer: NodeJS.Timeout | null = null;
+
+  quickPlay(socketId: string, payload: QuickPlayPayload) {
+    // Remove if already in queue
+    this.matchmakingQueue = this.matchmakingQueue.filter((e) => e.clientId !== payload.clientId);
+
+    this.matchmakingQueue.push({
+      clientId: payload.clientId,
+      socketId,
+      profile: payload.profile,
+      language: payload.language || "en",
+      mode: payload.mode || "classic",
+      joinedAt: Date.now()
+    });
+
+    // Try to match immediately
+    const result = this.tryMatch(payload.language, payload.mode);
+    if (result) return result;
+
+    // Start periodic matching if not already running
+    if (!this.matchmakingTimer) {
+      this.matchmakingTimer = setInterval(() => {
+        if (this.matchmakingQueue.length === 0) {
+          clearInterval(this.matchmakingTimer!);
+          this.matchmakingTimer = null;
+          return;
+        }
+        // Try matching for each unique lang+mode combo in queue
+        const combos = new Set(this.matchmakingQueue.map((e) => `${e.language}_${e.mode}`));
+        for (const combo of combos) {
+          const [lang, mode] = combo.split("_");
+          this.tryMatch(lang, mode as GameMode);
+        }
+      }, 5000);
+    }
+
+    return { ok: true, roomCode: undefined, selfId: undefined };
+  }
+
+  cancelQuickPlay(payload: { clientId: string }) {
+    this.matchmakingQueue = this.matchmakingQueue.filter((e) => e.clientId !== payload.clientId);
+  }
+
+  private tryMatch(language: string, mode: GameMode) {
+    const candidates = this.matchmakingQueue.filter(
+      (e) => e.language === language && e.mode === mode
+    );
+
+    const MIN_MATCH = 4;
+    if (candidates.length < MIN_MATCH) return null;
+
+    // Take up to 6 players
+    const matched = candidates.slice(0, 6);
+
+    // Remove from queue
+    const matchedIds = new Set(matched.map((e) => e.clientId));
+    this.matchmakingQueue = this.matchmakingQueue.filter((e) => !matchedIds.has(e.clientId));
+
+    // Create room with the first player as host
+    const host = matched[0];
+    const code = generateRoomCode(new Set(this.rooms.keys()));
+    const hostPlayer = this.createPlayer({
+      id: createId("player"),
+      clientId: host.clientId,
+      socketId: host.socketId,
+      profile: host.profile,
+      isHost: true
+    });
+
+    const allKeywords: Record<string, string> = { fr: "Tout", en: "All", es: "Todo", pt: "Tudo", de: "Alle" };
+
+    const room: ServerRoom = {
+      code,
+      createdAt: Date.now(),
+      status: "lobby",
+      phase: "lobby",
+      phaseEndsAt: null,
+      settings: clampSettings({
+        ...DEFAULT_SETTINGS,
+        mode,
+        language,
+        selectedCategories: [allKeywords[language] || "All"],
+        customWordPairs: []
+      }),
+      hostId: hostPlayer.id,
+      players: [hostPlayer],
+      lobbyChat: [],
+      round: null,
+      completedRounds: [],
+      currentRound: 0,
+      usedWordPairIds: [],
+      finalResults: null,
+      systemNotice: "Matchmaking — Partie trouvée !",
+      timeoutHandle: null
+    };
+
+    this.rooms.set(code, room);
+    this.io.sockets.sockets.get(host.socketId)?.join(code);
+
+    // Add other matched players
+    for (let i = 1; i < matched.length; i++) {
+      const entry = matched[i];
+      const player = this.createPlayer({
+        id: createId("player"),
+        clientId: entry.clientId,
+        socketId: entry.socketId,
+        profile: entry.profile,
+        isHost: false
+      });
+      room.players.push(player);
+      this.io.sockets.sockets.get(entry.socketId)?.join(code);
+    }
+
+    this.emitRoomState(room);
+
+    return {
+      ok: true,
+      roomCode: code,
+      selfId: hostPlayer.id
+    };
   }
 
   private beginRound(room: ServerRoom) {

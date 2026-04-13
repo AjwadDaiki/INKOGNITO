@@ -4,6 +4,8 @@ import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { Server } from "socket.io";
 import type { ClientToServerEvents, ServerToClientEvents } from "../shared/protocol.js";
 import { RoomManager } from "./room-manager.js";
@@ -14,6 +16,25 @@ const distDir = path.resolve(rootDir, "dist");
 const port = Number(process.env.PORT ?? 3001);
 
 const app = express();
+
+// Security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // SPA handles its own CSP
+    crossOriginEmbedderPolicy: false
+  })
+);
+
+// Rate limiting
+app.use(
+  rateLimit({
+    windowMs: 60_000,
+    max: 120,
+    standardHeaders: true,
+    legacyHeaders: false
+  })
+);
+
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
@@ -68,9 +89,27 @@ io.on("connection", (socket) => {
   socket.on("submit_mr_white_guess", (payload) => rooms.submitMrWhiteGuess(payload));
   socket.on("replay_game", (payload) => rooms.replayGame(payload));
   socket.on("return_to_lobby", (payload) => rooms.returnToLobby(payload));
+  socket.on("kick_player", (payload) => rooms.kickPlayer(payload));
+  socket.on("quick_play", (payload, callback) => {
+    callback(rooms.quickPlay(socket.id, payload));
+  });
+  socket.on("cancel_quick_play", (payload) => rooms.cancelQuickPlay(payload));
   socket.on("disconnect", () => rooms.handleDisconnect(socket.id));
 });
 
 server.listen(port, () => {
-  console.log(`INKOGNITO server listening on http://localhost:${port}`);
+  console.log(`[inkognito] server listening on http://localhost:${port}`);
 });
+
+// Graceful shutdown
+function shutdown(signal: string) {
+  console.log(`[inkognito] ${signal} received — shutting down`);
+  io.close();
+  server.close(() => {
+    console.log("[inkognito] server closed");
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(1), 5000);
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

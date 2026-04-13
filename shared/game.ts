@@ -18,6 +18,7 @@ import type {
   WordPair
 } from "./protocol.js";
 import { BASE_WORD_PAIRS } from "./words.js";
+import { getWordPairsForLang, getAllKeywordForLang, type SupportedLanguage } from "./words/index.js";
 
 export function createId(prefix: string) {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
@@ -41,7 +42,12 @@ export function generateRoomCode(existingCodes: Set<string>) {
   return code;
 }
 
+const SUPPORTED_LANGUAGES = ["fr", "en", "es", "pt", "de"] as const;
+
 export function clampSettings(settings?: Partial<RoomSettings>): RoomSettings {
+  const language = SUPPORTED_LANGUAGES.includes(settings?.language as SupportedLanguage)
+    ? settings!.language!
+    : DEFAULT_SETTINGS.language;
   return {
     mode: settings?.mode === "mr_white" ? "mr_white" : DEFAULT_SETTINGS.mode,
     rounds: clampNumber(settings?.rounds ?? DEFAULT_SETTINGS.rounds, 3, 5),
@@ -55,10 +61,12 @@ export function clampSettings(settings?: Partial<RoomSettings>): RoomSettings {
       30
     ),
     difficulty: normalizeDifficulty(settings?.difficulty),
-    selectedCategories: sanitizeSelectedCategories(settings?.selectedCategories),
+    selectedCategories: sanitizeSelectedCategories(settings?.selectedCategories, language as SupportedLanguage),
     customWordPairs: (settings?.customWordPairs ?? [])
       .map((pair, index) => sanitizeWordPair(pair, index))
-      .filter((pair): pair is WordPair => pair !== null)
+      .filter((pair): pair is WordPair => pair !== null),
+    language,
+    locked: settings?.locked === true
   };
 }
 
@@ -73,13 +81,14 @@ function normalizeDifficulty(value?: Difficulty): Difficulty {
   return "random";
 }
 
-function sanitizeSelectedCategories(categories?: string[]) {
-  const cleaned = [...new Set((categories ?? DEFAULT_SETTINGS.selectedCategories)
+function sanitizeSelectedCategories(categories?: string[], lang: SupportedLanguage = "fr") {
+  const allKeyword = getAllKeywordForLang(lang);
+  const cleaned = [...new Set((categories ?? [allKeyword])
     .map((category) => category?.trim())
     .filter((category): category is string => Boolean(category)))];
 
-  if (cleaned.length === 0 || cleaned.includes("Tout")) {
-    return ["Tout"];
+  if (cleaned.length === 0 || cleaned.includes("Tout") || cleaned.includes("All") || cleaned.includes("Todo") || cleaned.includes("Tudo") || cleaned.includes("Alle")) {
+    return [allKeyword];
   }
 
   return cleaned;
@@ -155,12 +164,15 @@ export function assignRoles(playerIds: string[], mode: RoomSettings["mode"]) {
 }
 
 export function pickWordPair(settings: RoomSettings, usedIds: string[]) {
-  const pool = [...BASE_WORD_PAIRS, ...settings.customWordPairs];
+  const lang = (settings.language || "fr") as SupportedLanguage;
+  const basePairs = getWordPairsForLang(lang);
+  const allKeyword = getAllKeywordForLang(lang);
+  const pool = [...basePairs, ...settings.customWordPairs];
   const categoryPool = pool.filter((pair) => {
     if (usedIds.includes(pair.id)) {
       return false;
     }
-    if (!settings.selectedCategories.includes("Tout")) {
+    if (!settings.selectedCategories.includes(allKeyword)) {
       return settings.selectedCategories.includes(pair.category);
     }
     return true;

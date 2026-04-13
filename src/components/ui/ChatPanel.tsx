@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { ChatMessage, PlayerView } from "@shared/protocol";
 import { Button } from "./Button";
+import { useI18n } from "@/i18n";
 
 export function ChatPanel({
   title,
@@ -13,6 +14,7 @@ export function ChatPanel({
   messages: ChatMessage[];
   onSend: (value: string) => void;
 }) {
+  const t = useI18n((s) => s.t);
   const [value, setValue] = useState("");
   const playersById = useMemo(
     () => Object.fromEntries(players.map((p) => [p.id, p])),
@@ -48,11 +50,11 @@ export function ChatPanel({
         <input
           value={value}
           onChange={(e) => setValue(e.target.value.slice(0, 100))}
-          placeholder="Un mot..."
+          placeholder={t("chat.placeholder")}
           className="min-h-11 flex-1 rounded-[1.15rem] px-4 text-sm text-ink-950 outline-none placeholder:text-ink-300"
         />
         <Button type="submit" className="px-4">
-          Envoyer
+          {t("chat.send")}
         </Button>
       </form>
     </div>

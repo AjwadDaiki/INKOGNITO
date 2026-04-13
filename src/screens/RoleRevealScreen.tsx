@@ -78,7 +78,7 @@ export function RoleRevealScreen({
   }, [hasConfirmed, onConfirm]);
 
   return (
-    <div className="relative flex min-h-[100svh] items-center justify-center overflow-y-auto p-4 md:p-6 lg:h-[100svh] lg:min-h-0 lg:overflow-hidden">
+    <div className="relative flex min-h-[100svh] items-start justify-center overflow-y-auto p-4 md:p-6 lg:h-[100svh] lg:min-h-0 lg:items-center lg:overflow-hidden">
       <InkSplatter variant={0} className="left-[8%] top-[10%]" size={220} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[10%] right-[8%]" size={220} opacity={0.09} />
 

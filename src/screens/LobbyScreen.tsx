@@ -113,17 +113,17 @@ export function LobbyScreen({
   }
 
   return (
-    <div className="relative flex min-h-[100svh] items-center justify-center overflow-y-auto p-3 md:p-5 lg:h-[100svh] lg:min-h-0 lg:overflow-hidden">
+    <div className="relative flex min-h-[100svh] items-start justify-center overflow-y-auto p-3 md:p-5 lg:h-[100svh] lg:min-h-0 lg:items-center lg:overflow-hidden">
       <InkSplatter variant={0} className="left-[3%] top-[9%]" size={210} opacity={0.08} />
       <InkSplatter variant={1} className="bottom-[5%] right-[4%]" size={230} opacity={0.08} />
       <CoffeeStain className="bottom-[14%] left-[6%] -rotate-12" size={110} opacity={0.055} />
 
-      <StackedPages className="h-full w-full max-w-[1480px]">
+      <StackedPages className="w-full max-w-[1480px] lg:h-full">
       <motion.section
         initial={{ opacity: 0, y: 24, rotate: -1 }}
         animate={{ opacity: 1, y: 0, rotate: -0.4 }}
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
-        className="paper-sheet notebook-page desk-shadow animate-page-settle flex w-full flex-col overflow-y-auto px-5 py-5 md:px-8 lg:h-full lg:overflow-hidden"
+        className="paper-sheet notebook-page desk-shadow animate-page-settle flex w-full flex-col px-5 py-5 md:px-8 lg:h-full lg:overflow-hidden"
       >
         <SpiralBinding />
         <div className="pointer-events-none absolute right-8 top-8 h-24 w-24 rounded-full bg-ink-950/8" />
@@ -131,7 +131,7 @@ export function LobbyScreen({
         <WashiTape className="-right-2 top-6" variant={2} rotate={-12} width={105} />
         <WashiTape className="-left-1 bottom-4" variant={0} rotate={6} width={95} />
 
-        <div className="flex min-h-0 flex-1 flex-col pl-7 md:pl-10">
+        <div className="flex flex-col pl-7 md:pl-10 lg:min-h-0 lg:flex-1">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="font-sketch text-4xl font-bold text-ink-950 md:text-5xl">
@@ -178,7 +178,7 @@ export function LobbyScreen({
 
           <div className="paper-divider my-5" />
 
-          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[1.16fr_0.84fr]">
+          <div className="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[1.16fr_0.84fr]">
             <div className="min-h-0 rounded-[1.7rem] border border-[rgba(74,60,46,0.12)] bg-paper/88 px-4 py-4 md:px-5">
               <div className="flex min-h-0 flex-col lg:h-full">
                 <div className="mb-3 font-sketch text-3xl font-semibold text-ink-900">{t("lobby.title")}</div>

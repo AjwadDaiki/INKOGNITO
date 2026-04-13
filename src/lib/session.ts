@@ -27,15 +27,17 @@ function safeLocalStorage() {
 }
 
 export function ensureClientId() {
-  // Use localStorage so the ID survives tab close / refresh for reconnection
-  const storage = safeLocalStorage();
-  const existing = storage?.getItem(CLIENT_ID_KEY);
+  // Use sessionStorage so each tab gets its own ID (allows multi-tab testing).
+  // Fall back to a fresh ID if sessionStorage is unavailable.
+  // On page refresh the same tab keeps its ID → reconnection still works.
+  const session = safeSessionStorage();
+  const existing = session?.getItem(CLIENT_ID_KEY);
   if (existing) return existing;
   const value =
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `client_${Math.random().toString(36).slice(2, 10)}`;
-  storage?.setItem(CLIENT_ID_KEY, value);
+  session?.setItem(CLIENT_ID_KEY, value);
   return value;
 }
 

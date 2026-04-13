@@ -180,11 +180,12 @@ export class RoomManager {
       }
       room.systemNotice = `${player.profile.name} s'est reconnecté.`;
     } else {
+      const dedupedProfile = this.deduplicateName(normalizeProfile(payload.profile), room);
       player = this.createPlayer({
         id: createId("player"),
         clientId: payload.clientId,
         socketId,
-        profile: payload.profile,
+        profile: dedupedProfile,
         isHost: false
       });
       room.players.push(player);
@@ -703,7 +704,7 @@ export class RoomManager {
       (e) => e.language === language && e.mode === mode
     );
 
-    const MIN_MATCH = 4;
+    const MIN_MATCH = 2;
     if (candidates.length < MIN_MATCH) return null;
 
     // Take up to 6 players
@@ -757,11 +758,12 @@ export class RoomManager {
     // Add other matched players
     for (let i = 1; i < matched.length; i++) {
       const entry = matched[i];
+      const dedupedProfile = this.deduplicateName(normalizeProfile(entry.profile), room);
       const player = this.createPlayer({
         id: createId("player"),
         clientId: entry.clientId,
         socketId: entry.socketId,
-        profile: entry.profile,
+        profile: dedupedProfile,
         isHost: false
       });
       room.players.push(player);
@@ -1117,6 +1119,16 @@ export class RoomManager {
       points: 0,
       stats: createEmptyStats()
     };
+  }
+
+  /** Add a numeric suffix if name already exists in the room */
+  private deduplicateName(profile: PlayerProfile, room: ServerRoom): PlayerProfile {
+    const baseName = profile.name;
+    const existingNames = new Set(room.players.map((p) => p.profile.name));
+    if (!existingNames.has(baseName)) return profile;
+    let suffix = 2;
+    while (existingNames.has(`${baseName} (${suffix})`)) suffix++;
+    return { ...profile, name: `${baseName} (${suffix})` };
   }
 
   private findPlayer(roomCode: string, clientId: string) {
